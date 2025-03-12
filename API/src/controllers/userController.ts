@@ -1,12 +1,12 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '../../prisma/postgre/client'
 import { RequestHandler, Request, Response, NextFunction } from "express"
-import { User } from '../types'
+import { UserCreated } from '../types'
 
 const prisma = new PrismaClient()
 
 class UserController {
   createUser: RequestHandler = async (req: Request, res: Response, next) => {
-    const data = req.body as User
+    const data = req.body as UserCreated
     try {
       const user = await prisma.user.create({ data })
       res.status(201).json(user)
