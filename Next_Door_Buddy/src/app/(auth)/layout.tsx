@@ -1,7 +1,7 @@
-export default function Home() {
+export default function AuthLayout({children}: {children: React.ReactNode}) {
   return (
     <div className={`h-screen flex flex-col items-center justify-center`}>
-      <h1>Hello world</h1>
+      {children}
     </div>
   )
 }

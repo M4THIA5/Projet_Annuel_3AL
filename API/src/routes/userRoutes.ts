@@ -3,10 +3,10 @@ import UserController from '../controllers/userController';
 
 const userController = new UserController();
 
-export function setUserRoutes(app: Router) {
-    app.post('/users', userController.createUser);
-    app.get('/users', userController.getAllUsers);
-    app.get('/users/:id', userController.getUser);
-    app.put('/users/:id', userController.updateUser);
-    app.delete('/users/:id', userController.deleteUser);
+export function setUserRoutes(defaultRoute:string, app: Router) {
+    app.post(`${defaultRoute}/`, userController.createUser);
+    app.get(`${defaultRoute}/`, userController.getAllUsers);
+    app.get(`${defaultRoute}/:id`, userController.getUser);
+    app.put(`${defaultRoute}/:id`, userController.updateUser);
+    app.delete(`${defaultRoute}/:id`, userController.deleteUser);
 }
