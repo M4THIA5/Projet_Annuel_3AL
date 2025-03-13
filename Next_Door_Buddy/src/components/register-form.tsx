@@ -9,7 +9,6 @@ import {
     CardHeader,
     CardTitle,
 } from "#/components/ui/card"
-import './ui/spinner.css'
 import {Input} from "#/components/ui/input"
 import {Label} from "#/components/ui/label"
 import Form from "next/form"

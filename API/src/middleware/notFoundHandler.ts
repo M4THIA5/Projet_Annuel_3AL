@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../prisma/postgre/client';
 import { Request, Response, NextFunction } from 'express';
 
 function notFoundHandler(err: any, req: Request, res: Response, next: NextFunction) {

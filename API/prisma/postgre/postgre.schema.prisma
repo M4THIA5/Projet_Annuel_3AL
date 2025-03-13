@@ -9,7 +9,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://user:password@localhost:5432/mydatabase" // FIXME
+  url      = env("DATABASE_URL")
 }
 
 model User {
