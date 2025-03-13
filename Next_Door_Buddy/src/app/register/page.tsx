@@ -19,26 +19,26 @@ function handleSubmit(e: FormEvent) {
     if (password.length < 8) {
         return;
     }
-
-
-    fetch("http://localhost:3001/register", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({email, password, nom, prenom}),
-    }).then((response) => {
-        if (response.ok) {
-            window.location.href = "/home";
-        }
-    });
+    try {
+        fetch("http://localhost:3001/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({email, password, nom, prenom}),
+        }).then((response) => {
+            if (response.ok) {
+                window.location.href = "/home";
+            }
+        });
+    } catch (e) {
+        console.error(e)
+    }
 
 
 }
 
-export default function Login() {
-
-
+export default function Register() {
     return (
         <Form action={"/register"} formMethod={"POST"} onSubmit={event => handleSubmit(event)}>
             <label>

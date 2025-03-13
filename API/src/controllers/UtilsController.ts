@@ -2,6 +2,8 @@ import {PrismaClient} from '../../prisma/postgre/client'
 import {RequestHandler, Request, Response, NextFunction} from "express"
 import {Credentials} from '../types'
 import UserController from "./userController";
+import bcrypt from 'bcrypt';
+
 
 const prisma = new PrismaClient()
 
@@ -16,18 +18,22 @@ class UtilsController {
                 res.status(401).json("Invalid credentials")
                 return;
             }
-            if (user && user.password !== credentials.password) {
-                res.status(401).json("Invalid credentials")
-                return;
-            }
-            res.status(200).json({message: "ok", id: user.id})
+            bcrypt.hash(credentials.password, 10, function (err, passwordToTest) {
+                bcrypt.compare(passwordToTest, user.password, function (err: Error | undefined, result) {
+                    if (!result) {
+                        res.status(401).json("Invalid credentials")
+                        return;
+                    }
+                })
+                res.status(200).json({message: "ok", id: user.id})
+            })
         } catch (error) {
             next(error)
         }
     };
     register: RequestHandler = async (req: Request, res: Response, next) => {
         const userController = new UserController();
-        await userController.createUser(req,res,next);
+        await userController.createUser(req, res, next);
     }
 
 }

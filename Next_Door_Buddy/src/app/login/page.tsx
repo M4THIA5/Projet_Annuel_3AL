@@ -3,7 +3,7 @@
 import Form from "next/form";
 import {FormEvent} from "react";
 
-function handleSubmit(e: FormEvent) {
+async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
@@ -16,7 +16,6 @@ function handleSubmit(e: FormEvent) {
         return;
     }
 
-
     fetch("http://localhost:3001/login", {
         method: "POST",
         headers: {
@@ -28,6 +27,7 @@ function handleSubmit(e: FormEvent) {
             window.location.href = "/home";
         }
     });
+
 
 
 }

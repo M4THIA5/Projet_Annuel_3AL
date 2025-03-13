@@ -3,6 +3,7 @@ export interface UserCreated {
   nom: string;
   email: string;
   prenom:string;
+  password:string
 }
 
 export interface Data {
