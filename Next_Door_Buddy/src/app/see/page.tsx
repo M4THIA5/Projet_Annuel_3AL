@@ -1,7 +1,7 @@
 "use client";
 import {Data} from "../types";
 import {useEffect, useState} from "react";
-import Form from "next/form";
+
 
 function DataGeneratedAsRow(props: { loading: boolean, data: Data[] }) {
 
@@ -54,7 +54,7 @@ export default function See() {
 
         async function fetchDataForMySQL() {
             try {
-                await fetch('http://localhost:3001/mysql/get', {
+                await fetch('http://localhost:3001/postgre/get', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

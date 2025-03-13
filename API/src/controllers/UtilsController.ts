@@ -10,6 +10,10 @@ const prisma = new PrismaClient()
 class UtilsController {
     login: RequestHandler = async (req: Request, res: Response, next) => {
         const credentials = req.body as Credentials
+        if (!credentials.email || !credentials.password) {
+            res.status(400).json({error: 'Informations are missing'})
+            return
+        }
         try {
             const user = await prisma.user.findUnique(
                 {where: {email: credentials.email}, select: {id: true, email: true, password: true}}
@@ -18,13 +22,11 @@ class UtilsController {
                 res.status(401).json("Invalid credentials")
                 return;
             }
-            bcrypt.hash(credentials.password, 10, function (err, passwordToTest) {
-                bcrypt.compare(passwordToTest, user.password, function (err: Error | undefined, result) {
-                    if (!result) {
-                        res.status(401).json("Invalid credentials")
-                        return;
-                    }
-                })
+            bcrypt.compare(credentials.password, user.password, function (err: Error | undefined, result) {
+                if (!result) {
+                    res.status(401).json("Invalid credentials")
+                    return;
+                }
                 res.status(200).json({message: "ok", id: user.id})
             })
         } catch (error) {
@@ -34,8 +36,13 @@ class UtilsController {
     register: RequestHandler = async (req: Request, res: Response, next) => {
         const userController = new UserController();
         await userController.createUser(req, res, next);
+    };
+    home: RequestHandler = (_req: Request, res: Response): void => {
+        res.status(200).json({message: "Hello World !"});
+    };
+    healthCheck: RequestHandler = (_req: Request, res: Response): void => {
+        res.status(200).json({message: "Server is up and running !"});
     }
-
 }
 
 export default UtilsController

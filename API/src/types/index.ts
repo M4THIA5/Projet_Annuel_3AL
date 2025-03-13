@@ -15,3 +15,13 @@ export interface Credentials {
     email:string;
     password:string;
 }
+/** Schema description defined by JSDoc */
+export interface Book {
+    /** Field description defined by JSDoc
+     *
+     * @example 14
+     */
+    id: number;
+    title: string;
+    description?: string;
+}

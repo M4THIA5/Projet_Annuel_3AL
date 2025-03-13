@@ -64,8 +64,8 @@ export default function RootLayout({
                         Create
                     </Link>
                     <Link className=" text-blue-600 visited:text-purple-600" href="/see">
-                    See
-                </Link>
+                        See
+                    </Link>
                     {user ? (
                         <>
                             <Link
@@ -85,9 +85,14 @@ export default function RootLayout({
                             </Link>
                         </>
                     ) : (
-                        <Link className=" text-blue-600 visited:text-purple-600" href="/login">
-                            Connect
-                        </Link>
+                        <>
+                            <Link className=" text-blue-600 visited:text-purple-600" href="/login">
+                                Connect
+                            </Link>
+                            <Link className=" text-blue-600 visited:text-purple-600" href="/register">
+                                Register
+                            </Link>
+                        </>
                     )}
                 </div>
             </div>

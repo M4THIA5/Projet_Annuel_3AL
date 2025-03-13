@@ -8,6 +8,10 @@ const prisma = new PrismaClient()
 class UserController {
     createUser: RequestHandler = async (req: Request, res: Response, next) => {
         let data = req.body as UserCreated
+        if (!data.email || !data.password || !data.nom || !data.prenom) {
+            res.status(400).json({error: 'Informations are missing'})
+            return
+        }
         try {
             bcrypt.hash(data.password, 10, async function (err, hash) {
                 data.password = hash;

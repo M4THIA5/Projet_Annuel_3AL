@@ -3,24 +3,21 @@ import type { Request, Response } from "express";
 import { setUserRoutes } from "./routes/userRoutes";
 import errorHandler from "./middleware/errorHandler";
 import notFoundHandler from "./middleware/notFoundHandler";
-import {setMySQLRoutes} from "./routes/mySQL";
+import {setPostgreRoutes} from "./routes/Postgre";
 import {setMongoRoutes} from "./routes/MongoDB";
 import cors from "cors";
 import useUtilsRoutes from "./routes/utils";
+import UtilsController from "./controllers/UtilsController";
 
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.get("/", (_req: Request, res: Response): void => {
-  res.status(200).json({ message: "Hello World !" });
-})
-
-app.get("/health", (_req: Request, res: Response): void => {
-  res.status(200).json({ message: "Server is up and running !" });
-})
+const utilsController = new UtilsController();
+app.get("/", utilsController.home)
+app.get("/health", utilsController.healthCheck);
 
 setUserRoutes(app);
-setMySQLRoutes(app);
+setPostgreRoutes(app);
 setMongoRoutes(app);
 useUtilsRoutes(app);
 app.use(notFoundHandler);

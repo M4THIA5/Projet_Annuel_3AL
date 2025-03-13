@@ -2,7 +2,7 @@
 
 
 function createDataInMySQL(){
-    fetch('http://localhost:3001/mysql/create', {
+    fetch('http://localhost:3001/postgre/create', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
