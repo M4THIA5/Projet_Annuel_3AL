@@ -1,5 +1,5 @@
 import {PrismaClient} from '../../prisma/postgre/client'
-import {RequestHandler, Request, Response, NextFunction} from "express"
+import {RequestHandler, Request, Response} from "express"
 import {Credentials} from '../types'
 import UserController from "./userController";
 import bcrypt from 'bcrypt';

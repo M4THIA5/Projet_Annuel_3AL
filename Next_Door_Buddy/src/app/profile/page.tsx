@@ -11,7 +11,7 @@ export default async function ProfileIndex() {
         <div>
             <h1>Profile</h1>
 
-            <p> This is a page only accessible if you are connected :)</p>
+            <p> This is a page only accessible if you are connected :) User id : {user.userId}</p>
 
             <Button className={"m-5"}>Edit</Button>
 

@@ -80,7 +80,7 @@ function handleSubmit(e: FormEvent) {
             if (response.ok) {
                 window.location.href = "/login";
             } else {
-                errAlert!.innerText = (await response.text()).replaceAll(/"/g, "");;
+                errAlert!.innerText = (await response.text()).replaceAll(/"/g, "");
             }
             end(errAlert, spinner, buttons, !response.ok);
         });

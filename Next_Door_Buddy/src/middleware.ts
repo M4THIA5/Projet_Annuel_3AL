@@ -17,43 +17,35 @@ async function handleSpecialPaths(path: string, req: NextRequest) {
 
         case '/logout':
             await logout()
-            return NextResponse.redirect(new URL('/login', req.nextUrl))
+            return NextResponse.redirect(new URL('/login', req.nextUrl), )
         default:
             console.log('idk man')
     }
     return undefined
 }
 
-const publicRoutes = ['/login', '/signup', '/']
-const protectedRoutes = ['/dashboard']
-
+const publicRoutes = ['/login', '/signup']
 
 export default async function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname
-    const isProtectedRoute = protectedRoutes.includes(path)
     const isPublicRoute = publicRoutes.includes(path)
-    console.log(path)
+    const cookie = (await cookies()).get('session')?.value
+    const session = await decrypt(cookie)
+    if (isPublicRoute && session?.userId){
+            return NextResponse.redirect(new URL('/', request.nextUrl))
+    }
     const potentialResponse = handleSpecialPaths(path, request)
     if (potentialResponse !== undefined) {
         return potentialResponse
     }
-    const cookie = (await cookies()).get('session')?.value
-    const session = await decrypt(cookie)
-    return null
-
-
+    return NextResponse.next()
 }
 
-function d(request:NextRequest)
-    {
-        if (isProtectedRoute && !session?.userId) {
-            return NextResponse.redirect(new URL('/login', request.nextUrl))
-        }
-        return NextResponse.next()
+function d(request:NextRequest) {
     let cookie = request.cookies.get('nextjs')
     console.log(cookie) // => { name: 'nextjs', value: 'fast', Path: '/' }
     const allCookies = request.cookies.getAll()
-    // console.log(allCookies) // => [{ name: 'nextjs', value: 'fast' }]
+    console.log(allCookies) // => [{ name: 'nextjs', value: 'fast' }]
 
     request.cookies.has('nextjs') // => true
     request.cookies.delete('nextjs')
