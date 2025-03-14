@@ -1,9 +1,8 @@
-"use client";
-
-import React, {useEffect} from "react";
+import React from "react";
 import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import {getPotentialUser} from "#/lib/dal";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -30,16 +29,12 @@ function textColor(color: string) {
     return luminance > 0.5 ? "black" : "white";
 }
 
-export default function RootLayout({
-                                       children,
-                                   }: Readonly<{
+export default async function RootLayout({
+                                             children,
+                                         }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const user = undefined;
-    let classe: string;
-    let classe2: string;
-    let style: object;
-
+    const user = await getPotentialUser();
     return (
         <html lang="en">
         <head>
@@ -70,7 +65,7 @@ export default function RootLayout({
                         <>
                             <Link
                                 className=" text-blue-600 visited:text-purple-600"
-                                href={"/profile/" + user.id + "/results"}
+                                href={"/profile/" + user.userId + "/results"}
                             >
                                 Results
                             </Link>
@@ -89,7 +84,8 @@ export default function RootLayout({
                             <Link className=" text-blue-600 visited:text-purple-600" href="/login">
                                 Connect
                             </Link>
-                            <Link className=" text-blue-600 visited:text-purple-600" href="/register">
+
+                            <Link className="text-blue-600 visited:text-purple-600" href="/register">
                                 Register
                             </Link>
                         </>

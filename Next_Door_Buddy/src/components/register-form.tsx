@@ -78,7 +78,7 @@ function handleSubmit(e: FormEvent) {
             body: JSON.stringify({email, password, nom, prenom}),
         }).then(async (response) => {
             if (response.ok) {
-                window.location.href = "/home";
+                window.location.href = "/login";
             } else {
                 errAlert!.innerText = (await response.text()).replaceAll(/"/g, "");;
             }

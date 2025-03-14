@@ -34,7 +34,27 @@ class UtilsController {
         }
     };
     register: RequestHandler = async (req: Request, res: Response, next) => {
+        try {
+            const email: string = req.body.email
+            if (email === "") {
+                res.status(400).json("Bad request")
+            }
+            const user = await prisma.user.findUnique({
+                where:
+                    {
+                        email: email
+                    }
+            })
+            if (user){
+                res.status(401).json("User with this email already exists")
+                return
+            }
+        } catch (e) {
+            res.status(500).json("An error has occured while trying to parse the email.")
+            return;
+        }
         const userController = new UserController();
+
         await userController.createUser(req, res, next);
     };
     home: RequestHandler = (_req: Request, res: Response): void => {

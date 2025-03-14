@@ -16,6 +16,7 @@ import {FormEvent} from "react";
 import {Alert, AlertDescription, AlertTitle} from "#/components/ui/alert"
 import {AlertCircle} from "lucide-react";
 import Link from "next/link";
+import {createSession} from "#/lib/session";
 
 
 async function handleSubmit(e: FormEvent) {
@@ -49,14 +50,16 @@ async function handleSubmit(e: FormEvent) {
         for (const button of buttons){
             button!.removeAttribute("disabled");
         }
-        if (response.ok) {
-            window.location.href = "/home";
-        } else {
+        if (!response.ok) {
             errAlert!.innerText = (await response.text()).replaceAll(/"/g, "");
             errAlert!.classList.add("block");
             errAlert!.classList.remove("hidden");
         }
-    });
+        return response.json()
+    }).then(async data => {
+        await createSession(data.id)
+        window.location.href = '/'
+    })
 }
 
 function Spinner() {
