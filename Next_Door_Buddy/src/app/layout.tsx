@@ -78,20 +78,6 @@ export default async function RootLayout({
                                 <Link className=" text-blue-600 visited:text-purple-600" href="/login">
                                     Connect
                                 </Link>
-
-                            <Link className="text-blue-600 visited:text-purple-600" href="/register">
-                                Register
-                            </Link>
-                        </>
-                    )}
-                </div>
-            </div>
-        </nav>
-        {children}
-        <footer className="bg-gray-100 py-4">
-            <div className="w-full"><p className="m-0 text-center text-black-600 ">Copyright © Your Website 2023</p>
-            </div>
-        </footer>
                                 <Link className="text-blue-600 visited:text-purple-600" href="/register">
                                     Register
                                 </Link>
