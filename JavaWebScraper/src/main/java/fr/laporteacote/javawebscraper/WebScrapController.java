@@ -1,9 +1,13 @@
 package fr.laporteacote.javawebscraper;
 
 import fr.laporteacote.javawebscraper.utils.Loader;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -15,7 +19,10 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.geometry.Insets;
 
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -101,33 +108,48 @@ public class WebScrapController extends Thread {
         if (keyword.getText().isEmpty()) {
             errors.setText("Au moins une valeur néessaire n'est pas remplie.");
             return;
-        } else {
-            errors.setText("");
         }
-        WebScrapController thread = new WebScrapController();
-        thread.start();
-        while (thread.isAlive()) {
-            //bla bla bla
-            System.out.println("Waiting...");
-        }
-        thread.join();
+        errors.setText("");
+        Stage loading = createLoadingPopup();
 
-        try {
-            Tab tab = new Tab("Request " + count++);
-            Node node = Loader.load("result.fxml");
-            assert node != null;
-            Text textarea = (Text) node.lookup("#text");
-            textarea.setText(scrappedValues);
-            tab.setContent(node);
-            tabPane.getTabs().add(tab);
-        } catch (Exception e) {
-            errors.setText(e.getMessage());
-            showError(e);
-        }
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                run2();  // Ton scrap ici
+                return null;
+            }
+        };
+
+        task.setOnRunning(e -> loading.show());
+        task.setOnSucceeded(e -> {
+            loading.close();
+            try {
+                Tab tab = new Tab("Request " + count++);
+                Node node = Loader.load("result.fxml");
+                assert node != null;
+                Text textarea = (Text) node.lookup("#text");
+                textarea.setText(scrappedValues);
+                tab.setContent(node);
+                tabPane.getTabs().add(tab);
+            } catch (Exception ex) {
+                errors.setText(ex.getMessage());
+                showError(ex);
+            }
+        });
+
+        task.setOnFailed(e -> {
+            loading.close();
+            errors.setText("Erreur : " + task.getException().getMessage());
+            showError(task.getException());
+        });
+
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
 
-    @Override
-    public void run() {
+
+    public void run2() {
         System.setProperty("webdriver.chrome.driver", "src/main/java/fr/laporteacote/javawebscraper/chromedriver.exe");
         // Remplace par ton chemin ou mets dans le PATH
         // https://googlechromelabs.github.io/chrome-for-testing/#stable
@@ -139,14 +161,18 @@ public class WebScrapController extends Thread {
         WebScrapper webScrapper = new WebScrapper();
         try {
             String url = "https://www.google.com/search?q=" + URLEncoder.encode("test", StandardCharsets.UTF_8);
-            scrappedValues = webScrapper.scrap( driver,  url, keyword.getText());
+            scrappedValues = webScrapper.scrap(driver, url, keyword.getText());
         } catch (Exception e) {
-            errors.setText(e.getMessage());
-            showError(e);
+            Platform.runLater(() -> {
+                errors.setText(e.getMessage());
+                showError(e);
+            });
+        } finally {
+            driver.quit();
         }
     }
 
-    private void showError(Exception e) {
+    private void showError(Throwable e) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error alert");
         alert.setHeaderText(e.getMessage());
@@ -226,5 +252,16 @@ public class WebScrapController extends Thread {
         }
     }
 
+    public Stage createLoadingPopup() {
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setResizable(false);
 
+        VBox box = new VBox(new Label("Chargement en cours..."));
+        box.setAlignment(Pos.CENTER);
+        box.setPadding(new Insets(20, 0, 0, 0));
+
+        dialog.setScene(new Scene(box, 200, 100));
+        return dialog;
+    }
 }
