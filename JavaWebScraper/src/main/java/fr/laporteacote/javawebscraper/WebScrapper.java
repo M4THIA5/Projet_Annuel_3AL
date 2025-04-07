@@ -120,7 +120,10 @@ public class WebScrapper {
             }
             formatted = sb.toString();
         }
-        return formatted.substring(0,6000);
+        if (formatted.length() > 6000) {
+            formatted = formatted.substring(0, 6000);
+        }
+        return formatted;
     }
 
     private static HttpURLConnection getHttpURLConnection() throws URISyntaxException, IOException {
@@ -136,17 +139,20 @@ public class WebScrapper {
     }
 
     public String scrap(WebDriver driver, String url, String keyword) throws Exception {
+        System.out.println("Step one : dodging cookie message");
         dodgeGoogleCookieMessage(driver, url);
-
+        System.out.println("Step two : getting search results");
         List<String> urls = getGoogleSearchResults(driver);
 
+        System.out.println("Step three : getting on link and extracting relevant text");
         List<String> data = new ArrayList<>();
         urls.forEach(link -> {
+            System.out.println("Checking "+link);
             driver.get(link);
             data.addAll(extractRelevantText(driver, keyword));
         });
 
-
+        System.out.println("Step four : cleaning data");
         List<String> newdata = new ArrayList<>();
         for (String pr : data) {
             String cleaned = this.cleanHTMLContent(pr);
@@ -154,8 +160,9 @@ public class WebScrapper {
                 newdata.add(cleaned);
             }
         }
+        System.out.println("Step five : summarizing data");
         String finalString = this.summarizeWithGPT4(newdata);
-
+        System.out.println("Step six : extracting response");
         return extractResponse(finalString);
 
     }

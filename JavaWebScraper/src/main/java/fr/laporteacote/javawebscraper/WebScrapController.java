@@ -1,9 +1,6 @@
 package fr.laporteacote.javawebscraper;
 
-import fr.laporteacote.javawebscraper.utils.ListViewCell;
 import fr.laporteacote.javawebscraper.utils.Loader;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -33,8 +30,9 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 
-public class WebScrapController {
+public class WebScrapController extends Thread {
 
+    public static String scrappedValues;
     @FXML
     public TextField keyword;
 
@@ -99,28 +97,22 @@ public class WebScrapController {
         });
     }
 
-    public void click(ActionEvent mouseEvent) throws IOException {
+    public void click(ActionEvent mouseEvent) throws IOException, InterruptedException {
         if (keyword.getText().isEmpty()) {
             errors.setText("Au moins une valeur néessaire n'est pas remplie.");
             return;
         } else {
             errors.setText("");
         }
-            System.setProperty("webdriver.chrome.driver", "src/main/java/fr/laporteacote/javawebscraper/chromedriver.exe");
-            // Remplace par ton chemin ou mets dans le PATH
-            // https://googlechromelabs.github.io/chrome-for-testing/#stable
-            ChromeOptions options = new ChromeOptions();
-            options.addArguments("--headless");  // Mode invisible
-            options.addArguments("--disable-blink-features=AutomationControlled");
-            options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
-            WebDriver driver = new ChromeDriver(options);
-            WebScrapper webScrapper = new WebScrapper();
+        WebScrapController thread = new WebScrapController();
+        thread.start();
+        while (thread.isAlive()) {
+            //bla bla bla
+            System.out.println("Waiting...");
+        }
+        thread.join();
 
         try {
-            String url = "https://www.google.com/search?q=" + URLEncoder.encode("test", StandardCharsets.UTF_8);
-            String scrappedValues = new WebScrapper().scrap( driver,  url, keyword.getText());
-
-
             Tab tab = new Tab("Request " + count++);
             Node node = Loader.load("result.fxml");
             assert node != null;
@@ -134,6 +126,25 @@ public class WebScrapController {
         }
     }
 
+    @Override
+    public void run() {
+        System.setProperty("webdriver.chrome.driver", "src/main/java/fr/laporteacote/javawebscraper/chromedriver.exe");
+        // Remplace par ton chemin ou mets dans le PATH
+        // https://googlechromelabs.github.io/chrome-for-testing/#stable
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");  // Mode invisible
+        options.addArguments("--disable-blink-features=AutomationControlled");
+        options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
+        WebDriver driver = new ChromeDriver(options);
+        WebScrapper webScrapper = new WebScrapper();
+        try {
+            String url = "https://www.google.com/search?q=" + URLEncoder.encode("test", StandardCharsets.UTF_8);
+            scrappedValues = webScrapper.scrap( driver,  url, keyword.getText());
+        } catch (Exception e) {
+            errors.setText(e.getMessage());
+            showError(e);
+        }
+    }
 
     private void showError(Exception e) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
