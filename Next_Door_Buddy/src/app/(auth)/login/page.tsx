@@ -10,9 +10,11 @@ import {
 } from "#/components/ui/card"
 import { Button } from "#/components/ui/button"
 import { Input } from "#/components/ui/input"
-import {loginFormData, loginUser } from "#/lib/api_requests/auth"
+import { loginFormData, loginUser } from "#/lib/api_requests/auth"
 
 import { useState } from "react"
+import { Routes } from "#/Routes"
+import { isTokenValid } from "#/lib/config"
 
 export default function SigninPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -33,8 +35,18 @@ export default function SigninPage() {
       if (!response.ok) {
         throw new Error('Failed to login')
       }
-      // TODO: Gestion de la réponse
-      console.log(response)
+
+      if (response.status !== 200) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Failed to login')
+      }
+
+      const { accessToken } = await response.json()
+      if (!accessToken || !isTokenValid(accessToken.toString())) {
+        throw new Error('Failed to login')
+      }
+
+      window.location.href = Routes.home.toString()
 
     } catch (error) {
       console.error(error)
