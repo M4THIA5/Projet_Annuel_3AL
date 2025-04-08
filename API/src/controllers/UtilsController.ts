@@ -1,11 +1,12 @@
-import {PrismaClient} from '../../prisma/postgre/client'
+import {PrismaClient as PostGre} from '../../prisma/postgre/client'
+import {PrismaClient as Mongo} from '../../prisma/mongodb/client'
 import {RequestHandler, Request, Response} from "express"
 import {Credentials} from '../types'
 import UserController from "./userController";
 import bcrypt from 'bcrypt';
 
 
-const prisma = new PrismaClient()
+const prisma = new PostGre()
 
 class UtilsController {
     login: RequestHandler = async (req: Request, res: Response, next) => {

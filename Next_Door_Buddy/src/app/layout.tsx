@@ -3,6 +3,7 @@ import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import {getPotentialUser} from "#/lib/dal";
+import {SocketProvider} from "#/components/SocketProvider";
 import {ThemeProvider} from "next-themes";
 import ThemeChooser from "#/components/ThemeChooser";
 
@@ -24,7 +25,7 @@ export default async function RootLayout({
 }>) {
     const user = await getPotentialUser();
     return (
-        <html lang="en">
+        <html lang="en" suppressHydrationWarning>
         <head>
             <meta charSet="utf-8"/>
             <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -86,7 +87,9 @@ export default async function RootLayout({
                     </div>
                 </div>
             </nav>
+            <SocketProvider>
                 {children}
+            </SocketProvider>
             <ThemeChooser/>
             <footer className="bg-gray-100 py-4">
                 <div className="w-full"><p className="m-0 text-center text-black-600 ">Copyright © Your Website 2023</p>

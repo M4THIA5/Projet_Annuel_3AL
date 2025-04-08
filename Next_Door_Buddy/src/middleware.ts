@@ -26,7 +26,7 @@ async function handleSpecialPaths(path: string, req: NextRequest) {
 
 const publicRoutes = ['/login', '/signup']
 
-export default async function middleware(request: NextRequest) {
+export default async function middleware(request: NextRequest, res:NextResponse) {
     const path = request.nextUrl.pathname
     const isPublicRoute = publicRoutes.includes(path)
     const cookie = (await cookies()).get('session')?.value
@@ -88,7 +88,7 @@ export const config = {
          */
         {
             source:
-                '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)',
+                '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|socket.io).*)',
         },
     ],
 }
