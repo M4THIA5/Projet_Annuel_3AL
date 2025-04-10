@@ -2,3 +2,7 @@
 node_modules/
 dist/
 # dependencies
+prisma/mongodb/client
+prisma/postgre/client
+prisma/sqlite/client
+.idea/*
