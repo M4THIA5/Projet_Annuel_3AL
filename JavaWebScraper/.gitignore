@@ -36,5 +36,5 @@ build/
 ### Mac OS ###
 .DS_Store
 
-src/main/java/fr/laporteacote/javawebscraper/chromedriver.exe
-
+app/src/main/resources/chromedriver.exe
+build-jpackage
