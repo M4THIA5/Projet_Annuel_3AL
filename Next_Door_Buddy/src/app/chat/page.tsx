@@ -8,39 +8,12 @@ const Chat = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [users, setUsers] = useState([]);
     const socket = useSocket();
+    // Socket connection and event listeners
     useEffect(() => {
         if (!socket) {
             console.log("Socket not ready yet");
             return;
         }
-    }, [socket]);
-    // Handle the message sending
-    const onMessage = (content) => {
-        if (selectedUser) {
-            if (!socket) {
-                console.log("Socket not ready yet");
-                return;
-            }
-            socket.emit("private message", {
-                content,
-                to: selectedUser.userID,
-            });
-            setSelectedUser((prevUser) => ({
-                ...prevUser,
-                messages: [
-                    ...prevUser.messages,
-                    { content, fromSelf: true }
-                ],
-            }));
-        }
-    };
-    // Handle user selection
-    const onSelectUser = (user:UserInterface) => {
-        setSelectedUser(user);
-        user.hasNewMessages = false;
-    };
-    // Socket connection and event listeners
-    useEffect(() => {
         const initReactiveProperties = (user:UserInterface) => {
             user.connected = true;
             user.messages = [];
@@ -113,7 +86,35 @@ const Chat = () => {
             socket.off("user disconnected");
             socket.off("private message");
         };
-    }, [selectedUser, users]);
+    }, [socket, selectedUser, users]);
+
+    // Handle the message sending
+    const onMessage = (content) => {
+        if (selectedUser) {
+            if (!socket) {
+                console.log("Socket not ready yet");
+                return;
+            }
+            socket.emit("private message", {
+                content,
+                to: selectedUser.userID,
+            });
+            setSelectedUser((prevUser) => ({
+                ...prevUser,
+                messages: [
+                    ...prevUser.messages,
+                    { content, fromSelf: true }
+                ],
+            }));
+        }
+    };
+    // Handle user selection
+    const onSelectUser = (user:UserInterface) => {
+        setSelectedUser(user);
+        user.hasNewMessages = false;
+    };
+
+
     return (
         <div className={"h-100"}>
             <div className="left-panel">

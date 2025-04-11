@@ -11,10 +11,12 @@ const socketHandler = (socket: Socket, io: Server): void => {
     socket.on('drawEnd', (data) => {
         socket.broadcast.emit('drawEnd', data);
     })
+
     const users = [];
-    for (const id of io.of("/").sockets) {
+    for (const [id,socket ]of io.of("/").sockets) {
         users.push({
             userID: id,
+            username: socket.id,
         });
     }
     socket.emit("users", users);
