@@ -31,6 +31,6 @@ echo "Lancement de jpackage..."
   --win-menu \
   --win-shortcut \
   --win-per-user-install \
-  --app-version 0.1.2 || { echo "Erreur jpackage"; exit 1; }
+  --app-version 0.1.5 || { echo "Erreur jpackage"; exit 1; }
 
 echo "Build terminé !"
