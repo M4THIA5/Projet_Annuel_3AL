@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 public class Lanceur {
     //Variables contenant les noms des fichiers à charger
     private static final String pathCurrent = File.separator + "app-"+Updater.getUserVersion()+".jar";
-    private static final String pathNew = File.separator + "app-"+ Updater.resolveLastVersion()+".jar";
+    private static final String pathNew = File.separator + "app-"+Updater.resolveLastVersion()+".jar";
     private static final String pathOld = File.separator + "old.jar";
 
     //Variable contenant le nom du répértoire courant
@@ -28,26 +28,17 @@ public class Lanceur {
             updater.update();
         } catch (Exception e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Erreur lors de la mise à jour : " + e.getMessage());
         }
-        Path currentPath = Paths.get(Lanceur.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
-        Path jarPath = currentPath.resolve(Updater.getUserVersion());
         if (!currentFolder.endsWith("app")) {
             currentFolder = currentFolder + File.separator + "app";
         }
         File current = new File(currentFolder + pathCurrent);
         File newVersion = new File(currentFolder + pathNew);
         File old = new File(currentFolder + pathOld);
-        String variables = """
-                "currentFolder = %s
-                pathCurrent = %s
-                pathNew = %s
-                pathOld = %s
-                currentPath = %s
-                jarPath = %s
-                current = %s
-                new =%s
-                old =%s""".formatted(currentFolder, pathCurrent, pathNew, pathOld, currentPath, jarPath, current, newVersion, old);
-        JOptionPane.showMessageDialog(null, variables);
+
+        System.out.println(newVersion);
+
         Desktop desktop = Desktop.getDesktop();
         //Si une nouvelle version a été téléchargée
         if (newVersion.exists()) {
@@ -62,10 +53,7 @@ public class Lanceur {
 
             try {
                 //On lance le nouveau fichier .jar
-                new ProcessBuilder("java", "-jar", pathCurrent).start();
-                desktop.open(newVersion);
-
-
+                desktop.open(current);
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(null, e.getMessage());
                 e.printStackTrace();

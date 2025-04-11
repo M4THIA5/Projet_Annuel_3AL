@@ -15,7 +15,7 @@ import java.util.Collections;
  */
 public class Updater {
 
-    private static final String url = "http://devapi.freeboxos.fr/versions.json";
+    private static final String url = "http://devapi.freeboxos.fr/java/versions.json";
 
     //Variable contenant le nom du répértoire courant
     private static String currentFolder = System.getProperty("user.dir");
@@ -34,7 +34,7 @@ public class Updater {
         ArrayList<String> versions = getVersions();
         //Version actuelle
         String version = getUserVersion();
-        System.out.println("version ="+ version);
+        System.out.println("version =" + version);
         //Si la version est nulle
         if (versions.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Impossible de se connecter au service, vérifiez votre " +
@@ -106,7 +106,7 @@ public class Updater {
             if (!currentFolder.endsWith("app")) {
                 currentFolder = currentFolder + File.separator + "app";
             }
-            File versionFile = new File(currentFolder+File.separator+".version");
+            File versionFile = new File(currentFolder + File.separator + ".version");
             if (versionFile.exists()) {
                 BufferedReader reader = new BufferedReader(new FileReader(versionFile));
                 String version = reader.readLine();
@@ -129,7 +129,7 @@ public class Updater {
      * @return les versions disponibles
      */
     private static ArrayList<String> getVersions() {
-        ArrayList<String> versions = new ArrayList<String>();
+        ArrayList<String> versions = new ArrayList<>();
 
         try {
             JsonNode rootNode = getJsonNode();
@@ -147,6 +147,7 @@ public class Updater {
             Collections.sort(versions);
 
         } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
             e.printStackTrace();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
@@ -184,7 +185,7 @@ public class Updater {
      * @param destination, chemin du fichier en local
      */
     private void downloadFile(String filePath, String destination) {
-        URLConnection connection = null;
+        URLConnection connection;
         InputStream is = null;
         FileOutputStream destinationFile = null;
 
@@ -243,10 +244,12 @@ public class Updater {
             throw new RuntimeException(e);
         } finally {
             try {
-                assert is != null;
-                is.close();
-                assert destinationFile != null;
-                destinationFile.close();
+                if (is != null) {
+                    is.close();
+                }
+                if (destinationFile != null) {
+                    destinationFile.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
