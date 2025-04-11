@@ -9,14 +9,13 @@ mvn clean install || { echo "Erreur Maven"; exit 1; }
 
 echo "Fusion des targets..."
 
-# Copier le .jar de ton app
 cp app/target/app-*.jar build-jpackage/
 
-# Copier le .jar de ton launcher
 cp launcher/target/launcher-*.jar build-jpackage/
 
-# Copier chromedriver ou autre ressource externe
-cp app/src/main/resources/chromedriver.exe build-jpackage/
+cp app/target/classes/chromedriver.exe build-jpackage/
+cp app/target/classes/.version build-jpackage
+
 
 echo "Lancement de jpackage..."
 
@@ -31,6 +30,6 @@ echo "Lancement de jpackage..."
   --win-menu \
   --win-shortcut \
   --win-per-user-install \
-  --app-version 0.1.5 || { echo "Erreur jpackage"; exit 1; }
+  --app-version 0.2.2 || { echo "Erreur jpackage"; exit 1; }
 
 echo "Build terminé !"

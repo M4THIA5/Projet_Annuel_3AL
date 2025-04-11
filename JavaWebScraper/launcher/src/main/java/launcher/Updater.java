@@ -15,15 +15,15 @@ import java.util.Collections;
  */
 public class Updater {
 
-
-    private String lanceurPath;
-
-    private final String url = "http://devapi.freeboxos.fr/versions.json";
-
-
+    private static final String url = "http://devapi.freeboxos.fr/versions.json";
 
     //Variable contenant le nom du répértoire courant
-    private final String currentFolder = System.getProperty("user.dir");
+    private static String currentFolder = System.getProperty("user.dir");
+
+    public static String resolveLastVersion() {
+        ArrayList<String> versions = getVersions();
+        return versions.getLast();
+    }
 
     /**
      * Cette méthode permet de mettre à jour votre programme, elle va chercher
@@ -33,8 +33,6 @@ public class Updater {
     public void update() throws IOException, URISyntaxException {
         ArrayList<String> versions = getVersions();
         //Version actuelle
-
-        //TODO get bonne version
         String version = getUserVersion();
         System.out.println("version ="+ version);
         //Si la version est nulle
@@ -43,7 +41,7 @@ public class Updater {
                     "connection internet");
         } else {
             //Si la dernière version n'est pas la même que l'actuelle
-            if (!versions.get(versions.size() - 1).equals(version)) {
+            if (!versions.getLast().equals(version)) {
                 //                String versionChoisie = (String) JOptionPane.showInputDialog(null, "Choississez la version à installer", "Versions disponibles", JOptionPane.QUESTION_MESSAGE,
                 //                        null, versions.toArray(), versions.get(versions.size() - 1));
                 //                //S'il veut la télécharger
@@ -56,7 +54,7 @@ public class Updater {
     }
 
     private void installLastVersion(ArrayList<String> versions) throws IOException, URISyntaxException {
-        installChosenVersion(versions.get(versions.size() - 1));
+        installChosenVersion(versions.getLast());
     }
 
     private void installChosenVersion(String versionChoisie) throws IOException, URISyntaxException {
@@ -74,7 +72,9 @@ public class Updater {
                 // Si c'est la bonne version, on télécharge tous ses fichiers
                 if (nom.equals(versionChoisie)) {
                     JsonNode filesNode = versionNode.get("files");
-
+                    if (!currentFolder.endsWith("app")) {
+                        currentFolder = currentFolder + File.separator + "app";
+                    }
                     // On liste tous les fichiers d'une version
                     for (JsonNode fileNode : filesNode) {
                         // On télécharge le fichier
@@ -101,9 +101,12 @@ public class Updater {
         }
     }
 
-    private String getUserVersion() {
+    public static String getUserVersion() {
         try {
-            File versionFile = new File("version.txt");
+            if (!currentFolder.endsWith("app")) {
+                currentFolder = currentFolder + File.separator + "app";
+            }
+            File versionFile = new File(currentFolder+File.separator+".version");
             if (versionFile.exists()) {
                 BufferedReader reader = new BufferedReader(new FileReader(versionFile));
                 String version = reader.readLine();
@@ -125,7 +128,7 @@ public class Updater {
      *
      * @return les versions disponibles
      */
-    private ArrayList<String> getVersions() {
+    private static ArrayList<String> getVersions() {
         ArrayList<String> versions = new ArrayList<String>();
 
         try {
@@ -152,7 +155,7 @@ public class Updater {
         return versions;
     }
 
-    private JsonNode getJsonNode() throws URISyntaxException, IOException {
+    private static JsonNode getJsonNode() throws URISyntaxException, IOException {
         URL xmlUrl = new URI(url).toURL();
         //On ouvre une connexion sur la page
         URLConnection urlConnection = xmlUrl.openConnection();

@@ -14,9 +14,9 @@ import java.nio.file.Paths;
  */
 public class Lanceur {
     //Variables contenant les noms des fichiers à charger
-    private static final String pathCurrent = File.separator + "app-0.0.15.jar";
-    private static final String pathNew = File.separator + "New.jar";
-    private static final String pathOld = File.separator + "Old.jar";
+    private static final String pathCurrent = File.separator + "app-"+Updater.getUserVersion()+".jar";
+    private static final String pathNew = File.separator + "app-"+ Updater.resolveLastVersion()+".jar";
+    private static final String pathOld = File.separator + "old.jar";
 
     //Variable contenant le nom du répértoire courant
     private static String currentFolder = System.getProperty("user.dir");
@@ -30,7 +30,7 @@ public class Lanceur {
             e.printStackTrace();
         }
         Path currentPath = Paths.get(Lanceur.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
-        Path jarPath = currentPath.resolve("app-0.0.15.jar");
+        Path jarPath = currentPath.resolve(Updater.getUserVersion());
         if (!currentFolder.endsWith("app")) {
             currentFolder = currentFolder + File.separator + "app";
         }

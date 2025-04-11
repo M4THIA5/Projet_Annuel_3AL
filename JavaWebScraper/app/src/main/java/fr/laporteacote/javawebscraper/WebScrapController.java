@@ -24,7 +24,6 @@ import javafx.geometry.Insets;
 
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -37,6 +36,8 @@ import java.io.*;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
+import static launcher.Updater.getUserVersion;
 
 
 public class WebScrapController extends Thread {
@@ -264,7 +265,7 @@ public class WebScrapController extends Thread {
         alert.setTitle("About");
         // Header Text: null
         alert.setHeaderText(null);
-        alert.setContentText(" JAVA Application created by the team of Laporte à Côté\n Version 0.1");
+        alert.setContentText(" JAVA Application created by the team of Laporte à Côté\n Version "+ getUserVersion());
 
         alert.showAndWait();
     }
