@@ -1,6 +1,7 @@
 package fr.laporteacote.javawebscraper;
 
 import fr.laporteacote.javawebscraper.utils.Loader;
+import fr.laporteacote.javawebscraper.utils.RingProgressIndicator;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -115,21 +116,43 @@ public class WebScrapController extends Thread {
             return;
         }
         errors.setText("");
-        Stage loading = createLoadingPopup();
 
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws IOException {
-                run2();
+                setupChromeDriver();
+                // Remplace par ton chemin ou mets dans le PATH
+                // https://googlechromelabs.github.io/chrome-for-testing/#stable
+                ChromeOptions options = new ChromeOptions();
+                options.addArguments("--headless");  // Mode invisible
+                options.addArguments("--disable-blink-features=AutomationControlled");
+                options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
+                WebDriver driver = new ChromeDriver(options);
+                WebScrapper webScrapper = new WebScrapper();
+                try {
+                    updateProgress(0, 100);
+                    String url = "https://www.google.com/search?q=" + URLEncoder.encode(keyword.getText(), StandardCharsets.UTF_8);
+                    scrappedValues = webScrapper.scrap(driver, url, keyword.getText(), this::updateProgress);
+                    sleep(2000);
+                    updateProgress(100, 100);
+                } catch (Exception e) {
+                    Platform.runLater(() -> {
+                        errors.setText(e.getMessage());
+                        showError(e);
+                    });
+                } finally {
+                    driver.quit();
+                }
                 return null;
             }
         };
+        Stage loading = createLoadingPopup(task);
 
         task.setOnRunning(e -> loading.show());
         task.setOnSucceeded(e -> {
             loading.close();
             try {
-                Tab tab = new Tab("Request " + count++);
+                Tab tab = new Tab("Request " + count++ +" : " + keyword.getText());
                 Node node = Loader.load("result.fxml");
                 assert node != null;
                 textarea = (TextArea) node.lookup("#text");
@@ -153,29 +176,6 @@ public class WebScrapController extends Thread {
         thread.start();
     }
 
-
-    public void run2() throws IOException {
-        setupChromeDriver();
-        // Remplace par ton chemin ou mets dans le PATH
-        // https://googlechromelabs.github.io/chrome-for-testing/#stable
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless");  // Mode invisible
-        options.addArguments("--disable-blink-features=AutomationControlled");
-        options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
-        WebDriver driver = new ChromeDriver(options);
-        WebScrapper webScrapper = new WebScrapper();
-        try {
-            String url = "https://www.google.com/search?q=" + URLEncoder.encode(keyword.getText(), StandardCharsets.UTF_8);
-            scrappedValues = webScrapper.scrap(driver, url, keyword.getText());
-        } catch (Exception e) {
-            Platform.runLater(() -> {
-                errors.setText(e.getMessage());
-                showError(e);
-            });
-        } finally {
-            driver.quit();
-        }
-    }
 
     private void setupChromeDriver() throws IOException {
         // Récupérer l'URL du chromedriver dans le .jar
@@ -298,20 +298,28 @@ public class WebScrapController extends Thread {
         }
     }
 
-    public Stage createLoadingPopup() {
+    public Stage createLoadingPopup(Task<?> task) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setResizable(false);
         dialog.setOnCloseRequest(event -> {
         });
+        RingProgressIndicator ringProgressIndicator = new RingProgressIndicator();
+        ringProgressIndicator.setRingWidth(200);
+        ringProgressIndicator.makeIndeterminate();
 
-        VBox box = new VBox(new Label("Chargement en cours..."));
+        task.progressProperty().addListener((obs, oldProgress, newProgress) -> {
+             ringProgressIndicator.setProgress((int) (newProgress.doubleValue()*100));
+        });
+
+
+        VBox box = new VBox(ringProgressIndicator, new Label("Chargement en cours..."));
         box.setAlignment(Pos.CENTER);
         box.setPadding(new Insets(20, 0, 0, 0));
         dialog.setOnCloseRequest(Event::consume);
 
 
-        dialog.setScene(new Scene(box, 200, 100));
+        dialog.setScene(new Scene(box, 400, 300));
         return dialog;
     }
 }

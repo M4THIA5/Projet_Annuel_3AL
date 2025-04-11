@@ -1,5 +1,6 @@
 package fr.laporteacote.javawebscraper;
 
+import javafx.concurrent.Task;
 import org.openqa.selenium.*;
 
 import java.io.BufferedReader;
@@ -13,6 +14,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -167,6 +169,47 @@ public class WebScrapper {
         String finalString = this.summarizeWithGPT4(newdata);
         System.out.println("Step six : extracting response");
         return extractResponse(finalString);
+
+    }
+    public String scrap(WebDriver driver, String url, String keyword, BiConsumer<Integer, Integer> progressCallback) throws Exception {
+        int act = 16;
+        System.out.println("Step one : dodging cookie message");
+        progressCallback.accept(act, 100);
+        dodgeGoogleCookieMessage(driver, url);
+        System.out.println("Step two : getting search results");
+        List<String> urls = getGoogleSearchResults(driver);
+        progressCallback.accept( 2*act, 100);
+        System.out.println("Step three : getting on link and extracting relevant text");
+        List<String> data = new ArrayList<>();
+        int finalCount = 16/urls.size();
+
+        for (int i =0; i< urls.size(); i++) {
+            System.out.println("Checking "+urls.get(i));
+            driver.get(urls.get(i));
+            data.addAll(extractRelevantText(driver, keyword));
+            System.out.println((act*2)+(finalCount*(i+1)));
+            progressCallback.accept((act*2)+(finalCount*(i+1)), 100);
+        }
+
+
+        progressCallback.accept( 3*act, 100);
+        System.out.println("Step four : cleaning data");
+        List<String> newdata = new ArrayList<>();
+        for (String pr : data) {
+            String cleaned = this.cleanHTMLContent(pr);
+            if (!cleaned.isEmpty()) {
+                newdata.add(cleaned);
+            }
+        }
+        progressCallback.accept(4*act, 100);
+        System.out.println("Step five : summarizing data");
+        String finalString = this.summarizeWithGPT4(newdata);
+        progressCallback.accept(5*act, 100);
+        System.out.println("Step six : extracting response");
+        String str = extractResponse(finalString);
+        progressCallback.accept(6*act, 100);
+        return str;
+
 
     }
 
