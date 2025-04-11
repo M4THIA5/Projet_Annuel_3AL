@@ -1,0 +1,54 @@
+name: Create new release
+
+on:
+  push:
+    branches: [ "feat/java" ]
+  pull_request:
+    branches: [ "feat/java" ]
+
+
+jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v2
+        - name: Set up JDK 24
+          uses: actions/setup-java@v2
+          with:
+            java-version: '24'
+            distribution: 'temurin'
+        - name: Build with maven
+          run: mvn clean install
+        - name: Create release # créer l'installer ???
+          id: create_release
+          uses: softprops/action-gh-release@v1
+          with:
+            tag_name: v1.0.0
+            release_name: Release v1.0.0
+            body: |
+                This is the release notes for version 1.0.0.
+                - Feature 1
+                - Feature 2
+                - Bug fix 1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              - name: Deploy project with SSH
+                uses: easingthemes/ssh-deploy@v2.1.4
+                env:
+                  SSH_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+                  REMOTE_HOST: ${{ secrets.HOST }}
+                  REMOTE_USER: ${{ secrets.USERNAME }}
+                  SOURCE: "./"
+                  TARGET: "~/java"
+              - name: Deploy using ssh
+                uses: appleboy/ssh-action@master
+                with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  key: ${{ secrets.PRIVATE_KEY }}
+                  port: 22
+                  script: |
+                    cd java
+                    create-release.sh <tag>
+## release.sh doit modifier versions.json, build le projet et mettre jar à disposition
