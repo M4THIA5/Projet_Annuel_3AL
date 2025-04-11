@@ -15,7 +15,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
 
     useEffect(() => {
-        const port = process.env.NEXT_PUBLIC_SOCKET_PORT || 3005;
+        const port = process.env.NEXT_PUBLIC_SOCKET_PORT || 9845;
         // const socketInstance = io("http://localhost:3005");  for different server websocket url
         const socketInstance = io("http://localhost:"+port, {
             transports: ['websocket'],

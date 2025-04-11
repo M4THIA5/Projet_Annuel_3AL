@@ -12,7 +12,17 @@ const socketHandler = (socket: Socket, io: Server): void => {
         socket.broadcast.emit('drawEnd', data);
     })
 
-    const users = [];
+    socket.on('message', (data) => {
+        io.emit('messageResponse', data);
+    });
+    const users: any[] = [];
+    socket.on('newUser', (data) => {
+        //Adds the new user to the list of users
+        users.push(data);
+        // console.log(users);
+        //Sends the list of users to the client
+        socket.broadcast.emit('newUserResponse', users);
+    });
     for (const [id,socket ]of io.of("/").sockets) {
         users.push({
             userID: id,
@@ -38,6 +48,11 @@ const socketHandler = (socket: Socket, io: Server): void => {
     // notify users upon disconnection
     socket.on("disconnect", () => {
         socket.broadcast.emit("user disconnected", socket.id);
+
+        users = users.filter((user) => user.socketID !== socket.id);
+        // console.log(users);
+        //Sends the list of users to the client
+        socket.emit('newUserResponse', users);
     });
 
 
