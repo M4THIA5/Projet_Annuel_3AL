@@ -34,7 +34,7 @@ export const AuthLinks = ({user}: { user: any }) => {
         if (!userData) return '';
         const initials = userData.user.nom
             .split(' ')
-            .map(word => word.charAt(0).toUpperCase())
+            .map((word: string) => word.charAt(0).toUpperCase())
             .join('');
 
         return initials.slice(0, 2);
@@ -52,9 +52,9 @@ export const AuthLinks = ({user}: { user: any }) => {
                             </NavigationMenuLink>
                         </Link>
                         &nbsp;
-                        <Link href="/" legacyBehavior passHref>
+                        <Link href="/neighborhood" legacyBehavior passHref>
                             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                                Mes quartier
+                                Mes quartiers
                             </NavigationMenuLink>
                         </Link>
                         &nbsp;

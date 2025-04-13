@@ -48,6 +48,28 @@ class api {
         }
     }
 
+    // Méthode pour effectuer une requête PUT
+    async put(endpoint: string, data: any) {
+        try {
+            const response = await fetch(`${this.baseUrl}${endpoint}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Erreur lors de la requête PUT:', error);
+            throw error;
+        }
+    }
+
     // Méthode pour effectuer une requête DELETE
     async delete(endpoint: string) {
         try {
