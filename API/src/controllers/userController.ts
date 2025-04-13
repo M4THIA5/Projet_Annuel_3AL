@@ -34,7 +34,16 @@ class UserController {
 
     getUser: RequestHandler = async (req: Request, res: Response, next) => {
         try {
-            const user = await prisma.user.findUnique({where: {id: Number(req.params.id)}})
+            const user = await prisma.user.findUnique({
+                where: {id: Number(req.params.id)},
+                select: {
+                    id: true,
+                    email: true,
+                    nom: true,
+                    prenom: true,
+                    color: true,
+                }
+            })
             if (!user) {
                 res.status(404).json({error: 'User not found'})
             }
@@ -43,6 +52,7 @@ class UserController {
             next(error)
         }
     }
+
 
     updateUser: RequestHandler = async (req: Request, res: Response, next) => {
         try {

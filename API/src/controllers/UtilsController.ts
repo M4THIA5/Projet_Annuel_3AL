@@ -28,7 +28,7 @@ class UtilsController {
                     res.status(401).json("Invalid credentials")
                     return;
                 }
-                res.status(200).json({message: "ok", id: user.id})
+                res.status(200).json({message: "ok", id: user.id, })
             })
         } catch (error) {
             next(error)

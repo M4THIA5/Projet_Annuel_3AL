@@ -3,3 +3,4 @@ export const Routes = {
     toString: () => "/" as const,
   },
 }
+

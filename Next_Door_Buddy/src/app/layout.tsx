@@ -6,7 +6,9 @@ import {getPotentialUser} from "#/lib/dal";
 import {SocketProvider} from "#/components/SocketProvider";
 import {ThemeProvider} from "next-themes";
 import ThemeChooser from "#/components/ThemeChooser";
-
+import Image from 'next/image';
+import logo from "../assets/logo.png";
+import {Navbar} from "#/components/NavBar/NavBar";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -41,52 +43,7 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
         >
-            <nav className={"bg-gray-100"}>
-                <div className="py-4 flex">
-                    <Link className="text-3xl ml-5" href="/">
-                        La Porte à côté
-                    </Link>
-                    <div className="flex justify-around grow items-center" id="navbarSupportedContent">
-                        <Link className=" text-blue-600 visited:text-purple-600" href="/">
-                            Home
-                        </Link>
-                        <Link className=" text-blue-600 visited:text-purple-600" href="/create">
-                            Create
-                        </Link>
-                        <Link className=" text-blue-600 visited:text-purple-600" href="/see">
-                            See
-                        </Link>
-                        {user ? (
-                            <>
-                                <Link
-                                    className=" text-blue-600 visited:text-purple-600"
-                                    href={"/profile/" + user.userId + "/results"}
-                                >
-                                    Results
-                                </Link>
-                                <Link href={"/profile"} className={" text-blue-600 visited:text-purple-600"}>
-                                    Profile
-                                </Link>
-                                <Link href={"/games"} className={" text-blue-600 visited:text-purple-600"}>
-                                    Games
-                                </Link>
-                                <Link href={"/logout"} className={" text-blue-600 visited:text-purple-600"}>
-                                    Logout
-                                </Link>
-                            </>
-                        ) : (
-                            <>
-                                <Link className=" text-blue-600 visited:text-purple-600" href="/login">
-                                    Connect
-                                </Link>
-                                <Link className="text-blue-600 visited:text-purple-600" href="/register">
-                                    Register
-                                </Link>
-                            </>
-                        )}
-                    </div>
-                </div>
-            </nav>
+            <Navbar user={user}></Navbar>
             <SocketProvider>
                 {children}
             </SocketProvider>
