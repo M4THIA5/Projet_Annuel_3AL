@@ -1,5 +1,6 @@
 
 import { PrismaClient as PostGrePrismaClient } from '@prisma/client';
+// @ts-ignore
 import { PrismaClient as SqlitePrismaClient } from '../../prisma/sqlite/client/sqlite';
 
 declare global {

@@ -68,12 +68,24 @@ class UserController {
 
     deleteUser: RequestHandler = async (req: Request, res: Response, next) => {
         try {
-            await prisma.user.delete({where: {id: Number(req.params.id)}})
-            res.status(204).send()
+            const userId = Number(req.params.id);
+
+            // Supprimer toutes les relations UserNeighborhood associées à cet utilisateur
+            await prisma.userNeighborhood.deleteMany({
+                where: { userId },
+            });
+
+            // Supprimer l'utilisateur
+            await prisma.user.delete({
+                where: { id: userId },
+            });
+
+            res.status(204).send();
         } catch (error) {
-            next(error)
+            next(error);
         }
-    }
+    };
+
 }
 
 export default UserController
