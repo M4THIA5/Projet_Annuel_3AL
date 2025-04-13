@@ -113,7 +113,7 @@ public class WebScrapper {
     private String stringify(List<String> text) {
         String formatted;
         if (text.size() == 1) {
-            formatted = text.get(0);
+            formatted = text.getFirst();
         } else {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < text.size(); i++) {
@@ -187,11 +187,8 @@ public class WebScrapper {
             System.out.println("Checking "+urls.get(i));
             driver.get(urls.get(i));
             data.addAll(extractRelevantText(driver, keyword));
-            System.out.println((act*2)+(finalCount*(i+1)));
             progressCallback.accept((act*2)+(finalCount*(i+1)), 100);
         }
-
-
         progressCallback.accept( 3*act, 100);
         System.out.println("Step four : cleaning data");
         List<String> newdata = new ArrayList<>();

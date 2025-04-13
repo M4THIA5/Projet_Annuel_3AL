@@ -121,6 +121,7 @@ public class WebScrapController extends Thread {
             @Override
             protected Void call() throws IOException {
                 setupChromeDriver();
+                updateProgress(0, 100);
                 // Remplace par ton chemin ou mets dans le PATH
                 // https://googlechromelabs.github.io/chrome-for-testing/#stable
                 ChromeOptions options = new ChromeOptions();
@@ -130,7 +131,6 @@ public class WebScrapController extends Thread {
                 WebDriver driver = new ChromeDriver(options);
                 WebScrapper webScrapper = new WebScrapper();
                 try {
-                    updateProgress(0, 100);
                     String url = "https://www.google.com/search?q=" + URLEncoder.encode(keyword.getText(), StandardCharsets.UTF_8);
                     scrappedValues = webScrapper.scrap(driver, url, keyword.getText(), this::updateProgress);
                     sleep(2000);
@@ -152,11 +152,12 @@ public class WebScrapController extends Thread {
         task.setOnSucceeded(e -> {
             loading.close();
             try {
-                Tab tab = new Tab("Request " + count++ +" : " + keyword.getText());
+                Tab tab = new Tab("Request " + ++count +" : " + keyword.getText());
                 Node node = Loader.load("result.fxml");
                 assert node != null;
                 textarea = (TextArea) node.lookup("#text");
                 textarea.setText(scrappedValues);
+                textarea.setEditable(false);
                 tab.setContent(node);
                 tabPane.getTabs().add(tab);
             } catch (Exception ex) {
