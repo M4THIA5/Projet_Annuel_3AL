@@ -156,8 +156,46 @@ def t_ccode_comment(t):
 
 lex.lex()
 
+def p_start(p):
+    '''start : statement_list'''
+    p[0] = p[1]
 
+def p_statements(p):
+    '''statement_list : statement_list statement
+                      | statement'''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = p[1] + [p[2]]
 
+def p_statement(p):
+    '''statement : insert_statement
+    | select_statement'''
+    p[0] = p[1]
+def p_insert_statement(p):
+    '''insert_statement : PRINT LPAREN expression RPAREN SEMI'''
+    p[0] = p[1:]
+
+def p_select_statement(p):
+    '''select_statement : FUNCTION LPAREN expression RPAREN SEMI'''
+    p[0] = p[1:]
+def p_expression(p):
+    '''expression : expression PLUS expression
+                  | expression MINUS expression
+                  | expression TIMES expression
+                  | expression DIVIDE expression
+                  | expression AND expression
+                  | expression OR expression
+                  | LPAREN expression RPAREN
+                  | NUMBER
+                  | NAME
+                  | TEXT'''
+    if len(p) == 4:
+        p[0] = p[1] + p[2] + p[3]
+    elif len(p) == 3:
+        p[0] = p[2]
+    else:
+        p[0] = p[1]
 def p_error(p):
     print(p)
     print("Syntax error in input!")
