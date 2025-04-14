@@ -1,11 +1,13 @@
 import React, {useState} from 'react';
 
+type Props = {
+    socket: any;
+    user: string;
+};
 
-function ChatFooter(
-    socket: any
-){
+function ChatFooter({ socket, user }: Props) {
+
     const [message, setMessage] = useState('');
-
     const handleSendMessage = (e: { preventDefault: () => void; }) => {
         e.preventDefault();
         if (message.trim()) {
@@ -13,11 +15,10 @@ function ChatFooter(
                 console.log("socket is not ready")
                 return
             }
-            console.log(socket)
-            socket.socket.emit('message', {
+            socket.emit('send_message', {
                 text: message,
-                name: socket.id,
-                id: `${socket.id}${Math.random()}`,
+                name: user,
+                id: `${user}${Math.random()}`,
                 socketID: socket.id,
             });
         }

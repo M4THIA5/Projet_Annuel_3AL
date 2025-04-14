@@ -4,36 +4,34 @@ import ChatBar from './Bar';
 import ChatBody from './Body';
 import ChatFooter from './Footer';
 import {useSocket} from "#/components/SocketProvider";
-import {getUser, getUserName} from "#/lib/dal";
 
 
-function ChatPage() {
+function ChatPage({userName}: { userName: string }) {
     const [messages, setMessages] = useState([]);
     const socket = useSocket();
-
     useEffect(() => {
-        async function asyncGetUserName()
-        {
-            return await getUserName(getUser());
-        }
-        if (!socket) {
-            console.log("socket is not ready")
-            return
-        }
-        const userName = asyncGetUserName();
-        socket.emit('newUser', {userName, socketID: socket.id});
-        socket.on('messageResponse', (data) => setMessages([...messages, data]));
-        console.log(messages)
-    }, [socket, messages]);
+        if (!socket || !userName) return;
+
+        socket.username = userName;
+        const handleMessage = (data) => {
+            setMessages((prev) => [...prev, data]);
+        };
+
+        socket.on('message_sent', handleMessage);
+
+        return () => {
+            socket.off('message_sent', handleMessage);
+        };
+    }, [socket, userName]);
 
     return (
         <div className="chat">
-        <ChatBar socket={socket} />
-        <div className="chat__main">
-            <ChatBody messages={messages}/>
-            <ChatFooter socket={socket} />
+            <ChatBar socket={socket}/>
+            <div className="chat__main">
+                <ChatBody messages={messages} user={userName}/>
+                <ChatFooter socket={socket} user={userName}/>
             </div>
-            </div>
+        </div>
     );
 };
 

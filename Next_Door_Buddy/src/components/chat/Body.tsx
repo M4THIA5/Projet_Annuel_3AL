@@ -1,12 +1,16 @@
 import React from 'react';
+type Props = {
+    messages: never[];
+    user: string;
+};
 
-function ChatBody (mem: never[]) {
+
+function ChatBody({ messages, user }: Props) {
 
     const handleLeaveChat = () => {
         localStorage.removeItem('userName');
         window.location.reload();
     };
-    const messages = mem.messages;
     return (
         <>
             <header className="chat__mainHeader">
@@ -19,7 +23,7 @@ function ChatBody (mem: never[]) {
             {/*This shows messages sent from you*/}
             <div className="message__container">
                 {messages.map((message) =>
-                    message.username ? (
+                    message.name === user ? (
                         <div className="message__chats" key={message.id}>
                             <p className="sender__name">You</p>
                             <div className="message__sender">

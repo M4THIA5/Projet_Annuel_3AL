@@ -28,10 +28,10 @@ class UtilsController {
                     res.status(401).json("Invalid credentials")
                     return;
                 }
-                res.status(200).json({message: "ok", id: user.id})
+                res.status(200).json({message: "ok", id: user.id, username: user.email})
             })
         } catch (error) {
-            next(error)
+            res.status(500).json("An error has occured. Please try again later.")
         }
     };
     register: RequestHandler = async (req: Request, res: Response, next) => {

@@ -7,10 +7,9 @@ function ChatBar({socket}){
     useEffect(() => {
         if (!socket){
             console.log("Socket not ready yet");
-            return;
+            return
         }
-        console.log(socket)
-        socket.on('newUserResponse', (data) => setUsers(data));
+        socket.on('newUser', (data) => setUsers(data));
     }, [socket, users]);
     return (
         <div className="chat__sidebar">
@@ -20,12 +19,12 @@ function ChatBar({socket}){
                 <h4 className="chat__header">ACTIVE USERS</h4>
                 <div className="chat__users">
                     {users.map((user) => (
-                    <p key={user.userID}>{user.username}</p>
+                    <p key={user.userID+""+Math.random()}>{user.username}</p>
                     ))}
                 </div>
             </div>
         </div>
     );
-};
+}
 
 export default ChatBar;

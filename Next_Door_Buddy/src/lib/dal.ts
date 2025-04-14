@@ -15,7 +15,7 @@ export const verifySession = cache(async () => {
         redirect('/login')
     }
 
-    return {isAuth: true, userId: session.userId}
+    return {isAuth: true, userId: session.userId, username:session.username}
 })
 
 export const getUser = cache(async () => {
@@ -32,25 +32,4 @@ export const getPotentialUser = cache(async () => {
 
 })
 
-export const getUserName = cache(async (user: any) => {
-    if (!user) return null
-    fetch(
-        process.env.API_URL + '/user/' + user.userId,
-        {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${user.token}`,
-            },
-        }
-    )
-        .then((response) => response.json())
-        .then((data) => {
-            user.userName = data.userName
-        }
-    )
-    if (!user.userName) {
-        return null
-    }
-    return user.userName
-})
+

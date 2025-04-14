@@ -57,7 +57,7 @@ async function handleSubmit(e: FormEvent) {
         }
         return response.json()
     }).then(async data => {
-        await createSession(data.id)
+        await createSession(data.id, data.username)
         window.location.href = '/'
     })
 }
