@@ -1,5 +1,10 @@
 name: Create new release
 
+permissions:
+  contents: write
+  packages: write
+
+
 on:
   push:
     branches: [ "feat/java" ]
