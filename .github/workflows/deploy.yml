@@ -54,6 +54,5 @@ jobs:
             key: ${{ secrets.PRIVATE_KEY }}
             port: 22
             script: |
-              cd java
               create-release.sh <tag>
 ## release.sh doit modifier versions.json, build le projet et mettre jar à disposition
