@@ -46,6 +46,11 @@ La structure du projet est organisée comme suit :
 ```
 
 ## Migrations
+Pour faire un changement mineur sur la db:
+```bash
+npx prisma db push
+```
+
 Pour créer une nouvelle migration :
 ```bash
 npx prisma migrate dev --create-only --name "nom_de_la_migration"

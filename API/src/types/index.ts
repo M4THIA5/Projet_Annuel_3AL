@@ -24,4 +24,10 @@ export interface Book {
     id: number
     title: string
     description?: string
+export interface User {
+  id?: number;
+  name: string;
+  email: string;
+  password: string;
+  isAdmin?: boolean;
 }
