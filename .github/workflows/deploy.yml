@@ -19,7 +19,7 @@ jobs:
             java-version: '24'
             distribution: 'temurin'
         - name: Build with maven
-          run: mvn clean install
+          run: cd JavaWebScraper && mvn clean install
         - name: Create release # créer l'installer ???
           id: create_release
           uses: softprops/action-gh-release@v1
