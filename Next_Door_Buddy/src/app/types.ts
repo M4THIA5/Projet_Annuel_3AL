@@ -1,10 +1,10 @@
 export interface User {
-  id?: number;
-  name: string;
-  email: string;
+  id?: number
+  name: string
+  email: string
 }
 
 export interface Data {
-    id?: number;
-    data: string;
+    id?: number
+    data: string
 }

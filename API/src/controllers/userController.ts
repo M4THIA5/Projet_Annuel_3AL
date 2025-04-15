@@ -1,4 +1,4 @@
-import {PrismaClient} from '../../prisma/postgre/client'
+import {PrismaClient} from '../../prisma/postgres/client'
 import {RequestHandler, Request, Response} from "express"
 import {UserCreated} from '../types'
 import bcrypt from "bcrypt"
@@ -68,23 +68,23 @@ class UserController {
 
     deleteUser: RequestHandler = async (req: Request, res: Response, next) => {
         try {
-            const userId = Number(req.params.id);
+            const userId = Number(req.params.id)
 
             // Supprimer toutes les relations UserNeighborhood associées à cet utilisateur
             await prisma.userNeighborhood.deleteMany({
                 where: { userId },
-            });
+            })
 
             // Supprimer l'utilisateur
             await prisma.user.delete({
                 where: { id: userId },
-            });
+            })
 
-            res.status(204).send();
+            res.status(204).send()
         } catch (error) {
-            next(error);
+            next(error)
         }
-    };
+    }
 
 }
 

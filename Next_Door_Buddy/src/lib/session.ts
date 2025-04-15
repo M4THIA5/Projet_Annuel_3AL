@@ -1,4 +1,4 @@
-"use server";
+"use server"
 import 'server-only'
 import { cookies } from 'next/headers'
 import { SignJWT, jwtVerify } from 'jose'
@@ -35,8 +35,8 @@ export async function createSession(userId: string, username:string) {
         expiresAt : expiresAt,
         username: username, // TODO: this may be unnecessary
         user: user
-    };
-    console.log("data",data);
+    }
+    console.log("data",data)
     const session = await encrypt(data)
     const cookieStore = await cookies()
 

@@ -1,26 +1,26 @@
-import React from 'react';
-import StatusIcon from "#/components/StatusIcon";
+import React from 'react'
+import StatusIcon from "#/components/StatusIcon"
 
 // Type for the user object
 export interface UserInterface {
-    messages: string[];
-    userID:string;
-    username: string;
-    self: boolean;
-    connected: boolean;
-    hasNewMessages: boolean;
+    messages: string[]
+    userID:string
+    username: string
+    self: boolean
+    connected: boolean
+    hasNewMessages: boolean
 }
 
 // Props type for the User component
 interface UserProps {
-    user: UserInterface;
-    selected: boolean;
-    onSelect: () => void; // Function to handle click event
+    user: UserInterface
+    selected: boolean
+    onSelect: () => void // Function to handle click event
 }
 
 const User: React.FC<UserProps> = ({ user, selected, onSelect }) => {
     // Computed status
-    const status = user.connected ? 'online' : 'offline';
+    const status = user.connected ? 'online' : 'offline'
 
     return (
         <div
@@ -37,7 +37,7 @@ const User: React.FC<UserProps> = ({ user, selected, onSelect }) => {
             </div>
             {user.hasNewMessages && <div className="new-messages">!</div>}
         </div>
-    );
-};
+    )
+}
 
-export default User;
+export default User

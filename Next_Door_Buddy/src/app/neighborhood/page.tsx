@@ -1,43 +1,43 @@
-'use client';
+'use client'
 
-import {getPotentialUser} from '#/lib/dal';
-import './style.css';
-import {redirect} from 'next/navigation';
-import {Card, CardContent} from '#/components/ui/card';
-import {Button} from '#/components/ui/button';
-import {useEffect, useState} from 'react';
-import {getAllNeighborhoods} from '#/dao/daoNeighborhood';
-import Icon from "@mdi/react";
-import {mdiBellOutline, mdiPlusCircleOutline} from "@mdi/js";
-import {AspectRatio} from "#/components/ui/aspect-ratio";
+import {getPotentialUser} from '#/lib/dal'
+import './style.css'
+import {redirect} from 'next/navigation'
+import {Card, CardContent} from '#/components/ui/card'
+import {Button} from '#/components/ui/button'
+import {useEffect, useState} from 'react'
+import {getAllNeighborhoods} from '#/dao/daoNeighborhood'
+import Icon from "@mdi/react"
+import {mdiBellOutline, mdiPlusCircleOutline} from "@mdi/js"
+import {AspectRatio} from "#/components/ui/aspect-ratio"
 import Image from "next/image"
 import img from "@/maison.png"
 
 const Neighborhood = () => {
-    const [userData, setUserData] = useState<any>(null);
-    const [neighborhoods, setNeighborhoods] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [userData, setUserData] = useState<any>(null)
+    const [neighborhoods, setNeighborhoods] = useState<any[]>([])
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const fetchData = async () => {
-            const fetchedUserData = await getPotentialUser();
+            const fetchedUserData = await getPotentialUser()
             if (!fetchedUserData) {
-                redirect('/login'); // ⚠️ redirect ne marche pas ici
-                return;
+                redirect('/login') // ⚠️ redirect ne marche pas ici
+                return
             }
 
-            setUserData(fetchedUserData);
+            setUserData(fetchedUserData)
 
-            const fetchedNeighborhoodsData = await getAllNeighborhoods();
-            setNeighborhoods(fetchedNeighborhoodsData);
-            setLoading(false);
-        };
+            const fetchedNeighborhoodsData = await getAllNeighborhoods()
+            setNeighborhoods(fetchedNeighborhoodsData)
+            setLoading(false)
+        }
 
-        fetchData();
-    }, []);
+        fetchData()
+    }, [])
 
-    if (loading) return <div>Loading...</div>;
-    if (!userData) return null;
+    if (loading) return <div>Loading...</div>
+    if (!userData) return null
 
     return (
         <div>
@@ -129,7 +129,7 @@ const Neighborhood = () => {
             </div>
 
         </div>
-    );
-};
+    )
+}
 
-export default Neighborhood;
+export default Neighborhood

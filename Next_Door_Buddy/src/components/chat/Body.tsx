@@ -1,16 +1,16 @@
-import React from 'react';
+import React from 'react'
 type Props = {
-    messages: never[];
-    user: string;
-};
+    messages: never[]
+    user: string
+}
 
 
 function ChatBody({ messages, user }: Props) {
 
     const handleLeaveChat = () => {
-        localStorage.removeItem('userName');
-        window.location.reload();
-    };
+        localStorage.removeItem('userName')
+        window.location.reload()
+    }
     return (
         <>
             <header className="chat__mainHeader">
@@ -46,7 +46,7 @@ function ChatBody({ messages, user }: Props) {
                 </div>
             </div>
         </>
-    );
-};
+    )
+}
 
-export default ChatBody;
+export default ChatBody

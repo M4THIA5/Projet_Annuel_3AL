@@ -5,9 +5,9 @@ import {
 } from "#/components/ui/avatar"
 
 interface AvatarUserProps {
-    src: string;
-    alt: string;
-    fallback: string;
+    src: string
+    alt: string
+    fallback: string
 }
 
 export function AvatarUser({ src, alt, fallback }: AvatarUserProps) {

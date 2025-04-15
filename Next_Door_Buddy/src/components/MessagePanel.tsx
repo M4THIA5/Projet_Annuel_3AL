@@ -1,48 +1,48 @@
-import React, { useState } from "react";
-import './styles.css'; // Make sure the correct path is provided
-import StatusIcon from "#/components/StatusIcon";
+import React, { useState } from "react"
+import './styles.css' // Make sure the correct path is provided
+import StatusIcon from "#/components/StatusIcon"
 
 // Type for individual messages
 interface Message {
-    content: string;
-    fromSelf: boolean;
+    content: string
+    fromSelf: boolean
 }
 
 // Type for the user
 interface User {
-    username: string;
-    connected: boolean;
-    messages: Message[];
+    username: string
+    connected: boolean
+    messages: Message[]
 }
 
 // Type for the props the component receives
 interface MessagePanelProps {
-    user: User;
-    onMessage: (message: string) => void;
+    user: User
+    onMessage: (message: string) => void
 }
 
 const MessagePanel: React.FC<MessagePanelProps> = ({ user, onMessage }) => {
-    const [input, setInput] = useState<string>("");
+    const [input, setInput] = useState<string>("")
 
     // Handle form submission
     const onSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+        e.preventDefault()
         if (input.trim() !== "") {
-            onMessage(input); // Send the message up to parent
-            setInput(""); // Clear the input after sending the message
+            onMessage(input) // Send the message up to parent
+            setInput("") // Clear the input after sending the message
         }
-    };
+    }
 
     // Check if the sender of the current message is different from the previous one
     const displaySender = (message: Message, index: number) => {
         return (
             index === 0 ||
             user.messages[index - 1].fromSelf !== user.messages[index].fromSelf
-        );
-    };
+        )
+    }
 
     // Check if the input is valid
-    const isValid = input.length > 0;
+    const isValid = input.length > 0
 
     return (
         <div>
@@ -75,7 +75,7 @@ const MessagePanel: React.FC<MessagePanelProps> = ({ user, onMessage }) => {
                 </button>
             </form>
         </div>
-    );
-};
+    )
+}
 
-export default MessagePanel;
+export default MessagePanel

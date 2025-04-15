@@ -1,28 +1,28 @@
 "use client"
-import React, {useEffect, useState} from 'react';
-import ChatBar from './Bar';
-import ChatBody from './Body';
-import ChatFooter from './Footer';
-import {useSocket} from "#/components/SocketProvider";
+import React, {useEffect, useState} from 'react'
+import ChatBar from './Bar'
+import ChatBody from './Body'
+import ChatFooter from './Footer'
+import {useSocket} from "#/components/SocketProvider"
 
 
 function ChatPage({userName}: { userName: string }) {
-    const [messages, setMessages] = useState([]);
-    const socket = useSocket();
+    const [messages, setMessages] = useState([])
+    const socket = useSocket()
     useEffect(() => {
-        if (!socket || !userName) return;
+        if (!socket || !userName) return
 
-        socket.username = userName;
+        socket.username = userName
         const handleMessage = (data) => {
-            setMessages((prev) => [...prev, data]);
-        };
+            setMessages((prev) => [...prev, data])
+        }
 
-        socket.on('message_sent', handleMessage);
+        socket.on('message_sent', handleMessage)
 
         return () => {
-            socket.off('message_sent', handleMessage);
-        };
-    }, [socket, userName]);
+            socket.off('message_sent', handleMessage)
+        }
+    }, [socket, userName])
 
     return (
         <div className="chat">
@@ -32,7 +32,7 @@ function ChatPage({userName}: { userName: string }) {
                 <ChatFooter socket={socket} user={userName}/>
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default ChatPage;
+export default ChatPage

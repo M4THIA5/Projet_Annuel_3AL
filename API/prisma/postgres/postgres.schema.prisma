@@ -9,7 +9,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("POSTGRESQL_DATABASE_URL")
 }
 
 model User {
@@ -19,13 +19,13 @@ model User {
   prenom String
   color  String @default("212529")
 
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
   password String
 
-  Score Score[]
-  roles Role[]
+  Score             Score[]
+  roles             Role[]
   userNeighborhoods UserNeighborhood[]
 }
 
@@ -57,14 +57,13 @@ model Data {
   data String
 }
 
-
 model Neighborhood {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   name        String
   city        String?
   postalCode  String?
-  members     Int   @default(1)
-  createdAt   DateTime @default(now())
+  members     Int       @default(1)
+  createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
   description String?
   image       Bytes?
@@ -79,8 +78,6 @@ model UserNeighborhood {
   joinedAt       DateTime @default(now())
   roleInArea     String?
 
-  user          User        @relation(fields: [userId], references: [id])
-  neighborhood  Neighborhood @relation(fields: [neighborhoodId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+  neighborhood Neighborhood @relation(fields: [neighborhoodId], references: [id])
 }
-
-
