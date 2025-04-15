@@ -7,19 +7,8 @@ import ply.lex as lex
 
 
 reserved = {
-    'say': 'PRINT',
-    'if': 'IF',
-    'while': "WHILE",
-    'for': 'FOR',
-    'elif': 'ELIF',
-    'else': 'ELSE',
-    'fun': 'FUNCTION',
-    'ckoa': 'INPUT',
-    'plzdo': 'CALL',
-    'return': 'RETURN',
-    'class': 'CLASS',
-    'new': 'NEW',
-    # 'prints' : 'PRINTSTRING'
+    'select' : 'SELECT',
+    ''
 }
 
 tokens = ['NUMBER', 'MINUS', 'PLUS', 'TIMES', 'DIVIDE',
@@ -153,12 +142,22 @@ def t_ccode_comment(t):
     r'(/\*(.|\n)*?\*/)|(//.*)'
     pass
 
+def eval_inst(t):
+    if t[0] == 'PRINT':
+        print(t[2])
+    elif t[0] == 'FUNCTION':
+        print("Function called with argument:", t[2])
+    else:
+        print("Unknown instruction:", t)
+
+
 
 lex.lex()
 
 def p_start(p):
     '''start : statement_list'''
     p[0] = p[1]
+    eval_inst(p[1])
 
 def p_statements(p):
     '''statement_list : statement_list statement
