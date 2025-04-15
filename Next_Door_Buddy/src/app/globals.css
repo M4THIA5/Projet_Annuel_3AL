@@ -50,6 +50,9 @@
 
 @layer base {
   :root {
+    --color-primary: #F0F0F0;
+    --color-secondary: #031926;
+    --color-ternary: #2563EB;
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -78,6 +81,9 @@
   }
 
   .dark {
+    --color-primary: #F0F0F0;
+    --color-secondary: #031926;
+    --color-ternary: #2563EB;
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;

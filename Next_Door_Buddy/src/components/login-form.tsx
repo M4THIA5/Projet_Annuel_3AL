@@ -38,6 +38,7 @@ async function handleSubmit(e: FormEvent) {
     if (!email || !password || email === "" || password === "") {
         return;
     }
+
     fetch("http://localhost:3001/login", {
         method: "POST",
         headers: {

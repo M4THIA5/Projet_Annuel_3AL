@@ -2,6 +2,8 @@
 import 'server-only'
 import { cookies } from 'next/headers'
 import { SignJWT, jwtVerify } from 'jose'
+import {getUserDetails} from "#/dao/daoUser"
+
 
 const secretKey = process.env.SESSION_SECRET
 const encodedKey = new TextEncoder().encode(secretKey)
@@ -27,7 +29,15 @@ export async function decrypt(session: string | undefined = '') {
 
 export async function createSession(userId: string, username:string) {
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-    const session = await encrypt({ userId, username, expiresAt })
+    const user = await getUserDetails(userId)
+    const data = {
+        userId : userId,
+        expiresAt : expiresAt,
+        username: username, // TODO: this may be unnecessary
+        user: user
+    };
+    console.log("data",data);
+    const session = await encrypt(data)
     const cookieStore = await cookies()
 
     cookieStore.set('session', session, {

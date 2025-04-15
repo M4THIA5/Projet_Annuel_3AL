@@ -20,12 +20,13 @@ model User {
   color  String @default("212529")
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime? @updatedAt
 
   password String
 
   Score Score[]
   roles Role[]
+  userNeighborhoods UserNeighborhood[]
 }
 
 model Role {
@@ -55,3 +56,31 @@ model Data {
   id   Int    @id @default(autoincrement())
   data String
 }
+
+
+model Neighborhood {
+  id          Int      @id @default(autoincrement())
+  name        String
+  city        String?
+  postalCode  String?
+  members     Int   @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime? @updatedAt
+  description String?
+  image       Bytes?
+
+  userNeighborhoods UserNeighborhood[]
+}
+
+model UserNeighborhood {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  neighborhoodId Int
+  joinedAt       DateTime @default(now())
+  roleInArea     String?
+
+  user          User        @relation(fields: [userId], references: [id])
+  neighborhood  Neighborhood @relation(fields: [neighborhoodId], references: [id])
+}
+
+
