@@ -1,4 +1,5 @@
 import {Server, Socket} from 'socket.io'
+
 interface CurrentUser {
     userID: string,
     username: string,
@@ -33,6 +34,10 @@ const socketHandler = (socket: Socket, io: Server): void => {
         })
     }
     socket.emit("users", users)
+    socket.emit("newUser", users)
+
+
+    socket.on('typing', (data) => socket.broadcast.emit('typingResponse', data))
 
     // notify existing users
     socket.broadcast.emit("user connected", {

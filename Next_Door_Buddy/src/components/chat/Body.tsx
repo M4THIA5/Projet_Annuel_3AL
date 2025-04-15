@@ -1,11 +1,18 @@
 import React from 'react'
+
 type Props = {
-    messages: never[]
+    messages: Message[]
     user: string
+    lastMessageRef: React.RefObject<HTMLDivElement>
+    typingStatus: string
+}
+type Message = {
+    id: number
+    text: string
+    name: string
 }
 
-
-function ChatBody({ messages, user }: Props) {
+function ChatBody({messages, user, lastMessageRef, typingStatus}: Props) {
 
     const handleLeaveChat = () => {
         localStorage.removeItem('userName')
@@ -42,8 +49,9 @@ function ChatBody({ messages, user }: Props) {
 
                 {/*This is triggered when a user is typing*/}
                 <div className="message__status">
-                    <p>Someone is typing...</p>
+                    <p>{typingStatus}</p>
                 </div>
+                <div ref={lastMessageRef}/>
             </div>
         </>
     )
