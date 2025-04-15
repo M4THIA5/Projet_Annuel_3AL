@@ -1,16 +1,16 @@
 "use client"
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react'
 
 
 function ChatBar({socket}){
-    const [users, setUsers] = useState([]);
+    const [users, setUsers] = useState([])
     useEffect(() => {
         if (!socket){
-            console.log("Socket not ready yet");
+            console.log("Socket not ready yet")
             return
         }
-        socket.on('newUser', (data) => setUsers(data));
-    }, [socket, users]);
+        socket.on('newUser', (data) => setUsers(data))
+    }, [socket, users])
     return (
         <div className="chat__sidebar">
             <h2>Open Chat</h2>
@@ -24,7 +24,7 @@ function ChatBar({socket}){
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default ChatBar;
+export default ChatBar

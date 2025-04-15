@@ -1,4 +1,4 @@
-import {PrismaClient as PostGre} from '../../prisma/postgre/client'
+import {PrismaClient as PostGre} from '../../prisma/postgres/client'
 import {RequestHandler, Request, Response} from "express"
 import {Credentials} from '../types'
 import UserController from "./userController"

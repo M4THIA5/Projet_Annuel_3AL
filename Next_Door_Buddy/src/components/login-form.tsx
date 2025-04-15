@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import {cn} from "#/lib/utils"
 import {Button} from "#/components/ui/button"
@@ -12,31 +12,31 @@ import {
 import {Input} from "#/components/ui/input"
 import {Label} from "#/components/ui/label"
 import Form from "next/form"
-import {FormEvent} from "react";
+import {FormEvent} from "react"
 import {Alert, AlertDescription, AlertTitle} from "#/components/ui/alert"
-import {AlertCircle} from "lucide-react";
-import Link from "next/link";
-import {createSession} from "#/lib/session";
+import {AlertCircle} from "lucide-react"
+import Link from "next/link"
+import {createSession} from "#/lib/session"
 
 
 async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    const errAlert = document.getElementById("error-alert");
-    errAlert!.classList.add("hidden");
-    const spinner = document.getElementById("spinner");
-    spinner!.classList.remove("hidden");
-    spinner!.classList.add("block");
-    const buttons = document.querySelectorAll("button");
+    e.preventDefault()
+    const errAlert = document.getElementById("error-alert")
+    errAlert!.classList.add("hidden")
+    const spinner = document.getElementById("spinner")
+    spinner!.classList.remove("hidden")
+    spinner!.classList.add("block")
+    const buttons = document.querySelectorAll("button")
 
     for (const button of buttons) {
-        button!.setAttribute("disabled", "true");
+        button!.setAttribute("disabled", "true")
     }
-    const form = e.target as HTMLFormElement;
-    const formData = new FormData(form);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+    const form = e.target as HTMLFormElement
+    const formData = new FormData(form)
+    const email = formData.get("email") as string
+    const password = formData.get("password") as string
     if (!email || !password || email === "" || password === "") {
-        return;
+        return
     }
 
     fetch("http://localhost:3001/login", {
@@ -46,17 +46,18 @@ async function handleSubmit(e: FormEvent) {
         },
         body: JSON.stringify({email, password}),
     }).then(async (response) => {
-        spinner!.classList.remove("block");
-        spinner!.classList.add("hidden");
+        spinner!.classList.remove("block")
+        spinner!.classList.add("hidden")
         for (const button of buttons){
-            button!.removeAttribute("disabled");
+            button!.removeAttribute("disabled")
         }
         if (!response.ok) {
-            errAlert!.innerText = (await response.text()).replaceAll(/"/g, "");
-            errAlert!.classList.add("block");
-            errAlert!.classList.remove("hidden");
+            errAlert!.innerText = (await response.text()).replaceAll(/"/g, "")
+            errAlert!.classList.add("block")
+            errAlert!.classList.remove("hidden")
+        } else {
+            return response.json()
         }
-        return response.json()
     }).then(async data => {
         await createSession(data.id, data.username)
         window.location.href = '/'
@@ -75,7 +76,7 @@ function Spinner() {
                 d="M10.14,1.16a11,11,0,0,0-9,8.92A1.59,1.59,0,0,0,2.46,12,1.52,1.52,0,0,0,4.11,10.7a8,8,0,0,1,6.66-6.61A1.42,1.42,0,0,0,12,2.69h0A1.57,1.57,0,0,0,10.14,1.16Z"
                 className="spinner_ajPY"/>
         </svg>
-    );
+    )
 }
 
 
@@ -158,7 +159,7 @@ export function LoginForm({
                             </Button>
                         </div>
                         <div className="text-center text-sm">
-                            Don&apos;t have an account?{" "}
+                            Don&apost have an account?{" "}
                             <Link href="/register" className="underline underline-offset-4">
                                 Sign up
                             </Link>

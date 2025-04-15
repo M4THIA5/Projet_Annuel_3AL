@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import {cn} from "#/lib/utils"
 import {Button} from "#/components/ui/button"
@@ -12,18 +12,18 @@ import {
 import {Input} from "#/components/ui/input"
 import {Label} from "#/components/ui/label"
 import Form from "next/form"
-import {FormEvent} from "react";
+import {FormEvent} from "react"
 import {Alert, AlertDescription, AlertTitle} from "#/components/ui/alert"
-import {AlertCircle} from "lucide-react";
-import Link from "next/link";
+import {AlertCircle} from "lucide-react"
+import Link from "next/link"
 
 
 function start(errAlert: HTMLElement | null, spinner: HTMLElement | null, buttons: NodeListOf<HTMLButtonElement>) {
-    errAlert!.classList.add("hidden");
-    spinner!.classList.remove("hidden");
-    spinner!.classList.add("block");
+    errAlert!.classList.add("hidden")
+    spinner!.classList.remove("hidden")
+    spinner!.classList.add("block")
     for (const button of buttons) {
-        button!.setAttribute("disabled", "true");
+        button!.setAttribute("disabled", "true")
     }
 }
 
@@ -33,41 +33,41 @@ function end(
     buttons: NodeListOf<HTMLButtonElement>,
     issetError: boolean
 ) {
-    spinner!.classList.remove("block");
-    spinner!.classList.add("hidden");
+    spinner!.classList.remove("block")
+    spinner!.classList.add("hidden")
     for (const button of buttons) {
-        button!.removeAttribute("disabled");
+        button!.removeAttribute("disabled")
     }
     if (issetError) {
-        errAlert!.classList.add("block");
-        errAlert!.classList.remove("hidden");
+        errAlert!.classList.add("block")
+        errAlert!.classList.remove("hidden")
     }
 }
 
 function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    const errAlert = document.getElementById("error-alert");
-    const spinner = document.getElementById("spinner");
-    const buttons = document.querySelectorAll("button");
-    start(errAlert, spinner, buttons);
+    e.preventDefault()
+    const errAlert = document.getElementById("error-alert")
+    const spinner = document.getElementById("spinner")
+    const buttons = document.querySelectorAll("button")
+    start(errAlert, spinner, buttons)
 
-    const form = e.target as HTMLFormElement;
-    const formData = new FormData(form);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const nom = formData.get("nom") as string;
-    const prenom = formData.get("prenom") as string;
+    const form = e.target as HTMLFormElement
+    const formData = new FormData(form)
+    const email = formData.get("email") as string
+    const password = formData.get("password") as string
+    const nom = formData.get("nom") as string
+    const prenom = formData.get("prenom") as string
 
     if (!email || !password || email === "" || password === "" ||
         !nom || !prenom || nom === "" || prenom === "") {
-        errAlert!.innerText = "Please fill all the fields";
-        end(errAlert, spinner, buttons, true);
-        return;
+        errAlert!.innerText = "Please fill all the fields"
+        end(errAlert, spinner, buttons, true)
+        return
     }
     if (password.length < 8) {
-        errAlert!.innerText = "Password must be at least 8 characters long";
-        end(errAlert, spinner, buttons, true);
-        return;
+        errAlert!.innerText = "Password must be at least 8 characters long"
+        end(errAlert, spinner, buttons, true)
+        return
     }
     try {
         fetch("http://localhost:3001/register", {
@@ -78,12 +78,12 @@ function handleSubmit(e: FormEvent) {
             body: JSON.stringify({email, password, nom, prenom}),
         }).then(async (response) => {
             if (response.ok) {
-                window.location.href = "/login";
+                window.location.href = "/login"
             } else {
-                errAlert!.innerText = (await response.text()).replaceAll(/"/g, "");
+                errAlert!.innerText = (await response.text()).replaceAll(/"/g, "")
             }
-            end(errAlert, spinner, buttons, !response.ok);
-        });
+            end(errAlert, spinner, buttons, !response.ok)
+        })
     } catch (e) {
         console.error(e)
     }
@@ -102,7 +102,7 @@ function Spinner() {
                 d="M10.14,1.16a11,11,0,0,0-9,8.92A1.59,1.59,0,0,0,2.46,12,1.52,1.52,0,0,0,4.11,10.7a8,8,0,0,1,6.66-6.61A1.42,1.42,0,0,0,12,2.69h0A1.57,1.57,0,0,0,10.14,1.16Z"
                 className="spinner_ajPY"/>
         </svg>
-    );
+    )
 }
 
 

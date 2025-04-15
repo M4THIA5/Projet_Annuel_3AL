@@ -4,5 +4,5 @@ export default function Home() {
             <h1>Hello, i dont have the will to update boostrap components to tailwind so this will be the home
                 page </h1>
         </div>
-    );
+    )
 }

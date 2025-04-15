@@ -1,8 +1,8 @@
 class api {
-    private baseUrl: string;
+    private baseUrl: string
 
     constructor(baseUrl: string) {
-        this.baseUrl = baseUrl;
+        this.baseUrl = baseUrl
     }
 
     // Méthode pour effectuer une requête GET
@@ -13,16 +13,16 @@ class api {
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            });
+            })
 
             if (!response.ok) {
-                throw new Error(`Erreur HTTP ${response.status}`);
+                throw new Error(`Erreur HTTP ${response.status}`)
             }
 
-            return await response.json();
+            return await response.json()
         } catch (error) {
-            console.error('Erreur lors de la requête GET:', error);
-            throw error;
+            console.error('Erreur lors de la requête GET:', error)
+            throw error
         }
     }
 
@@ -35,16 +35,16 @@ class api {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(data)
-            });
+            })
 
             if (!response.ok) {
-                throw new Error(`Erreur HTTP ${response.status}`);
+                throw new Error(`Erreur HTTP ${response.status}`)
             }
 
-            return await response.json();
+            return await response.json()
         } catch (error) {
-            console.error('Erreur lors de la requête POST:', error);
-            throw error;
+            console.error('Erreur lors de la requête POST:', error)
+            throw error
         }
     }
 
@@ -57,16 +57,16 @@ class api {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(data)
-            });
+            })
 
             if (!response.ok) {
-                throw new Error(`Erreur HTTP ${response.status}`);
+                throw new Error(`Erreur HTTP ${response.status}`)
             }
 
-            return await response.json();
+            return await response.json()
         } catch (error) {
-            console.error('Erreur lors de la requête PUT:', error);
-            throw error;
+            console.error('Erreur lors de la requête PUT:', error)
+            throw error
         }
     }
 
@@ -78,29 +78,29 @@ class api {
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            });
+            })
 
             if (!response.ok) {
-                throw new Error(`Erreur HTTP ${response.status}`);
+                throw new Error(`Erreur HTTP ${response.status}`)
             }
 
-            return await response.json();
+            return await response.json()
         } catch (error) {
-            console.error('Erreur lors de la requête DELETE:', error);
-            throw error;
+            console.error('Erreur lors de la requête DELETE:', error)
+            throw error
         }
     }
 }
 
-export const API = new api('http://localhost:3001');
+export const API = new api('http://localhost:3001')
 
 
 
 // Exemple d'une requête GET
-// API.get('/tasks').then(data => console.log(data));
+// API.get('/tasks').then(data => console.log(data))
 
 // Exemple d'une requête POST
-// API.post('/tasks', { name: 'New Task', dueDate: '2025-04-15' }).then(data => console.log(data));
+// API.post('/tasks', { name: 'New Task', dueDate: '2025-04-15' }).then(data => console.log(data))
 
 // Exemple d'une requête DELETE
-// API.delete('/tasks/1').then(data => console.log(data));
+// API.delete('/tasks/1').then(data => console.log(data))

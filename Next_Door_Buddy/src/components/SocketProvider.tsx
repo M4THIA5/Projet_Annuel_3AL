@@ -1,45 +1,45 @@
-'use client';
+'use client'
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import { io, Socket } from 'socket.io-client'
 
 interface SocketContextType {
-    socket: Socket | null;
+    socket: Socket | null
 }
 export interface MySocket extends Socket {
-    username?: string;
+    username?: string
 }
-const SocketContext = createContext<SocketContextType | undefined>(undefined);
+const SocketContext = createContext<SocketContextType | undefined>(undefined)
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
-    const [socket, setSocket] = useState<Socket | null>(null);
+    const [socket, setSocket] = useState<Socket | null>(null)
 
 
     useEffect(() => {
-        const port = process.env.NEXT_PUBLIC_SOCKET_PORT || 9845;
-        // const socketInstance = io("http://localhost:3005");  for different server websocket url
+        const port = process.env.NEXT_PUBLIC_SOCKET_PORT || 3000
+        // const socketInstance = io("http://localhost:3005")  for different server websocket url
         const socketInstance = io("http://localhost:"+port, {
             transports: ['websocket'],
-        });
-        setSocket(socketInstance);
+        })
+        setSocket(socketInstance)
 
         return () => {
-            socketInstance.disconnect();
-        };
-    }, []);
+            socketInstance.disconnect()
+        }
+    }, [])
 
     return (
         <SocketContext.Provider value={{ socket }}>
             {children}
         </SocketContext.Provider>
-    );
-};
+    )
+}
 
 export const useSocket = (): MySocket | null => {
-    const context = useContext(SocketContext);
+    const context = useContext(SocketContext)
     if (!context) {
-        throw new Error('useSocket must be used within a SocketProvider');
+        throw new Error('useSocket must be used within a SocketProvider')
     }
-    return context.socket;
-};
+    return context.socket
+}

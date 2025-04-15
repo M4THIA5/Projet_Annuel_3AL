@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 
 function createDataInMySQL(){
@@ -62,5 +62,5 @@ export default function Create(){
                 Create in MySQL
             </button>
         </div>
-    );
+    )
 }

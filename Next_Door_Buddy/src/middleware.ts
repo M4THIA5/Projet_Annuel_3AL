@@ -1,7 +1,7 @@
 import {NextResponse} from 'next/server'
 import type {NextRequest} from 'next/server'
-import {decrypt, logout} from "#/lib/session";
-import {cookies} from "next/headers";
+import {decrypt, logout} from "#/lib/session"
+import {cookies} from "next/headers"
 
 async function handleSpecialPaths(path: string, req: NextRequest) {
     switch (path) {

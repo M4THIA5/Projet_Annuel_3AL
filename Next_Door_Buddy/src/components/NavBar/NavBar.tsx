@@ -1,7 +1,7 @@
-import Image from "next/image";
-import Link from "next/link";
-import logo from "@/logo.png";
-import { AuthLinks } from "./AuthLinks.tsx";
+import Image from "next/image"
+import Link from "next/link"
+import logo from "@/logo.png"
+import { AuthLinks } from "./AuthLinks"
 
 export const Navbar = ({ user }: { user: any }) => {
     return (
@@ -18,5 +18,5 @@ export const Navbar = ({ user }: { user: any }) => {
                 </div>
             </div>
         </nav>
-    );
-};
+    )
+}

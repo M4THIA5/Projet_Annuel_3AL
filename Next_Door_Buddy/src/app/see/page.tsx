@@ -1,6 +1,6 @@
-"use client";
-import {Data} from "../types";
-import {useEffect, useState} from "react";
+"use client"
+import {Data} from "../types"
+import {useEffect, useState} from "react"
 
 
 function DataGeneratedAsRow(props: { loading: boolean, data: Data[] }) {
@@ -10,7 +10,7 @@ function DataGeneratedAsRow(props: { loading: boolean, data: Data[] }) {
             <td colSpan={2}>Loading...</td>
         </tr>
     }
-    const data = Array.from(props.data);
+    const data = Array.from(props.data)
     console.log(data)
     return (
         data.length === 0 ? <tr>
@@ -28,10 +28,10 @@ function DataGeneratedAsRow(props: { loading: boolean, data: Data[] }) {
 }
 
 export default function See() {
-    const [mySQLData, setMySQLData] = useState({});
-    const [mongoDBData, setMongoDBData] = useState({});
-    const [isMongoLoading, setMongoLoading] = useState(true);
-    const [isMySqlLoading, setMySqlLoading] = useState(true);
+    const [mySQLData, setMySQLData] = useState({})
+    const [mongoDBData, setMongoDBData] = useState({})
+    const [isMongoLoading, setMongoLoading] = useState(true)
+    const [isMySqlLoading, setMySqlLoading] = useState(true)
 
     useEffect(() => {
         async function fetchDataForMongoDB() {
@@ -42,13 +42,13 @@ export default function See() {
                         'Content-Type': 'application/json',
                     },
                 }).then(r => r.json().then(data => {
-                    setMongoDBData(data);
-                    setMongoLoading(false);
-                }));
+                    setMongoDBData(data)
+                    setMongoLoading(false)
+                }))
             } catch (error) {
-                setMongoLoading(false);
-                setMongoDBData([]);
-                console.log(error);
+                setMongoLoading(false)
+                setMongoDBData([])
+                console.log(error)
             }
         }
 
@@ -60,21 +60,21 @@ export default function See() {
                         'Content-Type': 'application/json',
                     },
                 }).then(r => r.json().then(data => {
-                        setMySQLData(data);
-                        console.log();
-                        setMySqlLoading(false);
+                        setMySQLData(data)
+                        console.log()
+                        setMySqlLoading(false)
                     })
-                );
+                )
             } catch (error) {
-                setMySqlLoading(false);
-                setMySQLData([]);
-                console.log(error);
+                setMySqlLoading(false)
+                setMySQLData([])
+                console.log(error)
             }
         }
 
         fetchDataForMySQL()
         fetchDataForMongoDB()
-    }, []);
+    }, [])
 
     return (
         <div className={`h-screen flex flex-col items-center justify-center`}>
@@ -110,5 +110,5 @@ export default function See() {
                 </div>
             </div>
         </div>
-    );
+    )
 }

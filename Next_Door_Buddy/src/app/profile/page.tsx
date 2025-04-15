@@ -1,12 +1,12 @@
-import {getUser} from "#/lib/dal";
-import {Button} from "#/components/ui/button";
-import {redirect} from "next/navigation";
-import Link from "next/link";
+import {getUser} from "#/lib/dal"
+import {Button} from "#/components/ui/button"
+import {redirect} from "next/navigation"
+import Link from "next/link"
 
 export default async function ProfileIndex() {
-    const user = await getUser();
+    const user = await getUser()
 
-    if (!user) return redirect('/login');
+    if (!user) return redirect('/login')
     return (
         <div>
             <h1>Profile</h1>

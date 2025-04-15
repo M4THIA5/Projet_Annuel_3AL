@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { RequestHandler, Request, Response, NextFunction } from "express"
+import { RequestHandler, Request, Response } from "express"
 import argon2 from 'argon2'
 import jwt from 'jsonwebtoken'
 
@@ -26,7 +26,7 @@ class AuthController {
     }
   }
 
-  logout: RequestHandler = async (req: Request, res: Response, next) => {
+  logout: RequestHandler = async (req: Request, res: Response) => {
     // destroy the token
     res.status(200).json({ message: 'Logout successful' })
   }
