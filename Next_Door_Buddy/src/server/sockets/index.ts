@@ -1,6 +1,10 @@
 import {Server, Socket} from 'socket.io';
+interface CurrentUser {
+    userID: string,
+    username: string,
+}
 
-let users: any[] = [];
+let users: CurrentUser[] = [];
 const socketHandler = (socket: Socket, io: Server): void => {
     console.log('A user connected:', socket.id);
     socket.on('drawing', (data) => {

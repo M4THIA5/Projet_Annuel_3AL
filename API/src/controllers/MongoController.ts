@@ -1,5 +1,5 @@
 import { PrismaClient } from '../../prisma/mongodb/client'
-import { RequestHandler, Request, Response, NextFunction } from "express"
+import { RequestHandler, Request, Response } from "express"
 import { Data } from '../types'
 
 const prisma = new PrismaClient()
@@ -25,4 +25,4 @@ class MongoController{
     }
 }
 
-export default MongoController;
+export default MongoController

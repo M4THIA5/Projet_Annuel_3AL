@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
+import {MySocket} from "#/components/SocketProvider";
 
 type Props = {
-    socket: any;
+    socket: MySocket;
     user: string;
 };
 

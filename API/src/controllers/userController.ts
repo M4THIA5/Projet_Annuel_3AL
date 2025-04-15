@@ -1,20 +1,20 @@
 import {PrismaClient} from '../../prisma/postgre/client'
-import {RequestHandler, Request, Response, NextFunction} from "express"
+import {RequestHandler, Request, Response} from "express"
 import {UserCreated} from '../types'
-import bcrypt from "bcrypt";
+import bcrypt from "bcrypt"
 
 const prisma = new PrismaClient()
 
 class UserController {
     createUser: RequestHandler = async (req: Request, res: Response, next) => {
-        let data = req.body as UserCreated
+        const data = req.body as UserCreated
         if (!data.email || !data.password || !data.nom || !data.prenom) {
             res.status(400).json({error: 'Informations are missing'})
             return
         }
         try {
             bcrypt.hash(data.password, 10, async function (err, hash) {
-                data.password = hash;
+                data.password = hash
                 const user = await prisma.user.create({data})
                 res.status(201).json(user)
             })

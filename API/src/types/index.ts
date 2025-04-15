@@ -1,19 +1,19 @@
 export interface UserCreated {
-  id?: number;
-  nom: string;
-  email: string;
-  prenom:string;
+  id?: number
+  nom: string
+  email: string
+  prenom:string
   password:string
 }
 
 export interface Data {
-    id?: number;
-    data: string;
+    id?: number
+    data: string
 }
 
 export interface Credentials {
-    email:string;
-    password:string;
+    email:string
+    password:string
 }
 /** Schema description defined by JSDoc */
 export interface Book {
@@ -21,7 +21,7 @@ export interface Book {
      *
      * @example 14
      */
-    id: number;
-    title: string;
-    description?: string;
+    id: number
+    title: string
+    description?: string
 }

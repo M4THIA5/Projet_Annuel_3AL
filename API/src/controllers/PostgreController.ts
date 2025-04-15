@@ -1,5 +1,5 @@
 import { PrismaClient } from '../../prisma/postgre/client'
-import { RequestHandler, Request, Response, NextFunction } from "express"
+import { RequestHandler, Request, Response } from "express"
 import { Data } from '../types'
 
 const prisma = new PrismaClient()
@@ -24,4 +24,4 @@ class PostgreController {
         }
     }
 }
-export default PostgreController;
+export default PostgreController

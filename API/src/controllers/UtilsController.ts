@@ -1,15 +1,14 @@
 import {PrismaClient as PostGre} from '../../prisma/postgre/client'
-import {PrismaClient as Mongo} from '../../prisma/mongodb/client'
 import {RequestHandler, Request, Response} from "express"
 import {Credentials} from '../types'
-import UserController from "./userController";
-import bcrypt from 'bcrypt';
+import UserController from "./userController"
+import bcrypt from 'bcrypt'
 
 
 const prisma = new PostGre()
 
 class UtilsController {
-    login: RequestHandler = async (req: Request, res: Response, next) => {
+    login: RequestHandler = async (req: Request, res: Response) => {
         const credentials = req.body as Credentials
         if (!credentials.email || !credentials.password) {
             res.status(400).json({error: 'Informations are missing'})
@@ -21,19 +20,20 @@ class UtilsController {
             )
             if (!user) {
                 res.status(401).json("Invalid credentials")
-                return;
+                return
             }
             bcrypt.compare(credentials.password, user.password, function (err: Error | undefined, result) {
                 if (!result) {
                     res.status(401).json("Invalid credentials")
-                    return;
+                    return
                 }
                 res.status(200).json({message: "ok", id: user.id, username: user.email})
             })
-        } catch (error) {
+        } catch (e) {
             res.status(500).json("An error has occured. Please try again later.")
+            console.log(e)
         }
-    };
+    }
     register: RequestHandler = async (req: Request, res: Response, next) => {
         try {
             const email: string = req.body.email
@@ -46,23 +46,24 @@ class UtilsController {
                         email: email
                     }
             })
-            if (user){
+            if (user) {
                 res.status(401).json("User with this email already exists")
                 return
             }
         } catch (e) {
             res.status(500).json("An error has occured while trying to parse the email.")
-            return;
+            console.log(e)
+            return
         }
-        const userController = new UserController();
+        const userController = new UserController()
 
-        await userController.createUser(req, res, next);
-    };
+        await userController.createUser(req, res, next)
+    }
     home: RequestHandler = (_req: Request, res: Response): void => {
-        res.status(200).json({message: "Hello World !"});
-    };
+        res.status(200).json({message: "Hello World !"})
+    }
     healthCheck: RequestHandler = (_req: Request, res: Response): void => {
-        res.status(200).json({message: "Server is up and running !"});
+        res.status(200).json({message: "Server is up and running !"})
     }
 }
 

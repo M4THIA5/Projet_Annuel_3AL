@@ -1,10 +1,10 @@
-import { Tspec } from "tspec";
-import { Request, Response } from "express";
-import {Book, Credentials, Data, UserCreated} from "../types";
-import UtilsController from "../controllers/UtilsController";
-import UserController from "../controllers/userController";
-import PostgreController from "../controllers/PostgreController";
-import MongoController from "../controllers/MongoController";
+import { Tspec } from "tspec"
+import { Request, Response } from "express"
+import {Book, Credentials, Data, UserCreated} from "../types"
+import UtilsController from "../controllers/UtilsController"
+import UserController from "../controllers/userController"
+import PostgreController from "../controllers/PostgreController"
+import MongoController from "../controllers/MongoController"
 
 
 
@@ -15,11 +15,15 @@ export const getBookById = (
         id: +req.params.id,
         title: 'Book Title',
         description: 'Book Description',
-    });
+    })
 }
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const utils = new UtilsController()
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const user = new UserController()
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const mongo = new MongoController()
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const postgre = new PostgreController()
 
 export type baseApiSpec = Tspec.DefineApiSpec<{
@@ -60,7 +64,7 @@ export type baseApiSpec = Tspec.DefineApiSpec<{
             }
         }
     }
-}>;
+}>
 
 export type userApiSpec = Tspec.DefineApiSpec<{
     tags: ['User'],
@@ -100,7 +104,7 @@ export type userApiSpec = Tspec.DefineApiSpec<{
             },
         },
     }
-}>;
+}>
 
 export type postgreApiSpec = Tspec.DefineApiSpec<{
     tags: ['Postgre'],
@@ -121,7 +125,7 @@ export type postgreApiSpec = Tspec.DefineApiSpec<{
             },
         },
     }
-}>;
+}>
 
 export type mongoApiSpec = Tspec.DefineApiSpec<{
     tags: ['Mongo'],
@@ -142,7 +146,7 @@ export type mongoApiSpec = Tspec.DefineApiSpec<{
             },
         },
     }
-}>;
+}>
 
 export type BookApiSpec = Tspec.DefineApiSpec<{
     tags: ['Book'],
@@ -155,4 +159,4 @@ export type BookApiSpec = Tspec.DefineApiSpec<{
             },
         },
     }
-}>;
+}>
