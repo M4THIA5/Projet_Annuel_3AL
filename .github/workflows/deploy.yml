@@ -33,22 +33,22 @@ jobs:
                 - Bug fix 1
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              - name: Deploy project with SSH
-                uses: easingthemes/ssh-deploy@v2.1.4
-                env:
-                  SSH_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-                  REMOTE_HOST: ${{ secrets.HOST }}
-                  REMOTE_USER: ${{ secrets.USERNAME }}
-                  SOURCE: "./"
-                  TARGET: "~/java"
-              - name: Deploy using ssh
-                uses: appleboy/ssh-action@master
-                with:
-                  host: ${{ secrets.HOST }}
-                  username: ${{ secrets.USERNAME }}
-                  key: ${{ secrets.PRIVATE_KEY }}
-                  port: 22
-                  script: |
-                    cd java
-                    create-release.sh <tag>
+        - name: Deploy project with SSH
+          uses: easingthemes/ssh-deploy@v2.1.4
+          env:
+            SSH_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+            REMOTE_HOST: ${{ secrets.HOST }}
+            REMOTE_USER: ${{ secrets.USERNAME }}
+            SOURCE: "./"
+            TARGET: "~/java"
+        - name: Deploy using ssh
+          uses: appleboy/ssh-action@master
+          with:
+            host: ${{ secrets.HOST }}
+            username: ${{ secrets.USERNAME }}
+            key: ${{ secrets.PRIVATE_KEY }}
+            port: 22
+            script: |
+              cd java
+              create-release.sh <tag>
 ## release.sh doit modifier versions.json, build le projet et mettre jar à disposition
