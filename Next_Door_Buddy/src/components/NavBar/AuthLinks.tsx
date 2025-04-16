@@ -49,37 +49,37 @@ export const AuthLinks = ({user}: { user: any }) => {
                             Accueil
                         </NavigationMenuLink>
                     </Link>
-                    &nbsp
+                    &nbsp;
                     <Link href="/neighborhood" legacyBehavior passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                             Mes quartiers
                         </NavigationMenuLink>
                     </Link>
-                    &nbsp
+                    &nbsp;
                     <Link href="/chat" legacyBehavior passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                             Discussion
                         </NavigationMenuLink>
                     </Link>
-                    &nbsp
+                    &nbsp;
                     <Link href="/" legacyBehavior passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                             Mes échanges
                         </NavigationMenuLink>
                     </Link>
-                    &nbsp
+                    &nbsp;
                     <Link href="/" legacyBehavior passHref>
                         <NavigationMenuLink className={`${navigationMenuTriggerStyle()} p-1`}>
                             <Icon path={mdiBellOutline} size={1}/>
                         </NavigationMenuLink>
                     </Link>
-                    &nbsp
+                    &nbsp;
                     <Link href="/" legacyBehavior passHref>
                         <NavigationMenuLink className={`${navigationMenuTriggerStyle()} p-1`}>
                             <Icon path={mdiCog} size={1}/>
                         </NavigationMenuLink>
                     </Link>
-                    &nbsp
+                    &nbsp;
                     <Link href="/" legacyBehavior passHref>
                         <NavigationMenuLink className={`${navigationMenuTriggerStyle()} p-1`}>
                             <AvatarUser
