@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
-import sys
 
-import ply.yacc as yacc
+import pathlib as pathlib
+
 import ply.lex as lex
+import ply.yacc as yacc
 
-
+PATH = pathlib.Path(__file__).parent.resolve()
 
 reserved = {
     'select' : 'SELECT',
-    ''
+    'insert': 'INSERT',
+    'update': 'UPDATE',
+    'delete': 'DELETE',
+    'print': 'PRINT',
 }
 
 tokens = ['NUMBER', 'MINUS', 'PLUS', 'TIMES', 'DIVIDE',
@@ -65,63 +69,28 @@ def t_print(t):
     return t
 
 
-def t_if(t):
-    r'if'
-    t.type = reserved.get(t.value, 'IF')
+def t_select(t):
+    r'select'
+    t.type = reserved.get(t.value, 'SELECT')
     return t
 
 
-def t_while(t):
-    r'while'
-    t.type = reserved.get(t.value, 'WHILE')
+def t_insert(t):
+    r'insert'
+    t.type = reserved.get(t.value, 'INSERT')
     return t
 
 
-def t_for(t):
-    r'for'
-    t.type = reserved.get(t.value, 'FOR')
+def t_update(t):
+    r'update'
+    t.type = reserved.get(t.value, 'UPDATE')
     return t
 
 
-def t_elif(t):
-    r'elif'
-    t.type = reserved.get(t.value, 'ELIF')
+def t_delete(t):
+    r'delete'
+    t.type = reserved.get(t.value, 'DELETE')
     return t
-
-
-def t_else(t):
-    r'else'
-    t.type = reserved.get(t.value, 'ELSE')
-    return t
-
-
-def t_return(t):
-    r'return'
-    t.type = reserved.get(t.value, 'RETURN')
-    return t
-
-
-def t_fun(t):
-    r'fun'
-    t.type = reserved.get(t.value, 'FUNCTION')
-    return t
-
-def t_class(t):
-    r'class'
-    t.type = reserved.get(t.value, 'CLASS')
-    return t
-
-def t_new(t):
-    r'new'
-    t.type = reserved.get(t.value, 'NEW')
-    return t
-
-
-def t_input(t):
-    r'ckoa'
-    t.type = reserved.get(t.value, 'INPUT')
-    return t
-
 
 def t_name(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
@@ -144,9 +113,17 @@ def t_ccode_comment(t):
 
 def eval_inst(t):
     if t[0] == 'PRINT':
-        print(t[2])
-    elif t[0] == 'FUNCTION':
-        print("Function called with argument:", t[2])
+        print(t[1])
+    elif t[0] == 'INSERT':
+        print("Insert called with argument:", t[2])
+        with open(PATH / t[2]) as f:
+            f = Path(f)
+            if f.exists():
+                print("File exists")
+            else:
+                f.write(str(t[2]) + '\n')
+    elif t[0] == 'SELECT':
+        print("Select:", t[2])
     else:
         print("Unknown instruction:", t)
 
@@ -169,15 +146,20 @@ def p_statements(p):
 
 def p_statement(p):
     '''statement : insert_statement
-    | select_statement'''
+    | select_statement
+    | print_statement'''
     p[0] = p[1]
 def p_insert_statement(p):
-    '''insert_statement : PRINT LPAREN expression RPAREN SEMI'''
-    p[0] = p[1:]
+    '''insert_statement : INSERT expression INTO NAME SEMI'''
+    p[0] = ('INSERT', p[2], p[4])
 
+
+def p_print_statement(p):
+    '''print_statement : PRINT expression SEMI'''
+    p[0] = ('PRINT', p[2])
 def p_select_statement(p):
-    '''select_statement : FUNCTION LPAREN expression RPAREN SEMI'''
-    p[0] = p[1:]
+    '''select_statement : SELECT NAME SEMI'''
+    p[0] = ('select', p[2])
 def p_expression(p):
     '''expression : expression PLUS expression
                   | expression MINUS expression
