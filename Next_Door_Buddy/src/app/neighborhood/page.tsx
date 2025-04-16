@@ -8,10 +8,10 @@ import {Button} from '#/components/ui/button'
 import {useEffect, useState} from 'react'
 import {getAllNeighborhoods} from '#/dao/daoNeighborhood'
 import Icon from "@mdi/react"
-import {mdiBellOutline, mdiPlusCircleOutline} from "@mdi/js"
-import {AspectRatio} from "#/components/ui/aspect-ratio"
+import {mdiPlusCircleOutline} from "@mdi/js"
 import Image from "next/image"
 import img from "@/maison.png"
+import {Spinner} from "#/components/ui/loading"
 
 const Neighborhood = () => {
     const [userData, setUserData] = useState<any>(null)
@@ -20,12 +20,7 @@ const Neighborhood = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const fetchedUserData = await getPotentialUser()
-            if (!fetchedUserData) {
-                redirect('/login') // ⚠️ redirect ne marche pas ici
-                return
-            }
-
+            const fetchedUserData = await getPotentialUser();
             setUserData(fetchedUserData)
 
             const fetchedNeighborhoodsData = await getAllNeighborhoods()
@@ -36,7 +31,16 @@ const Neighborhood = () => {
         fetchData()
     }, [])
 
-    if (loading) return <div>Loading...</div>
+    // if (!userData) {
+    //     redirect('/login'); // ⚠️ redirect ne marche pas ici
+    //     return;
+    // }
+
+    if (loading) return (<>
+        <div className={"w-full h-full flex justify-center align-middle"}>
+            <Spinner show={true} className={""} size={"large"}/>
+        </div>
+    </>)
     if (!userData) return null
 
     return (

@@ -46,13 +46,17 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
         >
-            <Navbar user={user}></Navbar>
-            <SocketProvider>
-                {children}
-            </SocketProvider>
-            <ThemeChooser/>
-            <footer className="bg-gray-100 py-4">
-                <div className="w-full"><p className="m-0 text-center text-black-600 ">Copyright © Your Website 2023</p>
+                <Navbar user={user}></Navbar>
+                <SocketProvider>
+                    {children}
+                </SocketProvider>
+            <footer className="bottom-0 w-full ">
+
+                <div className="w-full">
+                    <div>
+                        <ThemeChooser/>
+                    </div>
+                    <p className="p-3 bg-gray-100 text-center text-black-600 "> Copyright © Your Website 2023</p>
                 </div>
             </footer>
         </ThemeProvider>

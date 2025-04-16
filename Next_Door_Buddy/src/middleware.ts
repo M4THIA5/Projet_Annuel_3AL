@@ -25,14 +25,19 @@ async function handleSpecialPaths(path: string, req: NextRequest) {
 }
 
 const publicRoutes = ['/login', '/signup']
+const protectedRoutes = ['/neighborhood']
 
 export default async function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname
     const isPublicRoute = publicRoutes.includes(path)
+    const isProtectedRoute = protectedRoutes.includes(path)
     const cookie = (await cookies()).get('session')?.value
     const session = await decrypt(cookie)
     if (isPublicRoute && session?.userId){
-            return NextResponse.redirect(new URL('/', request.nextUrl))
+        return NextResponse.redirect(new URL('/', request.nextUrl))
+    }
+    if(isProtectedRoute && !session){
+        return NextResponse.redirect(new URL('/login', request.nextUrl))
     }
     const potentialResponse = handleSpecialPaths(path, request)
     if (potentialResponse !== undefined) {
