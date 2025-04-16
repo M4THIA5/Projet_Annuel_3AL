@@ -9,6 +9,7 @@ type Props = {
 function ChatFooter({ socket, user }: Props) {
 
     const [message, setMessage] = useState('')
+    const handleTyping = () => socket.emit('typing', `${user} is typing`)
     const handleSendMessage = (e: { preventDefault: () => void }) => {
         e.preventDefault()
         if (message.trim()) {
@@ -34,6 +35,7 @@ function ChatFooter({ socket, user }: Props) {
                     className="message"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
+                    onKeyDown={handleTyping}
                 />
                 <button className="sendBtn">SEND</button>
             </form>
