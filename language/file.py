@@ -8,18 +8,20 @@ import ply.yacc as yacc
 PATH = pathlib.Path(__file__).parent.resolve()
 
 reserved = {
-    'select' : 'SELECT',
+    'select': 'SELECT',
     'insert': 'INSERT',
     'update': 'UPDATE',
     'delete': 'DELETE',
     'print': 'PRINT',
+    'into': 'INTO',
+    'where': 'WHERE',
 }
 
 tokens = ['NUMBER', 'MINUS', 'PLUS', 'TIMES', 'DIVIDE',
           'LPAREN', 'RPAREN', 'AND', 'OR', 'SEMI', 'NAME',
           'EQUAL', 'GT', 'LT', 'GTE', 'LTE', 'DEQUAL',
           'ACCDEB', 'ACCFERM', 'INC', 'DEC',
-          'CRDEB', 'CRFIN', 'VIR', 'NOTEQUAL','POINT',
+          'CRDEB', 'CRFIN', 'VIR', 'NOTEQUAL', 'POINT',
           'TEXT'
           ] + list(reserved.values())
 
@@ -48,6 +50,7 @@ t_CRFIN = r'\]'
 t_VIR = r','
 t_POINT = r'\.'
 t_ignore = " \t"
+
 
 def t_NUMBER(t):
     r'\-?\d+(\.\d+)?'
@@ -92,15 +95,28 @@ def t_delete(t):
     t.type = reserved.get(t.value, 'DELETE')
     return t
 
+
+def t_into(t):
+    r'into'
+    t.type = reserved.get(t.value, 'INTO')
+    return t
+
+
+def t_where(t):
+    r'where'
+    t.type = reserved.get(t.value, 'WHERE')
+    return t
 def t_name(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
     t.type = reserved.get(t.value, 'NAME')
     return t
 
+
 def t_TEXT(t):
     r'"[\(\)\[\]\w,éèàâêùëöÿäçô$*#&\/\\*\-+\s]*"'
     t.value = t.value
     return t
+
 
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])
@@ -111,30 +127,35 @@ def t_ccode_comment(t):
     r'(/\*(.|\n)*?\*/)|(//.*)'
     pass
 
+
 def eval_inst(t):
     if t[0] == 'PRINT':
         print(t[1])
     elif t[0] == 'INSERT':
-        print("Insert called with argument:", t[2])
-        with open(PATH / t[2]) as f:
-            f = Path(f)
-            if f.exists():
-                print("File exists")
-            else:
-                f.write(str(t[2]) + '\n')
+        print("Insert called with argument:", t[1])
+        try:
+            with open(PATH / t[1]) as f:
+                f = pathlib.Path(f)
+                if f.exists():
+                    print("File exists")
+                else:
+                    f.write(str(t[1]) + '\n')
+        except FileNotFoundError:
+            print("File not found")
     elif t[0] == 'SELECT':
-        print("Select:", t[2])
+        print("Select:", t[1])
     else:
         print("Unknown instruction:", t)
 
 
-
 lex.lex()
+
 
 def p_start(p):
     '''start : statement_list'''
     p[0] = p[1]
     eval_inst(p[1])
+
 
 def p_statements(p):
     '''statement_list : statement_list statement
@@ -144,11 +165,14 @@ def p_statements(p):
     else:
         p[0] = p[1] + [p[2]]
 
+
 def p_statement(p):
     '''statement : insert_statement
     | select_statement
     | print_statement'''
     p[0] = p[1]
+
+
 def p_insert_statement(p):
     '''insert_statement : INSERT expression INTO NAME SEMI'''
     p[0] = ('INSERT', p[2], p[4])
@@ -157,9 +181,40 @@ def p_insert_statement(p):
 def p_print_statement(p):
     '''print_statement : PRINT expression SEMI'''
     p[0] = ('PRINT', p[2])
+
+
 def p_select_statement(p):
-    '''select_statement : SELECT NAME SEMI'''
-    p[0] = ('select', p[2])
+    '''select_statement : SELECT NAME SEMI
+    | SELECT WHERE liste_condition SEMI'''
+    if len(p) == 5:
+        p[0] = ('SELECT', p[2], p[3])
+    else:
+        p[0] = ('SELECT', p[2])
+
+
+def p_list_condition(p):
+    '''liste_condition : liste_condition boolean_operator condition
+        | condition'''
+    p[0] = p[1]
+
+
+def p_boolean_operator(p):
+    '''boolean_operator : AND
+                        | OR'''
+    p[0] = p[1]
+
+
+def p_condition(p):
+    '''condition : expression EQUAL expression
+                 | expression GT expression
+                 | expression LT expression
+                 | expression GTE expression
+                 | expression LTE expression
+                 | expression DEQUAL expression
+                 | expression NOTEQUAL expression'''
+    p[0] = ('condition', p[1], p[2], p[3])
+
+
 def p_expression(p):
     '''expression : expression PLUS expression
                   | expression MINUS expression
@@ -177,11 +232,13 @@ def p_expression(p):
         p[0] = p[2]
     else:
         p[0] = p[1]
+
+
 def p_error(p):
     print(p)
     print("Syntax error in input!")
 
 
 yacc.yacc()
-s:str = input('calc > ')
+s: str = input('calc > ')
 yacc.parse(s)
