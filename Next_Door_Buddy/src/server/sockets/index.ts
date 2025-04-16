@@ -36,8 +36,24 @@ const socketHandler = (socket: Socket, io: Server): void => {
     socket.emit("users", users)
     socket.emit("newUser", users)
 
+    let peopleTyping: string[] = []
+    socket.on('typing', (data) => {
+        if (!peopleTyping.includes(data)) {
+            peopleTyping.push(data)
+        }
+        const message = peopleTyping.length > 1 ?
+            "" + peopleTyping.join(", ") + " are typing..." :
+            (peopleTyping.length === 0 ? "" : peopleTyping[0] + " is typing...")
+        socket.broadcast.emit('typingResponse', message)
+    })
+    socket.on('ntyping', (data) => {
+        peopleTyping = peopleTyping.filter((name) => name !== data)
+        const message = peopleTyping.length > 1 ?
+            "" + peopleTyping.join(", ") + " are typing..." :
+            (peopleTyping.length === 0 ? "" : peopleTyping[0] + " is typing...")
 
-    socket.on('typing', (data) => socket.broadcast.emit('typingResponse', data))
+        socket.broadcast.emit('typingResponse', message)
+    })
 
     // notify existing users
     socket.broadcast.emit("user connected", {
