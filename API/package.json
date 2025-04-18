@@ -8,6 +8,8 @@
     "build": "rm -rf dist && tsc",
     "prisma:generate:postgresql": "prisma generate --schema=./prisma/postgres/postgres.schema.prisma",
     "prisma:generate:mongodb": "prisma generate --schema=./prisma/mongodb/mongo.schema.prisma",
+    "prisma:push:postgresql": "prisma db push --schema=./prisma/postgres/postgres.schema.prisma",
+    "prisma:push:mongodb": "prisma db push --schema=./prisma/mongodb/mongo.schema.prisma",
     "prisma:migrate": "prisma migrate dev",
     "lint": "eslint src --ext .ts"
   },

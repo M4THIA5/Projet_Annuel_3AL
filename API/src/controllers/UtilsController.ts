@@ -1,5 +1,5 @@
 import {PrismaClient as PostGre} from '../../prisma/postgres/client'
-import {RequestHandler, Request, Response} from "express"
+import {Request, RequestHandler, Response} from "express"
 import {Credentials} from '../types'
 import UserController from "./userController"
 import bcrypt from 'bcrypt'
@@ -16,7 +16,10 @@ class UtilsController {
         }
         try {
             const user = await prisma.user.findUnique(
-                {where: {email: credentials.email}, select: {id: true, email: true, password: true}}
+                {
+                    where: {email: credentials.email},
+                    select: {id: true, email: true, password: true, prenom: true, nom: true}
+                }
             )
             if (!user) {
                 res.status(401).json("Invalid credentials")
@@ -27,7 +30,7 @@ class UtilsController {
                     res.status(401).json("Invalid credentials")
                     return
                 }
-                res.status(200).json({message: "ok", id: user.id, username: user.email})
+                res.status(200).json({message: "ok", id: user.id, username: user.prenom + " " + user.nom})
             })
         } catch (e) {
             res.status(500).json("An error has occured. Please try again later.")
