@@ -14,6 +14,7 @@ reserved = {
     'delete': 'DELETE',
     'print': 'PRINT',
     'into': 'INTO',
+    'create': 'CREATE',
     'where': 'WHERE',
 }
 
@@ -169,8 +170,20 @@ def p_statements(p):
 def p_statement(p):
     '''statement : insert_statement
     | select_statement
-    | print_statement'''
+    | print_statement
+    | create_statement
+    | update_statement'''
     p[0] = p[1]
+
+
+def p_create_statement(p):
+    '''create_statement : CREATE NAME SEMI'''
+    p[0] = ('CREATE', p[2], p[4])
+
+
+def p_update_statement(p):
+    '''update_statement : UPDATE NAME SEMI'''
+    p[0] = ('UPDATE', p[2], p[3])
 
 
 def p_insert_statement(p):
