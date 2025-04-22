@@ -1,12 +1,14 @@
 import { Router } from 'express'
 import UserController from '../controllers/userController'
+import { verifyJwt, verifyAdmin } from '../middleware/verifyJwt'
 
 const userController = new UserController()
 
-export function setUserRoutes(app: Router) {
-    app.post('/users', userController.createUser)
-    app.get('/users', userController.getAllUsers)
-    app.get('/users/:id', userController.getUser)
-    app.put('/users/:id', userController.updateUser)
-    app.delete('/users/:id', userController.deleteUser)
-}
+const userRoutes = Router()
+userRoutes.post('/', userController.createUser)
+userRoutes.get('/', verifyJwt, verifyAdmin, userController.getAllUsers)
+userRoutes.get('/:id', verifyJwt, userController.getUser)
+userRoutes.put('/:id', verifyJwt, userController.updateUser)
+userRoutes.delete('/:id', verifyJwt, userController.deleteUser)
+
+export default userRoutes

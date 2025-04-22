@@ -6,7 +6,7 @@ import {redirect} from 'next/navigation'
 import {Card, CardContent} from '#/components/ui/card'
 import {Button} from '#/components/ui/button'
 import {useEffect, useState} from 'react'
-import {getAllNeighborhoods} from '#/dao/daoNeighborhood'
+import {getAllNeighborhoods} from '#/lib/api_requests/neighborhood'
 import Icon from "@mdi/react"
 import {mdiPlusCircleOutline} from "@mdi/js"
 import Image from "next/image"

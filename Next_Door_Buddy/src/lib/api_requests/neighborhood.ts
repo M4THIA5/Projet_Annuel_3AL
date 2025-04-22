@@ -1,4 +1,4 @@
-import { API } from "#/lib/fetch"
+import { API } from "#/lib/api_requests/fetch"
 
 export const createNeighborhood = async (data: any) => {
     try {
