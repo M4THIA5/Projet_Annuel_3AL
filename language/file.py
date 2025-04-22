@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import os
 import pathlib as pathlib
 
 import ply.lex as lex
@@ -148,7 +148,23 @@ def eval_inst(t):
         print("Insert called with argument:", t[1])
         open(PATH / t[1], "w")
     elif t[0] == 'DELETE':
+        print("Delete:", t[1])
+        try:
+            os.remove(PATH / t[1])
+        except FileNotFoundError:
+            print("File not found")
     elif t[0] == 'UPDATE':
+        print("Update called with argument:", t[1])
+        try:
+            with open(PATH / t[1], "w") as file:
+                f = pathlib.Path(PATH / t[1])
+                if f.exists():
+                    print("File exists")
+                else:
+                    print("File does not exist")
+                file.write(str(t[1]) + '\n')
+        except FileNotFoundError:
+            print("File not found")
     elif t[0] == 'SELECT':
         print("Select:", t[1])
     else:
@@ -170,7 +186,7 @@ def p_statements(p):
     if len(p) == 2:
         p[0] = p[1]
     else:
-        p[0] = p[1] + [p[2]]
+        p[0] = p[1] + p[2]
 
 
 def p_statement(p):
@@ -184,8 +200,8 @@ def p_statement(p):
 
 
 def p_delete_statement(p):
-    '''delete_statement : DELETE expression FROM NAME SEMI'''
-    p[0] = ('DELETE', p[2], p[4])
+    '''delete_statement : DELETE NAME SEMI'''
+    p[0] = ('DELETE', p[2])
 
 def p_create_statement(p):
     '''create_statement : CREATE NAME SEMI'''
