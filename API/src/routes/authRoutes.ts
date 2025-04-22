@@ -1,9 +1,12 @@
 import { Router } from 'express'
 import AuthController from '../controllers/authController'
+import { verifyJwt } from '../middleware/verifyJwt'
 
 const authController = new AuthController()
 
-export function setAuthRoutes(app: Router) {
-    app.post('/login', authController.login)
-    app.post('/logout', authController.logout)
-}
+const authRoutes = Router()
+authRoutes.post('/login', authController.login)
+authRoutes.post('/logout', verifyJwt, authController.logout)
+authRoutes.post('/refresh-access-token', authController.handleRefreshToken)
+
+export default authRoutes

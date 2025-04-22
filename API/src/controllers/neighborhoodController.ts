@@ -1,13 +1,13 @@
-import { PrismaClient } from '../../prisma/postgres/client'
-import { RequestHandler } from 'express'
+import { NextFunction, Request, Response } from "express"
+import { PrismaClient as PostgresClient } from "../../prisma/postgresql/client"
 
-const prisma = new PrismaClient()
+const postgresClient = new PostgresClient()
 
 class NeighborhoodController {
     // Create a new neighborhood
-    createNeighborhood: RequestHandler = async (req, res, next) => {
+    createNeighborhood = async (req:Request, res: Response, next: NextFunction) => {
         try {
-            const neighborhood = await prisma.neighborhood.create({
+            const neighborhood = await postgresClient.neighborhood.create({
                 data: req.body,
             })
             res.status(201).json(neighborhood)
@@ -17,9 +17,9 @@ class NeighborhoodController {
     }
 
     // Get all neighborhoods
-    getAllNeighborhoods: RequestHandler = async (_req, res, next) => {
+    getAllNeighborhoods = async (req:Request, res: Response, next: NextFunction) => {
         try {
-            const neighborhoods = await prisma.neighborhood.findMany()
+            const neighborhoods = await postgresClient.neighborhood.findMany()
             res.status(200).json(neighborhoods)
         } catch (error) {
             next(error)
@@ -27,14 +27,14 @@ class NeighborhoodController {
     }
 
     // Get one neighborhood by ID
-    // @ts-expect-error requestHandler
-    getNeighborhood: RequestHandler = async (req, res, next) => {
+    getNeighborhood = async (req:Request, res: Response, next: NextFunction) => {
         try {
-            const neighborhood = await prisma.neighborhood.findUnique({
+            const neighborhood = await postgresClient.neighborhood.findUnique({
                 where: { id: Number(req.params.id) },
             })
             if (!neighborhood) {
-                return res.status(404).json({ error: 'Neighborhood not found' })
+                res.status(404).json({ error: 'Neighborhood not found' })
+                return
             }
             res.status(200).json(neighborhood)
         } catch (error) {
@@ -43,9 +43,9 @@ class NeighborhoodController {
     }
 
     // Update a neighborhood
-    updateNeighborhood: RequestHandler = async (req, res, next) => {
+    updateNeighborhood = async (req:Request, res: Response, next: NextFunction) => {
         try {
-            const updated = await prisma.neighborhood.update({
+            const updated = await postgresClient.neighborhood.update({
                 where: { id: Number(req.params.id) },
                 data: req.body,
             })
@@ -56,17 +56,17 @@ class NeighborhoodController {
     }
 
     // Delete a neighborhood
-    deleteNeighborhood: RequestHandler = async (req, res, next) => {
+    deleteNeighborhood = async (req:Request, res: Response, next: NextFunction) => {
         try {
             const neighborhoodId = Number(req.params.id)
 
             // Supprimer toutes les relations UserNeighborhood liées à ce quartier
-            await prisma.userNeighborhood.deleteMany({
+            await postgresClient.userNeighborhood.deleteMany({
                 where: { neighborhoodId },
             })
 
             // Supprimer le quartier
-            await prisma.neighborhood.delete({
+            await postgresClient.neighborhood.delete({
                 where: { id: neighborhoodId },
             })
 

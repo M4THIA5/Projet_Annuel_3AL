@@ -1,6 +1,6 @@
 // Fonction pour récupérer les détails d'un utilisateur
 
-import {API} from "#/lib/fetch"
+import {API} from "#/lib/api_requests/fetch"
 
 export const getUserDetails = async (userId: string) => {
     try {

@@ -11,7 +11,8 @@ class api {
             const response = await fetch(`${this.baseUrl}${endpoint}`, {
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
             })
 
@@ -27,7 +28,7 @@ class api {
     }
 
     // Méthode pour effectuer une requête POST
-    async post(endpoint: string, data: any) {
+    async post(endpoint: string, data: unknown) {
         try {
             const response = await fetch(`${this.baseUrl}${endpoint}`, {
                 method: 'POST',
@@ -49,7 +50,7 @@ class api {
     }
 
     // Méthode pour effectuer une requête PUT
-    async put(endpoint: string, data: any) {
+    async put(endpoint: string, data: unknown) {
         try {
             const response = await fetch(`${this.baseUrl}${endpoint}`, {
                 method: 'PUT',
@@ -92,7 +93,7 @@ class api {
     }
 }
 
-export const API = new api('http://localhost:3001')
+export const API = new api(`${process.env.NEXT_PUBLIC_API_URL}`)
 
 
 
