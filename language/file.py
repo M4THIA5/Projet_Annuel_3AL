@@ -121,6 +121,8 @@ def t_where(t):
     r'where'
     t.type = reserved.get(t.value, 'WHERE')
     return t
+
+
 def t_name(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
     t.type = reserved.get(t.value, 'NAME')
@@ -257,7 +259,8 @@ def p_statement(p):
     | print_statement
     | create_statement
     | update_statement
-    | delete_statement'''
+    | delete_statement
+    | search_statement'''
     p[0] = p[1]
 
 
@@ -313,13 +316,13 @@ def p_boolean_operator(p):
 
 
 def p_condition(p):
-    '''condition : expression EQUAL expression
-                 | expression GT expression
-                 | expression LT expression
-                 | expression GTE expression
-                 | expression LTE expression
-                 | expression DEQUAL expression
-                 | expression NOTEQUAL expression'''
+    '''condition : prop EQUAL expression
+                 | prop GT expression
+                 | prop LT expression
+                 | prop GTE expression
+                 | prop LTE expression
+                 | prop DEQUAL expression
+                 | prop NOTEQUAL expression'''
     p[0] = ('condition', p[1], p[2], p[3])
 
 
