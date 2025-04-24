@@ -16,6 +16,7 @@ reserved = {
     'into': 'INTO',
     'create': 'CREATE',
     'where': 'WHERE',
+    'with': 'WITH'
 }
 
 tokens = ['NUMBER', 'MINUS', 'PLUS', 'TIMES', 'DIVIDE',
@@ -102,6 +103,11 @@ def t_into(t):
     t.type = reserved.get(t.value, 'INTO')
     return t
 
+def t_with(t):
+    r'with'
+    t.type = reserved.get(t.value, 'WITH')
+    return t
+
 
 def t_where(t):
     r'where'
@@ -129,44 +135,92 @@ def t_ccode_comment(t):
     pass
 
 
+def eval_expr(tree):
+    if isinstance(tree, int) or isinstance(tree, float):
+        return tree
+    elif tree[0] == '+':
+        return eval_expr(tree[1]) + eval_expr(tree[2])
+    elif tree[0] == '*':
+        return eval_expr(tree[1]) * eval_expr(tree[2])
+    elif tree[0] == '-':
+        return eval_expr(tree[1]) - eval_expr(tree[2])
+    elif tree[0] == '/':
+        return eval_expr(tree[1]) / eval_expr(tree[2])
+    elif tree[0] == '<':
+        return eval_expr(tree[1]) < eval_expr(tree[2])
+    elif tree[0] == '>':
+        return eval_expr(tree[1]) > eval_expr(tree[2])
+    elif tree[0] == '<=':
+        return eval_expr(tree[1]) <= eval_expr(tree[2])
+    elif tree[0] == '>=':
+        return eval_expr(tree[1]) >= eval_expr(tree[2])
+    elif tree[0] == '==':
+        return eval_expr(tree[1]) == eval_expr(tree[2])
+    else:
+        return tree
+
+
 def eval_inst(t):
-    if t[0] == 'PRINT':
-        print(t[1])
-    elif t[0] == 'INSERT':
-        print("Insert called with argument:", t[1])
+    if t[0] == 'empty' or t == 'empty':
+        return
+    elif t[0] == 'print':
+        print(eval_expr(t[1]))
+    elif t[0] == 'insert':
+        f = pathlib.Path(PATH / t[1])
+        if not f.exists():
+            print("File does not exist")
+            return
         try:
-            with open(PATH / t[1], "a") as file:
-                f = pathlib.Path(PATH / t[1])
-                if f.exists():
-                    print("File exists")
-                else:
-                    print("File does not exist")
+            with open(PATH / t[2], "a") as file:
                 file.write(str(t[1]) + '\n')
         except FileNotFoundError:
             print("File not found")
-    elif t[0] == 'CREATE':
-        print("Insert called with argument:", t[1])
+    elif t[0] == 'create':
+        f = pathlib.Path(PATH / t[1])
+        if f.exists():
+            print("File exists already")
+            return
         open(PATH / t[1], "w")
-    elif t[0] == 'DELETE':
-        print("Delete:", t[1])
+    elif t[0] == 'delete':
+        f = pathlib.Path(PATH / t[1])
+        if not f.exists():
+            print("File does not exist")
+            return
         try:
             os.remove(PATH / t[1])
         except FileNotFoundError:
             print("File not found")
-    elif t[0] == 'UPDATE':
-        print("Update called with argument:", t[1])
+    elif t[0] == 'update':
         try:
+            f = pathlib.Path(PATH / t[1])
+            if not f.exists():
+                print("File does not exist")
+                return
             with open(PATH / t[1], "w") as file:
-                f = pathlib.Path(PATH / t[1])
-                if f.exists():
-                    print("File exists")
-                else:
-                    print("File does not exist")
-                file.write(str(t[1]) + '\n')
+                file.write(str(t[2]) + '\n')
         except FileNotFoundError:
             print("File not found")
-    elif t[0] == 'SELECT':
-        print("Select:", t[1])
+    elif t[0] == 'select':
+        try:
+            f = pathlib.Path(PATH / t[1])
+            if not f.exists():
+                print(f"File {t[1]} does not exist")
+            else:
+                print(f"File {t[1]} exists")
+        except FileNotFoundError:
+            print("File not found")
+    elif t[0] == 'selectw':
+        print("Select:", t[1])  # TODO
+    elif t[0] == 'search':
+        print("1")
+        os.system("cd app/ && mvn clean compile --quiet --log-file ./log")
+        print("2")
+        os.system(
+            " cd app && mvn exec:java --quiet --log-file ./log -Dexec.mainClass=\"app.src.main.java.fr.laporteacote.javawebscraper.Main\" -Dexec.args=\"" +
+            t[1] + "\" 1> return.txt")
+    elif t[0] == "statement":
+        eval_inst(t[1])
+        eval_inst(t[2])
     else:
         print("Unknown instruction:", t)
 
@@ -184,9 +238,9 @@ def p_statements(p):
     '''statement_list : statement_list statement
                       | statement'''
     if len(p) == 2:
-        p[0] = p[1]
+        p[0] = ('statement', p[1], 'empty')
     else:
-        p[0] = p[1] + p[2]
+        p[0] = ('statement', p[1], p[2])
 
 
 def p_statement(p):
@@ -201,41 +255,47 @@ def p_statement(p):
 
 def p_delete_statement(p):
     '''delete_statement : DELETE NAME SEMI'''
-    p[0] = ('DELETE', p[2])
+    p[0] = ('delete', p[2])
+
+
+def p_search_statement(p):
+    '''search_statement : SEARCH NAME SEMI'''
+    p[0] = ('search', p[2])
+
 
 def p_create_statement(p):
     '''create_statement : CREATE NAME SEMI'''
-    p[0] = ('CREATE', p[2])
+    p[0] = ('create', p[2])
 
 
 def p_update_statement(p):
-    '''update_statement : UPDATE NAME SEMI'''
-    p[0] = ('UPDATE', p[2], p[3])
+    '''update_statement : UPDATE NAME WITH expression SEMI'''
+    p[0] = ('update', p[2], p[4])
 
 
 def p_insert_statement(p):
     '''insert_statement : INSERT expression INTO NAME SEMI'''
-    p[0] = ('INSERT', p[2], p[4])
+    p[0] = ('insert', p[2], p[4])
 
 
 def p_print_statement(p):
     '''print_statement : PRINT expression SEMI'''
-    p[0] = ('PRINT', p[2])
+    p[0] = ('print', p[2])
 
 
 def p_select_statement(p):
     '''select_statement : SELECT NAME SEMI
     | SELECT WHERE liste_condition SEMI'''
     if len(p) == 5:
-        p[0] = ('SELECT', p[2], p[3])
+        p[0] = ('selectw', p[2], p[3])
     else:
-        p[0] = ('SELECT', p[2])
+        p[0] = ('select', p[2])
 
 
 def p_list_condition(p):
     '''liste_condition : liste_condition boolean_operator condition
         | condition'''
-    p[0] = p[1]
+    p[0] = ('listeconditions', [1])
 
 
 def p_boolean_operator(p):
@@ -267,9 +327,7 @@ def p_expression(p):
                   | NAME
                   | TEXT'''
     if len(p) == 4:
-        p[0] = p[1] + p[2] + p[3]
-    elif len(p) == 3:
-        p[0] = p[2]
+        p[0] = (p[2], p[1], p[3])
     else:
         p[0] = p[1]
 
