@@ -16,6 +16,7 @@ reserved = {
     'into': 'INTO',
     'create': 'CREATE',
     'where': 'WHERE',
+    'search': 'SEARCH',
     'with': 'WITH'
 }
 
@@ -102,6 +103,13 @@ def t_into(t):
     r'into'
     t.type = reserved.get(t.value, 'INTO')
     return t
+
+
+def t_search(t):
+    r'search'
+    t.type = reserved.get(t.value, 'SEARCH')
+    return t
+
 
 def t_with(t):
     r'with'
