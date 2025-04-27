@@ -1,10 +1,10 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-generator client {
+generator postgresClient {
   provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
-  output          = "./client"
+  output          = "../client/postgresClient"
 }
 
 datasource db {
@@ -13,26 +13,20 @@ datasource db {
 }
 
 model User {
-  id     Int    @id @default(autoincrement())
-  email  String @unique
-  nom    String
-  prenom String
-  color  String @default("212529")
+  id                Int    @id @default(autoincrement())
+  email             String @unique
+  password          String
+  roles             String[] @default(["classic"])
+  refreshToken      String?
+  firstName         String?
+  lastName          String?
+  color             String @default("212529")
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  password String
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime? @updatedAt
 
   Score             Score[]
-  roles             Role[]
   userNeighborhoods UserNeighborhood[]
-}
-
-model Role {
-  id    Int    @id @default(autoincrement())
-  name  String @unique
-  users User[]
 }
 
 model Game {

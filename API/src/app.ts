@@ -4,8 +4,8 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import { config } from "./config/env"
 
-import { PrismaClient as PostgresClient } from "../prisma/postgresql/client"
-import { PrismaClient as MongoClient } from "../prisma/mongodb/client"
+import { PrismaClient as PostgresClient } from "../prisma/client/postgresClient"
+import { PrismaClient as MongoClient } from "../prisma/client/mongoClient"
 
 import errorHandler from "./middleware/errorHandler"
 import notFoundHandler from "./middleware/notFoundHandler"
@@ -19,7 +19,7 @@ const mongoClient = new MongoClient()
 
 const app = express()
 app.use(express.json())
-app.use(cors({ credentials: true, origin: `${config.HOST}:3000` }))
+app.use(cors({ credentials: true, origin: config.NODE_ENV === "production" ? `https://${config.HOST}:3000` : "http://localhost:3000" }))
 app.use(urlencoded({ extended: false }))
 app.use(cookieParser())
 
@@ -39,7 +39,7 @@ app.get("/health", async (req: Request, res: Response): Promise<void> => {
   }
 })
 
-app.use("/auth", authRoutes)
+app.use("/", authRoutes)
 app.use("/users", userRoutes)
 app.use("/neighborhoods", neighborhoodRoutes)
 app.use("/user-neighborhoods", userNeighborhoodRoutes)

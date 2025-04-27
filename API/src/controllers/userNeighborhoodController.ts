@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express"
-import { PrismaClient as PostgresClient } from "../../prisma/postgresql/client"
+import { PrismaClient as PostgresClient } from "../../prisma/client/postgresClient"
 
 const postgresClient = new PostgresClient()
 

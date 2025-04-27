@@ -1,13 +1,17 @@
+import { UserRole } from "../config/utils"
+
 export interface User {
   id?: number
-  name: string
+  firstName: string
+  lastName: string
   email: string
+  color?: string
   password: string
-  isAdmin?: boolean
+  roles?: UserRole[]
 }
 
 export type CurrentUser = {
   id: number
   email: string
-  isAdmin: boolean
+  roles: UserRole[]
 }
