@@ -1,62 +1,38 @@
-import {NextResponse} from 'next/server'
-import type {NextRequest} from 'next/server'
-import {decrypt, logout} from "#/lib/session"
-import {cookies} from "next/headers"
+import { isAuthenticated } from "#/lib/authentification"
+import { Routes } from "#/Routes"
+import type { NextRequest } from "next/server"
+import { NextResponse } from "next/server"
+import { getRoles } from "./lib/api_requests/user"
+import { userRole } from "./types/user"
 
-async function handleSpecialPaths(path: string, req: NextRequest) {
-    switch (path) {
-        case'/':
-            console.log("Home page !")
-            break
-        case '/login':
-            console.log("Login")
-            break
-        case '/see':
-            console.log("Here's the data")
-            break
+const PUBLIC_ROUTES = [
+  Routes.login.toString(),
+  Routes.register.toString(),
+]
 
-        case '/logout':
-            await logout()
-            return NextResponse.redirect(new URL('/login', req.nextUrl), )
-        default:
-            console.log('idk man')
+export async function middleware(req: NextRequest) {
+  const isAuth = await isAuthenticated()
+  const isPublicRoute = PUBLIC_ROUTES.some((route) => req.nextUrl.pathname.startsWith(route))
+  const isAdminRoute = req.nextUrl.pathname.startsWith(Routes.admin.toString())
+
+  if (!isAuth && !isPublicRoute) {
+    return NextResponse.redirect(new URL(Routes.login.toString(), req.url))
+  }
+  if (isAuth && isPublicRoute) {
+    return NextResponse.redirect(new URL(Routes.home.toString(), req.url))
+  }
+
+  if (isAuth && isAdminRoute) {
+    const roles = await getRoles()
+    if (!roles.includes(userRole.admin)) {
+      return NextResponse.redirect(new URL(Routes.home.toString(), req.url))
     }
-    return undefined
+  }
+  return NextResponse.next()
 }
 
-const publicRoutes = ['/login', '/signup']
-const protectedRoutes = ['/neighborhood']
-
-export default async function middleware(request: NextRequest) {
-    const path = request.nextUrl.pathname
-    const isPublicRoute = publicRoutes.includes(path)
-    const isProtectedRoute = protectedRoutes.includes(path)
-    const cookie = (await cookies()).get('session')?.value
-    const session = await decrypt(cookie)
-    if (isPublicRoute && session?.userId){
-        return NextResponse.redirect(new URL('/', request.nextUrl))
-    }
-    if(isProtectedRoute && !session){
-        return NextResponse.redirect(new URL('/login', request.nextUrl))
-    }
-    const potentialResponse = handleSpecialPaths(path, request)
-    if (potentialResponse !== undefined) {
-        return potentialResponse
-    }
-    return NextResponse.next()
-}
 export const config = {
-    matcher: [
-        /*
-         * Match all request paths except for the ones starting with:
-         * - api (API routes)
-         * - _next/static (static files)
-         * - _next/image (image optimization files)
-         * - favicon.ico, sitemap.xml, robots.txt (metadata files)
-         */
-        {
-            source:
-                '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|socket.io).*)',
-        },
-    ],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+  ],
 }
