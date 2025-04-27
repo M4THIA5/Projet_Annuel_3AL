@@ -4,8 +4,11 @@ export const Routes = {
   },
   login: {
     toString: () => "/login" as const,
-  }, 
+  },
   register: {
     toString: () => "/register" as const,
+  },
+  admin: {
+    toString: () => "/admin" as const,
   },
 }

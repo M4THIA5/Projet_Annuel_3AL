@@ -1,0 +1,95 @@
+import { API_URL } from "../config"
+
+class Api {
+  private baseUrl: string
+
+  constructor(baseUrl: string) {
+      this.baseUrl = baseUrl
+  }
+
+  // Méthode pour effectuer une requête GET
+  async get(endpoint: string, options?: { accessToken?: string }): Promise<Response> {
+    const accessToken = options?.accessToken
+    try {
+      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+
+      return response
+    } catch (error) {
+      console.error('Erreur lors de la requête GET:', error)
+      throw error
+    }
+  }
+
+  // Méthode pour effectuer une requête POST
+  async post(endpoint: string, options?: { accessToken?: string, data?: unknown }): Promise<Response> {
+    const accessToken = options?.accessToken
+    const data = options?.data
+    try {
+      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(data),
+      })
+
+      return response
+    } catch (error) {
+      console.error('Erreur lors de la requête POST:', error)
+      throw error
+    }
+  }
+
+  // Méthode pour effectuer une requête PUT
+  async put(endpoint: string, options?: { accessToken?: string, data?: unknown }): Promise<Response> {
+    const accessToken = options?.accessToken
+    const data = options?.data
+    try {
+      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(data),
+      })
+
+      return response
+    } catch (error) {
+      console.error('Erreur lors de la requête PUT:', error)
+      throw error
+    }
+  }
+
+  // Méthode pour effectuer une requête DELETE
+  async delete(endpoint: string, options?: { accessToken?: string }): Promise<Response> {
+    const accessToken = options?.accessToken
+    try {
+      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+
+      return response
+    } catch (error) {
+      console.error('Erreur lors de la requête DELETE:', error)
+      throw error
+    }
+  }
+}
+
+export const API = new Api(`${API_URL}`)

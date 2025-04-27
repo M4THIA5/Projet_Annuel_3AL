@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client'
-import { Request, Response, NextFunction } from 'express'
+import { Request, Response } from 'express'
 
 async function errorHandler(err: any, req: Request, res: Response) {
   if (err instanceof Prisma.PrismaClientKnownRequestError) {

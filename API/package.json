@@ -6,10 +6,19 @@
     "start": "node dist/server.js",
     "dev": "nodemon --exec ts-node src/server.ts",
     "build": "rm -rf dist && tsc",
+
     "prisma:generate:posgresql": "prisma generate --schema=./prisma/postgresql/schema.prisma",
     "prisma:generate:mongodb": "prisma generate --schema=./prisma/mongodb/schema.prisma",
     "prisma:migrate:postgresql": "prisma migrate dev --schema prisma/postgresql/schema.prisma",
-    "prisma:migrate:mongodb": "prisma migrate dev --schema prisma/mongodb/schema.prisma"
+    "prisma:migrate:mongodb": "prisma migrate dev --schema prisma/mongodb/schema.prisma",
+
+    "prisma:seed:postgresql": "npx prisma db seed",
+
+    "prisma:reset:postgresql": "prisma migrate reset --force --schema prisma/postgresql/schema.prisma",
+    "prisma:reset:mongodb": "prisma migrate reset --force --schema prisma/mongodb/schema.prisma"
+  },
+  "prisma": {
+    "seed": "ts-node src/scripts/seed.ts"
   },
   "author": "",
   "license": "ISC",
