@@ -220,7 +220,7 @@ def eval_inst(t):
         except FileNotFoundError:
             print("File not found")
     elif t[0] == 'selectw':
-        print("Select:", t[1])  # TODO
+        print("Select:", t[1], t[2])  # TODO
     elif t[0] == 'search':
         print("1")
         os.system("cd app/ && mvn clean compile --quiet --log-file ./log")
@@ -306,7 +306,10 @@ def p_select_statement(p):
 def p_list_condition(p):
     '''liste_condition : liste_condition boolean_operator condition
         | condition'''
-    p[0] = ('listeconditions', [1])
+    if len(p) > 2:
+        p[0] = ('liste_conditions', p[1], p[2], p[3])
+    else:
+        p[0] = p[1]
 
 
 def p_boolean_operator(p):
@@ -316,13 +319,13 @@ def p_boolean_operator(p):
 
 
 def p_condition(p):
-    '''condition : prop EQUAL expression
-                 | prop GT expression
-                 | prop LT expression
-                 | prop GTE expression
-                 | prop LTE expression
-                 | prop DEQUAL expression
-                 | prop NOTEQUAL expression'''
+    '''condition : NAME EQUAL result
+                 | NAME GT result
+                 | NAME LT result
+                 | NAME GTE result
+                 | NAME LTE result
+                 | NAME DEQUAL result
+                 | NAME NOTEQUAL result'''
     p[0] = ('condition', p[1], p[2], p[3])
 
 
@@ -341,6 +344,12 @@ def p_expression(p):
         p[0] = (p[2], p[1], p[3])
     else:
         p[0] = p[1]
+
+
+def p_prop(p):
+    '''result : NUMBER
+            | NAME '''
+    p[0] = p[1]
 
 
 def p_error(p):
