@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
 import pathlib as pathlib
+import stat
+from datetime import datetime
 
 import ply.lex as lex
 import ply.yacc as yacc
@@ -17,7 +19,10 @@ reserved = {
     'create': 'CREATE',
     'where': 'WHERE',
     'search': 'SEARCH',
-    'with': 'WITH'
+    'with': 'WITH',
+    'in': 'IN',
+    'dir': "DIR",
+    'file': "FILE"
 }
 
 tokens = ['NUMBER', 'MINUS', 'PLUS', 'TIMES', 'DIVIDE',
@@ -53,6 +58,8 @@ t_CRFIN = r'\]'
 t_VIR = r','
 t_POINT = r'\.'
 t_ignore = " \t"
+
+properties = ["name", "atime", "mtime", "ctime", "type"]
 
 
 def t_NUMBER(t):
@@ -123,6 +130,24 @@ def t_where(t):
     return t
 
 
+def t_in(t):
+    r'in'
+    t.type = reserved.get(t.value, 'IN')
+    return t
+
+
+def t_dir(t):
+    r'dir'
+    t.type = reserved.get(t.value, 'DIR')
+    return t
+
+
+def t_file(t):
+    r'file'
+    t.type = reserved.get(t.value, 'FILE')
+    return t
+
+
 def t_name(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
     t.type = reserved.get(t.value, 'NAME')
@@ -170,6 +195,26 @@ def eval_expr(tree):
         return tree
 
 
+def printStatData(stats, pa):
+    if stat.S_ISREG(stats.st_mode):
+        print("Is a file")
+    if stat.S_ISDIR(stats.st_mode):
+        print("Is a Directory")
+        print("Directory contents:")
+        for elem in os.listdir(PATH / pa):
+            print("-", elem)
+    print("Permissions :", stat.filemode(stats.st_mode))
+    print("Size :", human_size(stats.st_size))
+    dt = datetime.fromtimestamp(stats.st_ctime)  # convert from epoch timestamp to datetime
+    dt_str = datetime.strftime(dt, "%a %d %b %H:%M:%S %Y")  # format the datetime
+    print("Created on :", dt_str)
+    dt = datetime.fromtimestamp(stats.st_mtime)  # convert from epoch timestamp to datetime
+    dt_str = datetime.strftime(dt, "%a %d %b %H:%M:%S %Y")  # format the datetime
+    print("Last Modified on :", dt_str)
+    dt = datetime.fromtimestamp(stats.st_atime)  # convert from epoch timestamp to datetime
+    dt_str = datetime.strftime(dt, "%a %d %b %H:%M:%S %Y")  # format the datetime
+    print("Last accessed on :", dt_str)
+
 def eval_inst(t):
     if t[0] == 'empty' or t == 'empty':
         return
@@ -210,17 +255,43 @@ def eval_inst(t):
                 file.write(str(t[2]) + '\n')
         except FileNotFoundError:
             print("File not found")
-    elif t[0] == 'select':
-        try:
-            f = pathlib.Path(PATH / t[1])
-            if not f.exists():
-                print(f"File {t[1]} does not exist")
+    elif t[0] == 'select' or t[0] == '&':
+        if t[0] == "&" or t[1] == 'own':
+            print(t)
+            for elem in os.listdir(PATH):
+                print(elem)
+                print(os.stat(PATH / elem))
+                print(stat.S_ISREG(os.stat(PATH / elem).st_mode))
+        elif t[1] == 'all':
+            pass
+        elif t[1] == 'type':
+            if t[2] not in ["dir", "file"]:
+                print("Invalid type. Types must be 'dir', 'file'")
+            pass
+        elif t[1] == "allown":
+            if t[2] not in ["dir", "file"]:
+                print("Invalid type. Types must be 'dir', 'file'")
+                return
+            if t[2] == "dir":
+                for elem in os.listdir(PATH):
+                    if stat.S_ISDIR(os.stat(PATH / elem).st_mode):
+                        print(elem, end="   ")
             else:
-                print(f"File {t[1]} exists")
-        except FileNotFoundError:
-            print("File not found")
-    elif t[0] == 'selectw':
-        print("Select:", t[1], t[2])  # TODO
+                for elem in os.listdir(PATH):
+                    if stat.S_ISREG(os.stat(PATH / elem).st_mode):
+                        print(elem, end="   ")
+            print()
+        elif t[1] == 'select':
+            try:
+                f = pathlib.Path(PATH / t[2])
+                if not f.exists():
+                    print(f"Element {t[2]} does not exist")
+                else:
+                    print(f"Element {t[2]} exists")
+                    stats = os.stat(PATH / t[2])
+                    printStatData(stats, t[2])
+            except FileNotFoundError:
+                print("File not found")
     elif t[0] == 'search':
         print("1")
         os.system("cd app/ && mvn clean compile --quiet --log-file ./log")
@@ -233,6 +304,13 @@ def eval_inst(t):
         eval_inst(t[2])
     else:
         print("Unknown instruction:", t)
+
+
+def human_size(bytes, units=None):
+    """ Returns a human-readable string representation of bytes """
+    if units is None:
+        units = [' bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB']
+    return str(bytes) + units[0] if bytes < 1024 else human_size(bytes >> 10, units[1:])
 
 
 lex.lex()
@@ -260,7 +338,13 @@ def p_statement(p):
     | create_statement
     | update_statement
     | delete_statement
-    | search_statement'''
+    | search_statement
+    | x '''
+    p[0] = p[1]
+
+
+def p_x(p):
+    '''x : AND'''
     p[0] = p[1]
 
 
@@ -296,11 +380,27 @@ def p_print_statement(p):
 
 def p_select_statement(p):
     '''select_statement : SELECT NAME SEMI
-    | SELECT WHERE liste_condition SEMI'''
+    | SELECT IN NAME WHERE liste_condition SEMI
+    | SELECT type IN NAME WHERE liste_condition SEMI
+    | SELECT WHERE liste_condition SEMI
+    | SELECT type SEMI'''
     if len(p) == 5:
-        p[0] = ('selectw', p[2], p[3])
+        p[0] = ('select', 'own', p[2], p[3])
+    elif len(p) == 6:
+        p[0] = ('select', 'all', p[3], p[5])
+    elif len(p) == 7:
+        p[0] = ('select', 'type', p[2], p[3], p[5])
     else:
-        p[0] = ('select', p[2])
+        if p[2] in ['dir', 'file']:
+            p[0] = ('select', 'allown', p[2])
+        else:
+            p[0] = ('select', 'select', p[2])
+
+
+def p_type(p):
+    '''type : DIR
+            | FILE'''
+    p[0] = p[1]
 
 
 def p_list_condition(p):
