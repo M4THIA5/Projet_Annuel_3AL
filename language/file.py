@@ -215,6 +215,14 @@ def printStatData(stats, pa):
     dt_str = datetime.strftime(dt, "%a %d %b %H:%M:%S %Y")  # format the datetime
     print("Last accessed on :", dt_str)
 
+
+def filterConds(PATH, param):
+    for elem in os.listdir(PATH):
+        print(elem)
+    print(os.stat(PATH / elem))
+    print(stat.S_ISREG(os.stat(PATH / elem).st_mode))
+
+
 def eval_inst(t):
     if t[0] == 'empty' or t == 'empty':
         return
@@ -256,12 +264,11 @@ def eval_inst(t):
         except FileNotFoundError:
             print("File not found")
     elif t[0] == 'select' or t[0] == '&':
+        print(t)
         if t[0] == "&" or t[1] == 'own':
             print(t)
-            for elem in os.listdir(PATH):
-                print(elem)
-                print(os.stat(PATH / elem))
-                print(stat.S_ISREG(os.stat(PATH / elem).st_mode))
+            filterConds(PATH, t[2])
+
         elif t[1] == 'all':
             pass
         elif t[1] == 'type':
@@ -378,24 +385,46 @@ def p_print_statement(p):
     p[0] = ('print', p[2])
 
 
-def p_select_statement(p):
-    '''select_statement : SELECT NAME SEMI
-    | SELECT IN NAME WHERE liste_condition SEMI
-    | SELECT type IN NAME WHERE liste_condition SEMI
-    | SELECT WHERE liste_condition SEMI
-    | SELECT type SEMI'''
-    if len(p) == 5:
-        p[0] = ('select', 'own', p[2], p[3])
-    elif len(p) == 6:
-        p[0] = ('select', 'all', p[3], p[5])
-    elif len(p) == 7:
-        p[0] = ('select', 'type', p[2], p[3], p[5])
-    else:
-        if p[2] in ['dir', 'file']:
-            p[0] = ('select', 'allown', p[2])
-        else:
-            p[0] = ('select', 'select', p[2])
+def p_new_select(p):
+    '''select_statement : SELECT selector params SEMI'''
+    p[0] = ('select', p[2], p[3])
 
+
+def p_selector(p):
+    '''selector : NAME
+    | type
+    | empty
+    '''
+    p[0] = p[1]  # ToDO : voir si on donne le type ici
+
+
+def p_params(p):
+    '''params : in_clause where_clause
+    | in_clause
+    | where_clause
+    | empty'''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = (p[1], p[2])
+
+
+def p_in_clause(p):
+    '''in_clause : IN NAME
+    | empty'''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = p[2]
+
+
+def p_where_clause(p):
+    '''where_clause : WHERE liste_condition
+    | empty'''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = p[2]
 
 def p_type(p):
     '''type : DIR
@@ -428,6 +457,10 @@ def p_condition(p):
                  | NAME NOTEQUAL result'''
     p[0] = ('condition', p[1], p[2], p[3])
 
+
+def p_empty(p):
+    '''empty :'''
+    pass
 
 def p_expression(p):
     '''expression : expression PLUS expression
