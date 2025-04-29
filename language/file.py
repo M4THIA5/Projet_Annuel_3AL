@@ -223,6 +223,21 @@ def filterConds(PATH, param):
     print(stat.S_ISREG(os.stat(PATH / elem).st_mode))
 
 
+def calculate(t):
+    sum = 0
+    for elem in t:
+        if elem == 'select':
+            continue
+        if type(elem) == tuple and type(elem[0]) == int:
+            sum += elem[0]
+    return sum
+
+
+def selecter(t):
+    calc = calculate(t)
+    print("Select :", calc)
+
+
 def eval_inst(t):
     if t[0] == 'empty' or t == 'empty':
         return
@@ -263,42 +278,9 @@ def eval_inst(t):
                 file.write(str(t[2]) + '\n')
         except FileNotFoundError:
             print("File not found")
-    elif t[0] == 'select' or t[0] == '&':
+    elif t[0] == 'select':
         print(t)
-        if t[0] == "&" or t[1] == 'own':
-            print(t)
-            filterConds(PATH, t[2])
-
-        elif t[1] == 'all':
-            pass
-        elif t[1] == 'type':
-            if t[2] not in ["dir", "file"]:
-                print("Invalid type. Types must be 'dir', 'file'")
-            pass
-        elif t[1] == "allown":
-            if t[2] not in ["dir", "file"]:
-                print("Invalid type. Types must be 'dir', 'file'")
-                return
-            if t[2] == "dir":
-                for elem in os.listdir(PATH):
-                    if stat.S_ISDIR(os.stat(PATH / elem).st_mode):
-                        print(elem, end="   ")
-            else:
-                for elem in os.listdir(PATH):
-                    if stat.S_ISREG(os.stat(PATH / elem).st_mode):
-                        print(elem, end="   ")
-            print()
-        elif t[1] == 'select':
-            try:
-                f = pathlib.Path(PATH / t[2])
-                if not f.exists():
-                    print(f"Element {t[2]} does not exist")
-                else:
-                    print(f"Element {t[2]} exists")
-                    stats = os.stat(PATH / t[2])
-                    printStatData(stats, t[2])
-            except FileNotFoundError:
-                print("File not found")
+        selecter(t)
     elif t[0] == 'search':
         print("1")
         os.system("cd app/ && mvn clean compile --quiet --log-file ./log")
@@ -345,13 +327,7 @@ def p_statement(p):
     | create_statement
     | update_statement
     | delete_statement
-    | search_statement
-    | x '''
-    p[0] = p[1]
-
-
-def p_x(p):
-    '''x : AND'''
+    | search_statement'''
     p[0] = p[1]
 
 
@@ -395,7 +371,12 @@ def p_selector(p):
     | type
     | empty
     '''
-    p[0] = p[1]  # ToDO : voir si on donne le type ici
+    if p[1] in ["file", "dir"]:
+        p[0] = (1, p[1])
+    elif p[1] != None:
+        p[0] = (-0xffffff, p[1])
+    else:
+        p[0] = (0, p[1])
 
 
 def p_params(p):
@@ -406,7 +387,7 @@ def p_params(p):
     if len(p) == 2:
         p[0] = p[1]
     else:
-        p[0] = (p[1], p[2])
+        p[0] = (6, p[1], p[2])
 
 
 def p_in_clause(p):
@@ -415,7 +396,7 @@ def p_in_clause(p):
     if len(p) == 2:
         p[0] = p[1]
     else:
-        p[0] = p[2]
+        p[0] = (2, p[2])
 
 
 def p_where_clause(p):
@@ -424,7 +405,7 @@ def p_where_clause(p):
     if len(p) == 2:
         p[0] = p[1]
     else:
-        p[0] = p[2]
+        p[0] = (4, p[2])
 
 def p_type(p):
     '''type : DIR
