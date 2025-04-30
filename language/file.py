@@ -216,11 +216,14 @@ def printStatData(stats, pa):
     print("Last accessed on :", dt_str)
 
 
+def isValid(elem, param):
+    pass
+
+
 def filterConds(PATH, param):
     for elem in os.listdir(PATH):
-        print(elem)
-    print(os.stat(PATH / elem))
-    print(stat.S_ISREG(os.stat(PATH / elem).st_mode))
+        if isValid(elem, param):
+            print(elem, end='    ')
 
 
 def calculate(t):
@@ -236,7 +239,7 @@ def calculate(t):
 def selecter(t):
     calc = calculate(t)
     if calc < 0:
-        elem = t[1][1]
+        elem = t[1][1].replace('"', '')
         try:
             printStatData(os.stat(PATH / elem), elem)
         except FileNotFoundError:
@@ -256,19 +259,25 @@ def selecter(t):
                     print(elem, end='    ')
     elif calc == 2:
         path = PATH / t[2][1].replace('"', '')
-        for elem in os.listdir(path):
-            print(elem, end='    ')
+        try:
+            for elem in os.listdir(path):
+                print(elem, end='    ')
+        except FileNotFoundError:
+            print(path, ": No such way to access")
     elif calc == 3:
         check = t[1][1]
         path = PATH / t[2][1].replace('"', '')
-        if check == "dir":
-            for elem in os.listdir(path):
-                if stat.S_ISDIR(os.stat(path / elem).st_mode):
-                    print(elem, end='    ')
-        elif check == "file":
-            for elem in os.listdir(path):
-                if stat.S_ISREG(os.stat(path / elem).st_mode):
-                    print(elem, end='    ')
+        try:
+            if check == "dir":
+                for elem in os.listdir(path):
+                    if stat.S_ISDIR(os.stat(path / elem).st_mode):
+                        print(elem, end='    ')
+            elif check == "file":
+                for elem in os.listdir(path):
+                    if stat.S_ISREG(os.stat(path / elem).st_mode):
+                        print(elem, end='    ')
+        except FileNotFoundError:
+            print(path, ": No such way to access")
     elif calc == 4:
         pass
     elif calc == 5:
@@ -409,6 +418,7 @@ def p_new_select(p):
 
 def p_selector(p):
     '''selector : NAME
+    | TEXT
     | type
     | empty
     '''
