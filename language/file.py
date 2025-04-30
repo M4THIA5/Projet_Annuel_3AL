@@ -59,7 +59,7 @@ t_VIR = r','
 t_POINT = r'\.'
 t_ignore = " \t"
 
-properties = ["name", "atime", "mtime", "ctime", "type"]
+
 
 
 def t_NUMBER(t):
@@ -216,7 +216,17 @@ def printStatData(stats, pa):
     print("Last accessed on :", dt_str)
 
 
+properties = ["name", "atime", "mtime", "ctime", "type"]
 def isValid(elem, param):
+    # 2 cas : si condition, ou liste condition
+    print(param)
+    if param[0] == 'condition':
+        print("condition : if", param[1], param[2], param[3])
+    elif param[0] == 'liste_conditions':
+        print("liste_conditions : if", param[1], param[2], param[3])
+        print('call to check')
+        isValid(elem, param[1])
+        isValid(elem, param[3])
     pass
 
 
@@ -279,6 +289,7 @@ def selecter(t):
         except FileNotFoundError:
             print(path, ": No such way to access")
     elif calc == 4:
+        filterConds(PATH, t[2][1])
         pass
     elif calc == 5:
         pass
