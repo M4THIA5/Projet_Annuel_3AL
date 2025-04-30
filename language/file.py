@@ -235,7 +235,48 @@ def calculate(t):
 
 def selecter(t):
     calc = calculate(t)
-    print("Select :", calc)
+    if calc < 0:
+        elem = t[1][1]
+        try:
+            printStatData(os.stat(PATH / elem), elem)
+        except FileNotFoundError:
+            print(elem, ": No such file or directory")
+    elif calc == 0:
+        for elem in os.listdir(PATH):
+            print(elem, end='    ')
+    elif calc == 1:
+        check = t[1][1]
+        if check == "dir":
+            for elem in os.listdir(PATH):
+                if stat.S_ISDIR(os.stat(PATH / elem).st_mode):
+                    print(elem, end='    ')
+        elif check == "file":
+            for elem in os.listdir(PATH):
+                if stat.S_ISREG(os.stat(PATH / elem).st_mode):
+                    print(elem, end='    ')
+    elif calc == 2:
+        path = PATH / t[2][1].replace('"', '')
+        for elem in os.listdir(path):
+            print(elem, end='    ')
+    elif calc == 3:
+        check = t[1][1]
+        path = PATH / t[2][1].replace('"', '')
+        if check == "dir":
+            for elem in os.listdir(path):
+                if stat.S_ISDIR(os.stat(path / elem).st_mode):
+                    print(elem, end='    ')
+        elif check == "file":
+            for elem in os.listdir(path):
+                if stat.S_ISREG(os.stat(path / elem).st_mode):
+                    print(elem, end='    ')
+    elif calc == 4:
+        pass
+    elif calc == 5:
+        pass
+    elif calc == 6:
+        pass
+    elif calc == 7:
+        pass
 
 
 def eval_inst(t):
@@ -391,7 +432,8 @@ def p_params(p):
 
 
 def p_in_clause(p):
-    '''in_clause : IN NAME
+    '''in_clause : IN TEXT
+    | IN NAME
     | empty'''
     if len(p) == 2:
         p[0] = p[1]
@@ -406,6 +448,7 @@ def p_where_clause(p):
         p[0] = p[1]
     else:
         p[0] = (4, p[2])
+
 
 def p_type(p):
     '''type : DIR
@@ -442,6 +485,7 @@ def p_condition(p):
 def p_empty(p):
     '''empty :'''
     pass
+
 
 def p_expression(p):
     '''expression : expression PLUS expression
