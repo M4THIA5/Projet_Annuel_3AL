@@ -216,7 +216,7 @@ def eval_expr(tree):
         return tree
 
 
-properties = ["name", "atime", "mtime", "ctime", "type"]
+properties = ["name", "atime", "mtime", "ctime", "type", "size", "content"]
 
 
 def resolveProp(param, elem, PATH):
@@ -225,6 +225,7 @@ def resolveProp(param, elem, PATH):
         for p in properties:
             print("\t%s" % p)
         exit(1)
+    stats = os.stat(PATH / elem)
     if param == "name":
         return elem
     elif param == "type":
@@ -233,7 +234,25 @@ def resolveProp(param, elem, PATH):
         elif stat.S_ISDIR(os.stat(elem).st_mode):
             return "dir"
     elif param == "atime":
-        pass
+        return datetime.fromtimestamp(stats.st_atime)
+    elif param == "ctime":
+        return datetime.fromtimestamp(stats.st_ctime)
+    elif param == "mtime":
+        return datetime.fromtimestamp(stats.st_mtime)
+    elif param == "size":
+        return os.path.getsize(PATH / elem)
+    elif param == 'content':
+        try:
+            if stat.S_ISREG(os.stat(elem).st_mode):
+                f = open(PATH / elem)
+                c = f.read()
+                f.close()
+                return c
+            else:
+                return ""
+        except IOError:
+            print("File '%s' not found." % elem)
+            exit(1)
 
 
 def eval_cond(tree, elem, PATH):
@@ -250,25 +269,33 @@ def eval_cond(tree, elem, PATH):
     elif tree[0] == '!=':
         return resolveProp(tree[1], elem, PATH) != eval_expr(tree[2])
     elif tree[0] == "startsw":
-        if tree[1] == "name":
             return resolveProp(tree[1], elem, PATH).startswith(str(eval_expr(tree[2])))
-        else:
-            print("Cannot use startsw parameter with", tree[1])  # Move to checkup
-            exit(1)
     elif tree[0] == "like":
-        if tree[1] == "name":
-            return resolveProp(tree[1], elem, PATH).__contains__(str(eval_expr(tree[2])))
-        else:
-            print("Cannot use like parameter with", tree[1])
-            exit(1)
+        return (str(eval_expr(tree[2]))) in resolveProp(tree[1], elem, PATH)
     elif tree[0] == "endsw":
-        if tree[1] == "name":
             return resolveProp(tree[1], elem, PATH).endswith(str(eval_expr(tree[2])))
-        else:
-            print("Cannot use like parameter with", tree[1])
-            exit(1)
     else:
         return tree
+
+
+def checkup(property, value, operator):
+    if property == "type" and value not in ['file', 'dir']:
+        return False
+    if property == "atime" and value != int(value):
+        return False
+    if property == "ctime" and value != int(value):
+        return False
+    if property == "mtime" and value != int(value):
+        return False
+    if property == "size" and value != int(value):
+        return False
+    if operator == 'startsw' and (property != 'name' and property != 'content'):
+        return False
+    if operator == 'like' and (property != 'name' and property != 'content'):
+        return False
+    if operator == 'endsw' and (property != 'name' and property != 'content'):
+        return False
+    return True
 
 def printStatData(stats, pa):
     if stat.S_ISREG(stats.st_mode):
@@ -279,7 +306,7 @@ def printStatData(stats, pa):
         for elem in os.listdir(PATH / pa):
             print("-", elem)
     print("Permissions :", stat.filemode(stats.st_mode))
-    print("Size :", human_size(stats.st_size))
+    print("Size :", human_size(stats.st_size), f"({stats.st_size})")
     dt = datetime.fromtimestamp(stats.st_ctime)  # convert from epoch timestamp to datetime
     dt_str = datetime.strftime(dt, "%a %d %b %H:%M:%S %Y")  # format the datetime
     print("Created on :", dt_str)
@@ -291,16 +318,6 @@ def printStatData(stats, pa):
     print("Last accessed on :", dt_str)
 
 
-def checkup(param, param1):
-    if param == "type" and param1 not in ['file', 'dir']:
-        return False
-    if param == "atime" and param1 != int(param1):
-        return False
-    if param == "ctime" and param1 != int(param1):
-        return False
-    if param == "mtime" and param1 != int(param1):
-        return False
-    return True
 
 
 def isValid(elem, param, PATH):
@@ -308,7 +325,7 @@ def isValid(elem, param, PATH):
     # print(param)
     if param[0] == 'condition':
         # print("condition : if", param[1], param[2], param[3])
-        if not checkup(param[1], param[3]):
+        if not checkup(param[1], param[3], param[2]):
             print("Invalid condition")
             exit(1)
         if eval_cond((param[2], param[1], param[3]), elem, PATH):
