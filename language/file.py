@@ -22,7 +22,10 @@ reserved = {
     'with': 'WITH',
     'in': 'IN',
     'dir': "DIR",
-    'file': "FILE"
+    'file': "FILE",
+    "startsw": "STARTSW",
+    "like": "LIKE",
+    "endsw": "ENDSW",
 }
 
 tokens = ['NUMBER', 'MINUS', 'PLUS', 'TIMES', 'DIVIDE',
@@ -148,6 +151,24 @@ def t_file(t):
     return t
 
 
+def t_startsw(t):
+    r'startsw'
+    t.type = reserved.get(t.value, 'STARTSW')
+    return t
+
+
+def t_like(t):
+    r'like'
+    t.type = reserved.get(t.value, 'LIKE')
+    return t
+
+
+def t_endsw(t):
+    r'endsw'
+    t.type = reserved.get(t.value, 'ENDSW')
+    return t
+
+
 def t_name(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
     t.type = reserved.get(t.value, 'NAME')
@@ -195,6 +216,60 @@ def eval_expr(tree):
         return tree
 
 
+properties = ["name", "atime", "mtime", "ctime", "type"]
+
+
+def resolveProp(param, elem, PATH):
+    if param not in properties:
+        print("Unknown property '%s'\nAllowed properties :" % param)
+        for p in properties:
+            print("\t%s" % p)
+        exit(1)
+    if param == "name":
+        return elem
+    elif param == "type":
+        if stat.S_ISREG(os.stat(elem).st_mode):
+            return "file"
+        elif stat.S_ISDIR(os.stat(elem).st_mode):
+            return "dir"
+    elif param == "atime":
+        pass
+
+
+def eval_cond(tree, elem, PATH):
+    if tree[0] == '<':
+        return resolveProp(tree[1], elem, PATH) < eval_expr(tree[2])
+    elif tree[0] == '>':
+        return resolveProp(tree[1], elem, PATH) > eval_expr(tree[2])
+    elif tree[0] == '<=':
+        return resolveProp(tree[1], elem, PATH) <= eval_expr(tree[2])
+    elif tree[0] == '>=':
+        return resolveProp(tree[1], elem, PATH) >= eval_expr(tree[2])
+    elif tree[0] == '==':
+        return resolveProp(tree[1], elem, PATH) == eval_expr(tree[2])
+    elif tree[0] == '!=':
+        return resolveProp(tree[1], elem, PATH) != eval_expr(tree[2])
+    elif tree[0] == "startsw":
+        if tree[1] == "name":
+            return resolveProp(tree[1], elem, PATH).startswith(str(eval_expr(tree[2])))
+        else:
+            print("Cannot use startsw parameter with", tree[1])  # Move to checkup
+            exit(1)
+    elif tree[0] == "like":
+        if tree[1] == "name":
+            return resolveProp(tree[1], elem, PATH).__contains__(str(eval_expr(tree[2])))
+        else:
+            print("Cannot use like parameter with", tree[1])
+            exit(1)
+    elif tree[0] == "endsw":
+        if tree[1] == "name":
+            return resolveProp(tree[1], elem, PATH).endswith(str(eval_expr(tree[2])))
+        else:
+            print("Cannot use like parameter with", tree[1])
+            exit(1)
+    else:
+        return tree
+
 def printStatData(stats, pa):
     if stat.S_ISREG(stats.st_mode):
         print("Is a file")
@@ -216,26 +291,60 @@ def printStatData(stats, pa):
     print("Last accessed on :", dt_str)
 
 
-properties = ["name", "atime", "mtime", "ctime", "type"]
-def isValid(elem, param):
+def checkup(param, param1):
+    if param == "type" and param1 not in ['file', 'dir']:
+        return False
+    if param == "atime" and param1 != int(param1):
+        return False
+    if param == "ctime" and param1 != int(param1):
+        return False
+    if param == "mtime" and param1 != int(param1):
+        return False
+    return True
+
+
+def isValid(elem, param, PATH):
     # 2 cas : si condition, ou liste condition
-    print(param)
+    # print(param)
     if param[0] == 'condition':
-        print("condition : if", param[1], param[2], param[3])
+        # print("condition : if", param[1], param[2], param[3])
+        if not checkup(param[1], param[3]):
+            print("Invalid condition")
+            exit(1)
+        if eval_cond((param[2], param[1], param[3]), elem, PATH):
+            return True
+        else:
+            return False
     elif param[0] == 'liste_conditions':
-        print("liste_conditions : if", param[1], param[2], param[3])
-        print('call to check')
-        isValid(elem, param[1])
-        isValid(elem, param[3])
+        # print("liste_conditions : if", param[1], param[2], param[3])
+        if param[2] == "|":
+            if isValid(elem, param[1], PATH) or isValid(elem, param[3], PATH):
+                return True
+            else:
+                return False
+        elif param[2] == "&":
+            if isValid(elem, param[1], PATH) and isValid(elem, param[3], PATH):
+                return True
+            else:
+                return False
     pass
 
 
 def filterConds(PATH, param):
     for elem in os.listdir(PATH):
-        if isValid(elem, param):
+        if isValid(elem, param, PATH):
             print(elem, end='    ')
 
 
+def filterCondsWithType(path, param, elementType):
+    if elementType == "dir":
+        for elem in os.listdir(path):
+            if stat.S_ISDIR(os.stat(path / elem).st_mode) and isValid(elem, param, path):
+                print(elem, end='    ')
+    elif elementType == "file":
+        for elem in os.listdir(path):
+            if stat.S_ISREG(os.stat(path / elem).st_mode) and isValid(elem, param, path):
+                print(elem, end='    ')
 def calculate(t):
     sum = 0
     for elem in t:
@@ -290,13 +399,12 @@ def selecter(t):
             print(path, ": No such way to access")
     elif calc == 4:
         filterConds(PATH, t[2][1])
-        pass
     elif calc == 5:
-        pass
+        filterCondsWithType(PATH, t[2][1], t[1][1])
     elif calc == 6:
-        pass
+        filterConds(PATH / t[2][1].replace('"', ''), t[2][1])
     elif calc == 7:
-        pass
+        filterCondsWithType(PATH / t[2][1].replace('"', ''), t[2][1], t[1][1])
 
 
 def eval_inst(t):
@@ -493,13 +601,15 @@ def p_boolean_operator(p):
 
 
 def p_condition(p):
-    '''condition : NAME EQUAL result
-                 | NAME GT result
+    '''condition : NAME GT result
                  | NAME LT result
                  | NAME GTE result
                  | NAME LTE result
                  | NAME DEQUAL result
-                 | NAME NOTEQUAL result'''
+                 | NAME NOTEQUAL result
+                 | NAME STARTSW result
+                 | NAME LIKE result
+                 | NAME ENDSW result'''
     p[0] = ('condition', p[1], p[2], p[3])
 
 
@@ -527,7 +637,9 @@ def p_expression(p):
 
 def p_prop(p):
     '''result : NUMBER
-            | NAME '''
+            | NAME
+            | type
+             '''
     p[0] = p[1]
 
 
