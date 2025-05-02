@@ -234,11 +234,14 @@ def resolveProp(param, elem, PATH):
         elif stat.S_ISDIR(os.stat(elem).st_mode):
             return "dir"
     elif param == "atime":
-        return datetime.fromtimestamp(stats.st_atime)
+        # return datetime.fromtimestamp(stats.st_atime)
+        return stats.st_atime
     elif param == "ctime":
-        return datetime.fromtimestamp(stats.st_ctime)
+        # return datetime.fromtimestamp(stats.st_ctime)
+        return stats.st_ctime
     elif param == "mtime":
-        return datetime.fromtimestamp(stats.st_mtime)
+        # return datetime.fromtimestamp(stats.st_mtime)
+        return stats.st_mtime
     elif param == "size":
         return os.path.getsize(PATH / elem)
     elif param == 'content':
@@ -372,58 +375,6 @@ def calculate(t):
     return sum
 
 
-def selecter(t):
-    calc = calculate(t)
-    if calc < 0:
-        elem = t[1][1].replace('"', '')
-        try:
-            printStatData(os.stat(PATH / elem), elem)
-        except FileNotFoundError:
-            print(elem, ": No such file or directory")
-    elif calc == 0:
-        for elem in os.listdir(PATH):
-            print(elem, end='    ')
-    elif calc == 1:
-        check = t[1][1]
-        if check == "dir":
-            for elem in os.listdir(PATH):
-                if stat.S_ISDIR(os.stat(PATH / elem).st_mode):
-                    print(elem, end='    ')
-        elif check == "file":
-            for elem in os.listdir(PATH):
-                if stat.S_ISREG(os.stat(PATH / elem).st_mode):
-                    print(elem, end='    ')
-    elif calc == 2:
-        path = PATH / t[2][1].replace('"', '')
-        try:
-            for elem in os.listdir(path):
-                print(elem, end='    ')
-        except FileNotFoundError:
-            print(path, ": No such way to access")
-    elif calc == 3:
-        check = t[1][1]
-        path = PATH / t[2][1].replace('"', '')
-        try:
-            if check == "dir":
-                for elem in os.listdir(path):
-                    if stat.S_ISDIR(os.stat(path / elem).st_mode):
-                        print(elem, end='    ')
-            elif check == "file":
-                for elem in os.listdir(path):
-                    if stat.S_ISREG(os.stat(path / elem).st_mode):
-                        print(elem, end='    ')
-        except FileNotFoundError:
-            print(path, ": No such way to access")
-    elif calc == 4:
-        filterConds(PATH, t[2][1])
-    elif calc == 5:
-        filterCondsWithType(PATH, t[2][1], t[1][1])
-    elif calc == 6:
-        filterConds(PATH / t[2][1].replace('"', ''), t[2][1])
-    elif calc == 7:
-        filterCondsWithType(PATH / t[2][1].replace('"', ''), t[2][1], t[1][1])
-
-
 def eval_inst(t):
     if t[0] == 'empty' or t == 'empty':
         return
@@ -465,8 +416,57 @@ def eval_inst(t):
         except FileNotFoundError:
             print("File not found")
     elif t[0] == 'select':
-        print(t)
-        selecter(t)
+        calc = calculate(t)
+        # print(calc)
+        if calc < 0:
+            elem = t[1][1].replace('"', '')
+            try:
+                printStatData(os.stat(PATH / elem), elem)
+            except FileNotFoundError:
+                print(elem, ": No such file or directory")
+        elif calc == 0:
+            for elem in os.listdir(PATH):
+                print(elem, end='    ')
+        elif calc == 1:
+            check = t[1][1]
+            if check == "dir":
+                for elem in os.listdir(PATH):
+                    if stat.S_ISDIR(os.stat(PATH / elem).st_mode):
+                        print(elem, end='    ')
+            elif check == "file":
+                for elem in os.listdir(PATH):
+                    if stat.S_ISREG(os.stat(PATH / elem).st_mode):
+                        print(elem, end='    ')
+        elif calc == 2:
+            path = PATH / t[2][1].replace('"', '')
+            try:
+                for elem in os.listdir(path):
+                    print(elem, end='    ')
+            except FileNotFoundError:
+                print(path, ": No such way to access")
+        elif calc == 3:
+            check = t[1][1]
+            path = PATH / t[2][1].replace('"', '')
+            try:
+                if check == "dir":
+                    for elem in os.listdir(path):
+                        if stat.S_ISDIR(os.stat(path / elem).st_mode):
+                            print(elem, end='    ')
+                elif check == "file":
+                    for elem in os.listdir(path):
+                        if stat.S_ISREG(os.stat(path / elem).st_mode):
+                            print(elem, end='    ')
+            except FileNotFoundError:
+                print(path, ": No such way to access")
+        elif calc == 4:
+            filterConds(PATH, t[2][1])
+        elif calc == 5:
+            filterCondsWithType(PATH, t[2][1], t[1][1])
+        elif calc == 6:
+            print(t[2][1][1])
+            filterConds(PATH / t[2][1][1].replace('"', ''), t[2][1][1])
+        elif calc == 7:
+            filterCondsWithType(PATH / t[2][1][1].replace('"', ''), t[2][1][1], t[1][1])
     elif t[0] == 'search':
         print("1")
         os.system("cd app/ && mvn clean compile --quiet --log-file ./log")
