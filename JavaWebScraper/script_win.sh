@@ -1,5 +1,10 @@
 #!/bin/bash
-
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <version>"
+    echo "last version is : "
+    cat .lastver
+    exit 1
+fi
 echo "Nettoyage des anciens builds..."
 rm -rf build-jpackage
 mkdir build-jpackage
@@ -15,6 +20,8 @@ cp launcher/target/launcher-*.jar build-jpackage/
 
 cp app/target/classes/chromedriver.exe build-jpackage/
 cp app/target/classes/.version build-jpackage
+cp app/target/classes/icon.jpg build-jpackage
+cp app/target/classes/icon.ico build-jpackage
 
 
 echo "Lancement de jpackage..."
@@ -23,6 +30,7 @@ echo "Lancement de jpackage..."
   --type exe \
   --name MonApp \
   --input build-jpackage \
+  --icon build-jpackage/icon.ico \
   --main-jar launcher-1.0.2.jar \
   --main-class launcher.Lanceur \
   --resource-dir app/src/main/resources \
@@ -30,6 +38,9 @@ echo "Lancement de jpackage..."
   --win-menu \
   --win-shortcut \
   --win-per-user-install \
-  --app-version 0.2.5 || { echo "Erreur jpackage"; exit 1; }
+  --app-version "$1" || { echo "Erreur jpackage"; exit 1; }
+
+
+echo "$1" > .lastver
 
 echo "Build terminé !"

@@ -18,7 +18,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.geometry.Insets;
@@ -29,10 +28,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.io.*;
 
 import java.net.URLEncoder;
@@ -43,7 +38,6 @@ import static launcher.Updater.getUserVersion;
 
 public class WebScrapController extends Thread {
 
-    public static String scrappedValues;
     @FXML
     public TextField keyword;
 
@@ -71,11 +65,11 @@ public class WebScrapController extends Thread {
     @FXML
     public Button btn;
     @FXML
-    public Button saveBtn;
-    @FXML
-    public Button copyBtn;
 
     public TextArea textarea;
+    public Button saveBt;
+    public Button copyBt;
+    Context currentContext = Context.getInstance();
 
     @FXML
     void initialize() {
@@ -110,12 +104,13 @@ public class WebScrapController extends Thread {
         });
     }
 
-    public void click(ActionEvent mouseEvent) throws InterruptedException {
+    public void click(ActionEvent mouseEvent) {
         if (keyword.getText().isEmpty()) {
             errors.setText("Au moins une valeur néessaire n'est pas remplie.");
             return;
         }
         errors.setText("");
+        final String[] scrappedValues = new String[1];
 
         Task<Void> task = new Task<>() {
             @Override
@@ -127,13 +122,16 @@ public class WebScrapController extends Thread {
                 ChromeOptions options = new ChromeOptions();
                 options.addArguments("--headless");  // Mode invisible
                 options.addArguments("--disable-blink-features=AutomationControlled");
+                options.addArguments("--dns-prefetch-disable");
                 options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
                 WebDriver driver = new ChromeDriver(options);
                 WebScrapper webScrapper = new WebScrapper();
                 try {
                     String url = "https://www.google.com/search?q=" + URLEncoder.encode(keyword.getText(), StandardCharsets.UTF_8);
-                    scrappedValues = webScrapper.scrap(driver, url, keyword.getText(), this::updateProgress);
-                    sleep(2000);
+                    scrappedValues[0] = webScrapper.scrap(driver, url, keyword.getText(), this::updateProgress);
+                    currentContext.addRequest(scrappedValues[0]);
+                    System.out.println("added. len : " + currentContext.getRequests().size());
+                    sleep(3000);
                     updateProgress(100, 100);
                 } catch (Exception e) {
                     Platform.runLater(() -> {
@@ -156,8 +154,12 @@ public class WebScrapController extends Thread {
                 Node node = Loader.load("result.fxml");
                 assert node != null;
                 textarea = (TextArea) node.lookup("#text");
-                textarea.setText(scrappedValues);
+                textarea.setText(scrappedValues[0]);
                 textarea.setEditable(false);
+                saveBt = (Button) node.lookup("#copyBtn");
+                copyBt = (Button) node.lookup("#saveBtn");
+                saveBt.setId("copyBtn" + count);
+                copyBt.setId("saveBtn" + count);
                 tab.setContent(node);
                 tabPane.getTabs().add(tab);
             } catch (Exception ex) {
@@ -266,37 +268,9 @@ public class WebScrapController extends Thread {
         alert.setTitle("About");
         // Header Text: null
         alert.setHeaderText(null);
-        alert.setContentText(" JAVA Application created by the team of Laporte à Côté\n Version "+ getUserVersion());
+        alert.setContentText(" JAVA Application created by the team of Laporte à Côté\n Version " + getUserVersion());
 
         alert.showAndWait();
-    }
-
-    public void saveValueClipBoard(MouseEvent mouseEvent) {
-        System.out.println("Save value");
-        String str = textarea != null ? textarea.getText() : "jdfr";
-        Clipboard clip = Toolkit.getDefaultToolkit()
-                .getSystemClipboard();
-        StringSelection strse1 = new StringSelection(str);
-        clip.setContents(strse1, strse1);
-        JOptionPane.showMessageDialog(null,
-                "TEXTS ARE COPIED!");
-        Clipboard board = Toolkit.getDefaultToolkit().getSystemClipboard();
-
-
-    }
-
-    public void saveInFile(MouseEvent mouseEvent) throws IOException {
-        System.out.println("Save value");
-        JFileChooser fileChooser = new JFileChooser();
-        if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-            File file = fileChooser.getSelectedFile();
-            String str = textarea != null ? textarea.getText() : "jdfr";
-            FileOutputStream outputStream = new FileOutputStream(file+".txt");
-            byte[] strToBytes = str.getBytes();
-            outputStream.write(strToBytes);
-
-            outputStream.close();
-        }
     }
 
     public Stage createLoadingPopup(Task<?> task) {
@@ -310,7 +284,7 @@ public class WebScrapController extends Thread {
         ringProgressIndicator.makeIndeterminate();
 
         task.progressProperty().addListener((obs, oldProgress, newProgress) -> {
-             ringProgressIndicator.setProgress((int) (newProgress.doubleValue()*100));
+            ringProgressIndicator.setProgress((int) (newProgress.doubleValue() * 100));
         });
 
 

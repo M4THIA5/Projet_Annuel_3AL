@@ -3,6 +3,7 @@ package fr.laporteacote.javawebscraper;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.kordamp.bootstrapfx.BootstrapFX;
 
@@ -17,6 +18,7 @@ public class GUI extends Application {
         WebScrapController controller = loader.getController();
         scene.getStylesheets().add(BootstrapFX.bootstrapFXStylesheet());
         stage.setScene(scene);
+        stage.getIcons().add(new Image("icon.jpg"));
         controller.setup();
         stage.show();
     }

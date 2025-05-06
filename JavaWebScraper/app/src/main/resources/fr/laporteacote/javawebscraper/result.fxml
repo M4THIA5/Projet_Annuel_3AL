@@ -5,9 +5,9 @@
 
 <?import javafx.scene.text.Text?>
 <GridPane xmlns:fx="http://javafx.com/fxml"
-          fx:controller="fr.laporteacote.javawebscraper.WebScrapController"
+          fx:controller="fr.laporteacote.javawebscraper.ResultController"
           hgap="10" vgap="10" styleClass="page">
     <TextArea fx:id="text" GridPane.columnIndex="0" GridPane.rowIndex="0" wrapText="true" GridPane.hgrow="ALWAYS"/>
-    <Button onMouseClicked="#saveValueClipBoard" fx:id="copyBtn" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.hgrow="ALWAYS" text="Copy"/>
-    <Button onMouseClicked="#saveInFile" fx:id="saveBtn" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.hgrow="ALWAYS" text="Save"/>
+    <Button onAction="#saveValueClipBoard" fx:id="copyBtn" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.hgrow="ALWAYS" text="Copy"/>
+    <Button onAction="#saveInFile" fx:id="saveBtn" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.hgrow="ALWAYS" text="Save"/>
 </GridPane>

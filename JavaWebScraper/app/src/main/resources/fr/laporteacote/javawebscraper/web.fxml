@@ -1,51 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="fr.laporteacote.javawebscraper.WebScrapController"
-            prefHeight="400.0" prefWidth="600.0">
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.laporteacote.javawebscraper.WebScrapController">
     <top>
         <MenuBar>
             <Menu text="_File">
-                <MenuItem fx:id="Save" text="Save" onAction="#notImplemented"/>
-                <MenuItem fx:id="Exit" text="Exit" onAction="#exit"/>
+                <MenuItem fx:id="Save" onAction="#notImplemented" text="Save" />
+                <MenuItem fx:id="Exit" onAction="#exit" text="Exit" />
             </Menu>
             <Menu text="_Edit">
-                <MenuItem fx:id="Cut" text="Cut" onAction="#notImplemented"/>
-                <MenuItem fx:id="Copy" text="Copy" onAction="#notImplemented"/>
-                <MenuItem fx:id="Paste" text="Paste" onAction="#notImplemented"/>
+                <MenuItem fx:id="Cut" onAction="#notImplemented" text="Cut" />
+                <MenuItem fx:id="Copy" onAction="#notImplemented" text="Copy" />
+                <MenuItem fx:id="Paste" onAction="#notImplemented" text="Paste" />
             </Menu>
             <Menu text="_Help">
-                <MenuItem fx:id="Show" text="Show shortcuts" onAction="#showShortcuts"/>
-                <MenuItem fx:id="About" text="About" onAction="#showAbout"/>
+                <MenuItem fx:id="Show" onAction="#showShortcuts" text="Show shortcuts" />
+                <MenuItem fx:id="About" onAction="#showAbout" text="About" />
             </Menu>
         </MenuBar>
     </top>
     <center>
         <VBox alignment="TOP_CENTER" spacing="20.0">
             <TabPane fx:id="tabPane">
-                <Tab fx:id="searcher" text="Form" closable="false">
-                    <GridPane hgap="10" vgap="10" styleClass="page">
-                        <Text GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.hgrow="ALWAYS">Welcome</Text>
+                <Tab fx:id="searcher" closable="false" text="Form">
+                    <GridPane hgap="10" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="458.0" prefWidth="856.0" styleClass="page" vgap="10">
+                        <Text GridPane.columnIndex="0" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0">Welcome</Text>
 
-                        <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.hgrow="ALWAYS">
-                            <Label>Mot-clé </Label>
+                        <HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6">
+                            <TextField fx:id="keyword" maxHeight="1.7976931348623157E308" prefHeight="0.0" prefWidth="358.0" />
                             <padding>
-                                <Insets top="20" left="20" bottom="20" right="20"/>
+                                <Insets bottom="20" left="20" right="20" top="20" />
                             </padding>
-                            <TextField fx:id="keyword"/>
                         </HBox>
-                        <Text GridPane.columnIndex="0" GridPane.rowIndex="5" GridPane.hgrow="ALWAYS" fx:id="errors"
-                              styleClass="text-danger"></Text>
-                        <Button GridPane.columnIndex="0" GridPane.rowIndex="7" GridPane.hgrow="ALWAYS"
-                                fx:id="btn"
-                                styleClass="btn, btn-success" onAction="#click" text="Rechercher"/>
+                        <Text fx:id="errors" styleClass="text-danger" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" />
+                        <Button fx:id="btn" onAction="#click" styleClass="btn, btn-success" text="Rechercher" GridPane.hgrow="ALWAYS" GridPane.rowIndex="8" />
+                         <Label text="Mot-clé" GridPane.halignment="CENTER" GridPane.rowIndex="3">Mot-clé </Label>
+                  <columnConstraints>
+                     <ColumnConstraints />
+                  </columnConstraints>
+                  <rowConstraints>
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints maxHeight="17.0" minHeight="17.0" prefHeight="17.0" />
+                     <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                  </rowConstraints>
+                  <padding>
+                     <Insets top="10.0" />
+                  </padding>
                     </GridPane>
                 </Tab>
             </TabPane>

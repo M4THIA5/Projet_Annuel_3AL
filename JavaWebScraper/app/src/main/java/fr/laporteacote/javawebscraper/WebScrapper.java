@@ -1,6 +1,5 @@
 package fr.laporteacote.javawebscraper;
 
-import javafx.concurrent.Task;
 import org.openqa.selenium.*;
 
 import java.io.BufferedReader;
@@ -21,10 +20,32 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static java.lang.Thread.sleep;
 
+
 public class WebScrapper {
-    public List<String> extractRelevantText(WebDriver driver, String keyword) {
+
+    public static String ERROR_STRING ="Une erreur est survenue, aucun texte n'a été trouvé. Merci de réessayer.";
+    public String getWordsToSearchForWithGPT4(String keyword) throws IOException, URISyntaxException {
+        HttpURLConnection connection = getHttpURLConnection();
+
+        String requestBody = "{  \"model\": \"llama-3.3-70b-versatile\", \"messages\": [{ \"role\": \"system\", " +
+                "\"content\": \"Tu dois analyser le ou les mots-clés que l'on te donne, et en ressortir une liste de " +
+                "mots en lien, que ce soit des synonymes ou non, avec les mots clés donnés. Il est obligatoire que " +
+                "l'on puisse retrouver ces mots clés nouvellement trouvés sur une page web que l'on recherche sur" +
+                " internet, comme si l'on faisait une recherche Google avec les élements de ta liste. À toi de garder" +
+                " le plus important. N'interagis pas avec l'utilisateur. Seule ta réponse relative à la liste " +
+                "demandée est attendue. N'introduis pas ta réponse, ne donne pas de conclusion. Retourne simplement " +
+                "la liste, en pensant à garder les mots clés de base dans ta réponse. Le premier élément de ta" +
+                " liste doit absolument être les ou les mots-clés donnés par l'utilisateur.\" }," +
+                "{\"role\":\"user\", \"content\": \"J'ai cet élément à rechercher sur Google, quels seraient les mots" +
+                " qui pourraient me ressortir les informations les plus intéressantes ? \\\"" + keyword + "\\\"\"}] }";
+
+        return getString(connection, requestBody);
+    }
+
+    public List<String> extractRelevantText(WebDriver driver, List<String> keywords) throws IOException, URISyntaxException {
         List<String> paragraphs = new ArrayList<>();
         List<WebElement> elements = List.of();
+
         try {
             sleep(2000);
             elements = driver.findElements(By.tagName("p")); // Récupère tous les <p>
@@ -38,9 +59,13 @@ public class WebScrapper {
         }
         for (WebElement element : elements) {
             String text = element.getText().trim();
-            if (!text.isEmpty() && text.toLowerCase().contains(keyword.toLowerCase()) && text.length() > 30) {
-                paragraphs.add(text); // Garde les paragraphes contenant le mot-clé
+            for (String keyword : keywords) {
+                if (!text.isEmpty() && text.toLowerCase().contains(keyword.toLowerCase()) && text.length() > 30) {
+                    paragraphs.add(text); // Garde les paragraphes contenant le mot-clé
+                }
+
             }
+
         }
 
         return paragraphs;
@@ -74,7 +99,7 @@ public class WebScrapper {
         HttpURLConnection connection = getHttpURLConnection();
 
         if (text.isEmpty()) {
-            return "Une erreur est survenue, aucun texte n'a été trouvé. Merci de réessayer.";
+            return ERROR_STRING;
         }
         String requestBody = "{  \"model\": \"llama-3.3-70b-versatile\", \"messages\": [{ \"role\": \"system\", " +
                 "\"content\": \"Tu dois analyser les informations que l'on te donne, et les résumer " +
@@ -82,10 +107,17 @@ public class WebScrapper {
                 "sont pas forcément intéressantes à utiliser. À toi de garder le plus important. N'interagis pas avec " +
                 "l'utilisateur. Seule ta réponse relative au résumé est attendue. N'introduis pas ta réponse, ne donne " +
                 "pas de conclusion. Reste focalisé sur les termes réccurents du texte donné, et ne fais pas " +
-                "d'interprétations.\" }," +
+                "d'interprétations. Ta réponse peut être aussi longue que tu le souhaites. Je ne veux pas que" +
+                " tu résumes ton propre résumé. Fais attention à la logique de ta réponse. Tu ne dois pas" +
+                "renseigner d'informations que tu as récupéré si elles n'ont pas de lien avec l'ensemble de ta " +
+                "réponse.\" }," +
                 "{\"role\":\"user\", \"content\": \"J'ai ce texte là que j'ai récupéré, peux-tu m'en extraire les" +
                 " informations les plus intéressantes ? \\\"" + stringify(text) + "\\\"\"}] }";
 
+        return getString(connection, requestBody);
+    }
+
+    private String getString(HttpURLConnection connection, String requestBody) throws IOException {
         try (OutputStream os = connection.getOutputStream()) {
             byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
             os.write(input, 0, input.length);
@@ -149,15 +181,30 @@ public class WebScrapper {
         System.out.println("Step two : getting search results");
         List<String> urls = getGoogleSearchResults(driver);
 
-        System.out.println("Step three : getting on link and extracting relevant text");
+        System.out.println("Step three : getting list of relevant things to search for");
+        List<String> keywords= List.of(getWordsToSearchForWithGPT4(keyword).split(","));
+        System.out.println("Step four : getting on link and extracting relevant text");
         List<String> data = new ArrayList<>();
         urls.forEach(link -> {
             System.out.println("Checking "+link);
             driver.get(link);
-            data.addAll(extractRelevantText(driver, keyword));
+            try {
+                data.addAll(extractRelevantText(driver, keywords));
+            } catch (IOException | URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
         });
 
-        System.out.println("Step four : cleaning data");
+        System.out.println("Step five : cleaning data");
+        List<String> newdata = cleanData(data);
+        System.out.println("Step six : summarizing data");
+        String finalString = this.summarizeWithGPT4(newdata);
+        System.out.println("Step seven : extracting response");
+        return extractResponse(finalString);
+
+    }
+
+    private List<String> cleanData(List<String> data) {
         List<String> newdata = new ArrayList<>();
         for (String pr : data) {
             String cleaned = this.cleanHTMLContent(pr);
@@ -165,46 +212,39 @@ public class WebScrapper {
                 newdata.add(cleaned);
             }
         }
-        System.out.println("Step five : summarizing data");
-        String finalString = this.summarizeWithGPT4(newdata);
-        System.out.println("Step six : extracting response");
-        return extractResponse(finalString);
-
+        return newdata;
     }
+
     public String scrap(WebDriver driver, String url, String keyword, BiConsumer<Integer, Integer> progressCallback) throws Exception {
-        int act = 16;
+        int act = 14;
         System.out.println("Step one : dodging cookie message");
         progressCallback.accept(act, 100);
         dodgeGoogleCookieMessage(driver, url);
         System.out.println("Step two : getting search results");
         List<String> urls = getGoogleSearchResults(driver);
         progressCallback.accept( 2*act, 100);
-        System.out.println("Step three : getting on link and extracting relevant text");
+        System.out.println("Step three : getting list of relevant things to search for");
+        List<String> keywords= List.of(getWordsToSearchForWithGPT4(keyword).split(","));
+        progressCallback.accept( 3*act, 100);
+        System.out.println("Step four : getting on link and extracting relevant text");
         List<String> data = new ArrayList<>();
-        int finalCount = 16/urls.size();
-
+        int finalCount = 14/urls.size();
         for (int i =0; i< urls.size(); i++) {
             System.out.println("Checking "+urls.get(i));
             driver.get(urls.get(i));
-            data.addAll(extractRelevantText(driver, keyword));
-            progressCallback.accept((act*2)+(finalCount*(i+1)), 100);
+            data.addAll(extractRelevantText(driver, keywords));
+            progressCallback.accept((act*3)+(finalCount*(i+1)), 100);
         }
-        progressCallback.accept( 3*act, 100);
-        System.out.println("Step four : cleaning data");
-        List<String> newdata = new ArrayList<>();
-        for (String pr : data) {
-            String cleaned = this.cleanHTMLContent(pr);
-            if (!cleaned.isEmpty()) {
-                newdata.add(cleaned);
-            }
-        }
-        progressCallback.accept(4*act, 100);
-        System.out.println("Step five : summarizing data");
-        String finalString = this.summarizeWithGPT4(newdata);
+        progressCallback.accept( 4*act, 100);
+        System.out.println("Step five : cleaning data");
+        List<String> newdata = cleanData(data);
         progressCallback.accept(5*act, 100);
-        System.out.println("Step six : extracting response");
-        String str = extractResponse(finalString);
+        System.out.println("Step six : summarizing data");
+        String finalString = this.summarizeWithGPT4(newdata);
         progressCallback.accept(6*act, 100);
+        System.out.println("Step seven : extracting response");
+        String str = extractResponse(finalString);
+        progressCallback.accept(7*act, 100);
         return str;
 
 
@@ -223,6 +263,9 @@ public class WebScrapper {
     }
 
     public String extractResponse(String jsonResponse) throws Exception {
+        if (jsonResponse.equals(ERROR_STRING)){
+            return ERROR_STRING;
+        }
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode rootNode = objectMapper.readTree(jsonResponse);
 

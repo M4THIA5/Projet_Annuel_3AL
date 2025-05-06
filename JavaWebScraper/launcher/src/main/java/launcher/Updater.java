@@ -149,6 +149,7 @@ public class Updater {
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
             e.printStackTrace();
+            versions.add("Unknown");
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
