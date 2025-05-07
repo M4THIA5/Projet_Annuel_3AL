@@ -1,34 +1,17 @@
-export interface UserCreated {
-  id?: number
-  nom: string
-  email: string
-  prenom:string
-  password:string
-}
+import { UserRole } from "../config/utils"
 
-export interface Data {
-    id?: number
-    data: string
-}
-
-export interface Credentials {
-    email:string
-    password:string
-}
-/** Schema description defined by JSDoc */
-export interface Book {
-    /** Field description defined by JSDoc
-     *
-     * @example 14
-     */
-    id: number
-    title: string
-    description?: string
-}
 export interface User {
   id?: number
-  name: string
+  firstName: string
+  lastName: string
   email: string
+  color?: string
   password: string
-  isAdmin?: boolean
+  roles?: UserRole[]
+}
+
+export type CurrentUser = {
+  id: number
+  email: string
+  roles: UserRole[]
 }

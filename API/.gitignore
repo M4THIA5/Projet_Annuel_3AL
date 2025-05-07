@@ -1,7 +1,6 @@
 # dependencies
 node_modules/
 dist/
-# dependencies
-build/
 
-prisma/**/client/
+# Prisma client génération
+prisma/**/*Client/
