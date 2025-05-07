@@ -1,4 +1,4 @@
-package fr.laporteacote.javawebscraper;
+package app;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

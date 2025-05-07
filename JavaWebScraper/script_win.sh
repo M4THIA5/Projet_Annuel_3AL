@@ -22,7 +22,7 @@ cp app/target/classes/chromedriver.exe build-jpackage/
 cp app/target/classes/.version build-jpackage
 cp app/target/classes/icon.jpg build-jpackage
 cp app/target/classes/icon.ico build-jpackage
-
+cp launchjava.sh build-jpackage
 
 echo "Lancement de jpackage..."
 
@@ -35,6 +35,7 @@ echo "Lancement de jpackage..."
   --main-class launcher.Lanceur \
   --resource-dir app/src/main/resources \
   --win-dir-chooser \
+  --verbose \
   --win-menu \
   --win-shortcut \
   --win-per-user-install \

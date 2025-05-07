@@ -1,7 +1,7 @@
-package fr.laporteacote.javawebscraper;
+package app;
 
-import fr.laporteacote.javawebscraper.utils.Loader;
-import fr.laporteacote.javawebscraper.utils.RingProgressIndicator;
+import app.utils.Loader;
+import app.utils.RingProgressIndicator;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -32,6 +32,8 @@ import java.io.*;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
+import cli.WebScrapper;
 
 import static launcher.Updater.getUserVersion;
 

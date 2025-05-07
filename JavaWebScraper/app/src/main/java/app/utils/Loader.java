@@ -1,6 +1,6 @@
-package fr.laporteacote.javawebscraper.utils;
+package app.utils;
 
-import fr.laporteacote.javawebscraper.Main;
+import app.WebScrapController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 
@@ -10,7 +10,7 @@ public class Loader {
 
     public static Node load(String fileName) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource(fileName));
+            FXMLLoader fxmlLoader = new FXMLLoader(WebScrapController.class.getResource(fileName));
             return fxmlLoader.load();
         } catch (IOException e) {
             e.printStackTrace();

@@ -5,9 +5,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>pa</groupId>
-  <artifactId>app</artifactId>
+  <artifactId>cli</artifactId>
   <version>1.0.0</version>
-  <name>app</name>
+  <name>cli</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -84,12 +84,6 @@
           <groupId>test</groupId>
           <artifactId>launcher</artifactId>
           <version>1.0.2</version>
-          <scope>compile</scope>
-      </dependency>
-      <dependency>
-          <groupId>pa</groupId>
-          <artifactId>cli</artifactId>
-          <version>1.0.0</version>
           <scope>compile</scope>
       </dependency>
 

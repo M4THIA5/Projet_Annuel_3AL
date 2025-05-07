@@ -1,4 +1,4 @@
-package fr.laporteacote.javawebscraper;
+package cli;
 
 import org.openqa.selenium.*;
 

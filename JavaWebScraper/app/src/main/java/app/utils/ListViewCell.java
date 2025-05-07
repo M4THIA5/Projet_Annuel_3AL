@@ -1,4 +1,4 @@
-package fr.laporteacote.javawebscraper.utils;
+package app.utils;
 
 import javafx.scene.control.ListCell;
 

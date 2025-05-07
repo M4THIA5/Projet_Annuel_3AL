@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */ 
-package fr.laporteacote.javawebscraper.utils;
+package app.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +37,7 @@ import javafx.css.converter.SizeConverter;
  */
 public class RingProgressIndicator extends ProgressCircleIndicator {
     public RingProgressIndicator() {
-        this.getStylesheets().add(RingProgressIndicator.class.getResource("/fr/laporteacote/javawebscraper/utils/ringprogress.css").toExternalForm());
+        this.getStylesheets().add(RingProgressIndicator.class.getResource("/app/utils/ringprogress.css").toExternalForm());
         this.getStyleClass().add("ringindicator");
     }
 

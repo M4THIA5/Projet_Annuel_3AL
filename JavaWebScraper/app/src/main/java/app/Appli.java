@@ -1,4 +1,4 @@
-package fr.laporteacote.javawebscraper;
+package app;
 
 
 public class Appli{
