@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import os
 import pathlib as pathlib
-import stat
-from datetime import datetime
-
+import platform
 import ply.lex as lex
 import ply.yacc as yacc
+import stat
+import subprocess
+from datetime import datetime
 
 PATH = pathlib.Path(__file__).parent.resolve()
 
@@ -26,6 +27,7 @@ reserved = {
     "startsw": "STARTSW",
     "like": "LIKE",
     "endsw": "ENDSW",
+    'rename': "RENAME"
 }
 
 tokens = ['NUMBER', 'MINUS', 'PLUS', 'TIMES', 'DIVIDE',
@@ -166,6 +168,12 @@ def t_like(t):
 def t_endsw(t):
     r'endsw'
     t.type = reserved.get(t.value, 'ENDSW')
+    return t
+
+
+def t_rename(t):
+    r'rename'
+    t.type = reserved.get(t.value, 'RENAME')
     return t
 
 
@@ -391,11 +399,18 @@ def eval_inst(t):
         except FileNotFoundError:
             print("File not found")
     elif t[0] == 'create':
-        f = pathlib.Path(PATH / t[1])
-        if f.exists():
-            print("File exists already")
-            return
-        open(PATH / t[1], "w")
+        if len(t) == 2:
+            f = pathlib.Path(PATH / t[1])
+            if f.exists():
+                print("File exists already")
+                return
+            open(PATH / t[1], "w")
+        else:
+            d = pathlib.Path(PATH / t[2])
+            try:
+                os.makedirs(d)
+            except FileExistsError:
+                print(f"One or more directories in '{d}' already exist.")
     elif t[0] == 'delete':
         f = pathlib.Path(PATH / t[1])
         if not f.exists():
@@ -405,6 +420,17 @@ def eval_inst(t):
             os.remove(PATH / t[1])
         except FileNotFoundError:
             print("File not found")
+    elif t[0] == 'rename':
+        if len(t) == 3:
+            try:
+                os.rename(t[1], t[2])
+            except IOError:
+                print("Rename failed")
+        else:
+            try:
+                os.rename(t[2], t[3])
+            except IOError:
+                print("Rename failed")
     elif t[0] == 'update':
         try:
             f = pathlib.Path(PATH / t[1])
@@ -468,12 +494,16 @@ def eval_inst(t):
         elif calc == 7:
             filterCondsWithType(PATH / t[2][1][1].replace('"', ''), t[2][1][1], t[1][1])
     elif t[0] == 'search':
-        print("1")
-        os.system("cd app/ && mvn clean compile --quiet --log-file ./log")
-        print("2")
-        os.system(
-            " cd app && mvn exec:java --quiet --log-file ./log -Dexec.mainClass=\"app.src.main.java.fr.laporteacote.javawebscraper.Main\" -Dexec.args=\"" +
-            t[1] + "\" 1> return.txt")
+        cmd = "where" if platform.system() == "Windows" else "which"
+        test = subprocess.call([cmd, "launchjava.bat"], stdout=subprocess.DEVNULL,
+                               stderr=subprocess.STDOUT)
+        if test != 0:
+            print("The executable doesn't exist. Please install our Java app.")
+            exit(1)
+        command = "launchjava.bat " + t[1]
+        with os.popen(command) as process:
+            output = process.read()
+        print("Sortie Java:", output)
     elif t[0] == "statement":
         eval_inst(t[1])
         eval_inst(t[2])
@@ -513,6 +543,7 @@ def p_statement(p):
     | create_statement
     | update_statement
     | delete_statement
+    | rename_statement
     | search_statement'''
     p[0] = p[1]
 
@@ -528,8 +559,11 @@ def p_search_statement(p):
 
 
 def p_create_statement(p):
-    '''create_statement : CREATE NAME SEMI'''
-    p[0] = ('create', p[2])
+    '''create_statement : CREATE dir NAME SEMI'''
+    if p[2] == 'dir':
+        p[0] = ('create', p[2], p[3])
+    else:
+        p[0] = ('create', p[3])
 
 
 def p_update_statement(p):
@@ -537,6 +571,19 @@ def p_update_statement(p):
     p[0] = ('update', p[2], p[4])
 
 
+def p_rename_statement(p):
+    '''rename_statement : RENAME dir NAME WITH expression SEMI'''
+    if p[2] == 'dir':
+        p[0] = ('rename', p[2], p[3], p[5])
+    else:
+        p[0] = ('rename', p[3], p[5])
+
+
+def p_dir(p):
+    '''dir : DIR
+    | empty'''
+    if p[1] == 'dir':
+        p[0] = 'dir'
 def p_insert_statement(p):
     '''insert_statement : INSERT expression INTO NAME SEMI'''
     p[0] = ('insert', p[2], p[4])
