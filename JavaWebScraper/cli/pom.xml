@@ -110,7 +110,7 @@
                 <archive>
                     <manifest>
                         <addClasspath>true</addClasspath>
-                        <mainClass>app.Appli</mainClass>
+                        <mainClass>cli.Main</mainClass>
                     </manifest>
                     <manifestEntries>
                         <Class-Path>.</Class-Path>
@@ -131,7 +131,7 @@
                     <configuration>
                         <transformers>
                             <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                <mainClass>app.Appli</mainClass>
+                                <mainClass>cli.Main</mainClass>
                             </transformer>
                         </transformers>
                     </configuration>
@@ -171,10 +171,10 @@
             <!-- Default configuration for running with: mvn clean javafx:run -->
             <id>default-cli</id>
             <configuration>
-              <mainClass>app.Appli</mainClass>
-              <launcher>app</launcher>
-              <jlinkZipName>app</jlinkZipName>
-              <jlinkImageName>app</jlinkImageName>
+              <mainClass>cli.Main</mainClass>
+              <launcher>cli</launcher>
+              <jlinkZipName>cli</jlinkZipName>
+              <jlinkImageName>cli</jlinkImageName>
               <noManPages>true</noManPages>
               <stripDebug>true</stripDebug>
               <noHeaderFiles>true</noHeaderFiles>

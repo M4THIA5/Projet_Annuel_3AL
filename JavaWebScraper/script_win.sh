@@ -18,6 +18,8 @@ cp app/target/app-*.jar build-jpackage/
 
 cp launcher/target/launcher-*.jar build-jpackage/
 
+cp cli/target/cli-*.jar build-jpackage/
+
 cp app/target/classes/chromedriver.exe build-jpackage/
 cp app/target/classes/.version build-jpackage
 cp app/target/classes/icon.jpg build-jpackage

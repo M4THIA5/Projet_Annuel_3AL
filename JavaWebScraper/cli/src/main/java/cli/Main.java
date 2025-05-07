@@ -7,13 +7,41 @@ import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 
-import java.io.File;
+import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 
 public class Main {
+    private static void setupChromeDriver() throws IOException {
+        // Récupérer l'URL du chromedriver dans le .jar
+        InputStream chromedriverStream = WebScrapper.class.getClassLoader().getResourceAsStream("chromedriver.exe");
+
+        if (chromedriverStream == null) {
+            throw new IOException("chromedriver.exe n'a pas été trouvé dans le .jar");
+        }
+
+        // Créer un fichier temporaire pour stocker chromedriver
+        File tempFile = new File(System.getProperty("java.io.tmpdir"), "chromedriver.exe");
+
+        // Copier le fichier du .jar vers le fichier temporaire
+        try (OutputStream outputStream = new FileOutputStream(tempFile)) {
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = chromedriverStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Définir la propriété pour le WebDriver
+        System.setProperty("webdriver.chrome.driver", tempFile.getAbsolutePath());
+
+        // Pour s'assurer que le fichier est exécutable
+        tempFile.setExecutable(true);
+    }
     public static void main(String[] args) throws Exception {
         String word;
         if (args.length == 0) {
@@ -26,8 +54,8 @@ public class Main {
         } else {
             word = String.join(" ", args);
         }
-        System.setProperty("webdriver.chrome.driver", "src/main/java/fr/laporteacote/javawebscraper/chromedriver.exe");
-//         Remplace par ton chemin ou mets dans le PATH
+        setupChromeDriver();
+        //         Remplace par ton chemin ou mets dans le PATH
 //         https://googlechromelabs.github.io/chrome-for-testing/#stable
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");  // Mode invisible
@@ -51,7 +79,5 @@ public class Main {
         } finally {
             driver.quit(); // Fermer le navigateur
         }
-        driver.close(); // Fermer le navigateur
     }
-
 }

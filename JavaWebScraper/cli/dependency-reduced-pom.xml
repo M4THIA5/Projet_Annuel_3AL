@@ -33,7 +33,7 @@
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>app.Appli</mainClass>
+              <mainClass>cli.Main</mainClass>
             </manifest>
             <manifestEntries>
               <Class-Path>.</Class-Path>
@@ -53,7 +53,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>app.Appli</mainClass>
+                  <mainClass>cli.Main</mainClass>
                 </transformer>
               </transformers>
             </configuration>
@@ -68,10 +68,10 @@
           <execution>
             <id>default-cli</id>
             <configuration>
-              <mainClass>app.Appli</mainClass>
-              <launcher>app</launcher>
-              <jlinkZipName>app</jlinkZipName>
-              <jlinkImageName>app</jlinkImageName>
+              <mainClass>cli.Main</mainClass>
+              <launcher>cli</launcher>
+              <jlinkZipName>cli</jlinkZipName>
+              <jlinkImageName>cli</jlinkImageName>
               <noManPages>true</noManPages>
               <stripDebug>true</stripDebug>
               <noHeaderFiles>true</noHeaderFiles>
