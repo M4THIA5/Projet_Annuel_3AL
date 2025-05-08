@@ -2,10 +2,14 @@ package launcher;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import io.github.cdimascio.dotenv.Dotenv;
+import io.github.cdimascio.dotenv.DotenvException;
 /**
  * Cette classe est un lanceur pour votre application, elle va rechercher si une
  * nouvelle version a été téléchargée et le cas échéant, va remplacer l'actuelle
@@ -22,7 +26,8 @@ public class Lanceur {
     //Variable contenant le nom du répértoire courant
     private static String currentFolder = System.getProperty("user.dir");
 
-    public static void main(String[] args) throws URISyntaxException {
+    public static void main(String[] args) throws IOException {
+        checkEnvVariables();
         Updater updater = new Updater();
         //On lance la mise à jour
         try {
@@ -75,6 +80,18 @@ public class Lanceur {
         } else {
             //On avertit d'un problème
             JOptionPane.showMessageDialog(null, "Aucun fichier jar à lancer...");
+        }
+    }
+
+    private static void checkEnvVariables() throws IOException {
+        Dotenv dotenv;
+        dotenv = Dotenv.configure().ignoreIfMissing().load();
+        String apiKey =dotenv.get("API_KEY");
+        if (apiKey == null) {
+            apiKey = JOptionPane.showInputDialog("Veuillez saisir une api key créée sur : https://console.groq.com/keys");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(".env"));
+            writer.write("API_KEY=\""+apiKey+ "\"");
+            writer.close();
         }
     }
 }

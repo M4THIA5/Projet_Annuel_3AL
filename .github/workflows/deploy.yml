@@ -51,6 +51,6 @@ jobs:
             key: ${{ secrets.PRIVATE_KEY }}
             port: 22
             script: |
-              ls -la
+              chmod +x java/JavaWebScraper/create-release.sh
               ./java/JavaWebScraper/create-release.sh
 ## release.sh doit modifier versions.json, build le projet et mettre jar à disposition

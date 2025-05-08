@@ -103,6 +103,58 @@
     <?endif?>
 
     <UIRef Id="JpUI"/>
+    <UI>
+          <Dialog Id="ApiKeyDlg" Width="370" Height="270" Title="[ProductName] Setup">
+            <Control Id="Title" Type="Text" X="15" Y="15" Width="340" Height="30" Transparent="yes" NoPrefix="yes" Text="API Key"/>
+            <Control Id="Description" Type="Text" X="20" Y="60" Width="330" Height="60" Text="Please enter your API key. This will be saved in a .env file."/>
+            <Control Id="ApiKeyEdit" Type="Edit" X="20" Y="130" Width="330" Height="18" Property="API_KEY"/>
+
+            <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="Back">
+              <Publish Event="NewDialog" Value="WelcomeDlg">1</Publish>
+            </Control>
+            <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="Next">
+              <!-- Check that API_KEY is not empty -->
+              <Condition Action="disable"><![CDATA[API_KEY = ""]]></Condition>
+              <Condition Action="enable"><![CDATA[API_KEY <> ""]]></Condition>
+              <Publish Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+            </Control>
+            <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancel">
+              <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+            </Control>
+          </Dialog>
+
+          <!-- Add the dialog into the UI flow -->
+          <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="ApiKeyDlg">1</Publish>
+        </UI>
+
+        <!-- Custom Actions -->
+
+        <!-- Set CustomActionData to pass properties to deferred CustomAction -->
+        <CustomAction Id="SetCustomActionData"
+                      Property="WriteEnvFile"
+                      Value="INSTALLFOLDER=[INSTALLFOLDER];API_KEY=[API_KEY]"/>
+
+        <!-- VBScript to write the .env file -->
+        <CustomAction Id="WriteEnvFile"
+                      Script="vbscript"
+                      Execute="deferred"
+                      Return="ignore">
+          <![CDATA[
+            Dim data, items, installFolder, apiKey
+            data = Session.Property("CustomActionData")
+            items = Split(data, ";")
+
+            installFolder = items(0)
+            apiKey = items(1)
+
+            Const ForWriting = 2
+            Set fso = CreateObject("Scripting.FileSystemObject")
+            Set f = fso.OpenTextFile(installFolder & "\.env", ForWriting, True)
+            f.WriteLine "API_KEY=" & apiKey
+            f.Close
+          ]]>
+        </CustomAction>
+
 
     <InstallExecuteSequence>
       <Custom Action="JpSetARPINSTALLLOCATION" After="CostFinalize">Not Installed</Custom>
@@ -127,6 +179,8 @@
       <?endif?>
       <RemoveExistingProducts Before="CostInitialize"/>
       <Custom Action="JpFindRelatedProducts" After="FindRelatedProducts"/>
+      <Custom Action="SetCustomActionData" Before="WriteEnvFile">NOT Installed</Custom>
+      <Custom Action="WriteEnvFile" After="InstallFiles">NOT Installed</Custom>
     </InstallExecuteSequence>
 
     <InstallUISequence>

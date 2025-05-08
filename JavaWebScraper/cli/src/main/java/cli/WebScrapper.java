@@ -18,6 +18,9 @@ import java.util.function.BiConsumer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.github.cdimascio.dotenv.Dotenv;
+import io.github.cdimascio.dotenv.DotenvException;
+
 import static java.lang.Thread.sleep;
 
 
@@ -164,7 +167,9 @@ public class WebScrapper {
     }
 
     private static HttpURLConnection getHttpURLConnection() throws URISyntaxException, IOException {
-        String apiKey = "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";
+        Dotenv dotenv = null;
+        dotenv = Dotenv.configure().load();
+        String apiKey =dotenv.get("API_KEY");
         URL url = new URI("https://api.groq.com/openai/v1/chat/completions").toURL();
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();

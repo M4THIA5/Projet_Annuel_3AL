@@ -39,3 +39,5 @@ build/
 app/src/main/resources/chromedriver.exe
 build-jpackage
 .lastver
+.env
+
