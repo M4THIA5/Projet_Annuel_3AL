@@ -52,5 +52,5 @@ jobs:
             port: 22
             script: |
               ls -la
-              create-release.sh <tag>
+              ./java/JavaWebScraper/create-release.sh
 ## release.sh doit modifier versions.json, build le projet et mettre jar à disposition
