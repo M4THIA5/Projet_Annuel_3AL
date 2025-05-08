@@ -24,20 +24,17 @@ jobs:
             java-version: '24'
             distribution: 'temurin'
         - name: Build with maven
-          run: cd JavaWebScraper && mvn clean install
-        - name: Create release # créer l'installer ???
-          id: create_release
-          uses: softprops/action-gh-release@v1
-          with:
-            tag_name: v1.0.0
-            release_name: Release v1.0.0
-            body: |
-                This is the release notes for version 1.0.0.
-                - Feature 1
-                - Feature 2
-                - Bug fix 1
-          env:
-            GITHUB_TOKEN: ${{ github.token }}
+          run: cd JavaWebScraper && ./builder.sh
+        #        - name: Create release # créer l'installer ???
+        #          id: create_release
+        #          uses: softprops/action-gh-release@v1
+        #          with:
+        #            tag_name: v1.0.0
+        #            release_name: Release v1.0.0
+        #            body: |
+        #                This is the release notes for version 1.0.0.
+        #          env:
+        #            GITHUB_TOKEN: ${{ github.token }}
         - name: Deploy project with SSH
           uses: easingthemes/ssh-deploy@v2.1.4
           env:
@@ -54,5 +51,5 @@ jobs:
             key: ${{ secrets.PRIVATE_KEY }}
             port: 22
             script: |
-              create-release.sh <tag>
+              ls -la && create-release.sh <tag>
 ## release.sh doit modifier versions.json, build le projet et mettre jar à disposition

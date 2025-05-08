@@ -1,11 +1,10 @@
 package launcher;
 
-import java.io.*;
-import javax.swing.JOptionPane;
-import java.awt.Desktop;
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Cette classe est un lanceur pour votre application, elle va rechercher si une
@@ -14,10 +13,12 @@ import java.nio.file.Paths;
  */
 public class Lanceur {
     //Variables contenant les noms des fichiers à charger
-    private static final String pathCurrent = File.separator + "app-"+Updater.getUserVersion()+".jar";
-    private static final String pathNew = File.separator + "app-"+Updater.resolveLastVersion()+".jar";
+    private static final String pathappCurrent = File.separator + "app-" + Updater.getUserVersion() + ".jar";
+    private static final String pathappNew = File.separator + "app-" + Updater.resolveLastVersion() + ".jar";
+    private static final String pathappOld = File.separator + "app-old.jar";
+    private static final String pathCurrent = File.separator + "cli-" + Updater.getUserVersion() + ".jar";
+    private static final String pathNew = File.separator + "cli-" + Updater.resolveLastVersion() + ".jar";
     private static final String pathOld = File.separator + "old.jar";
-
     //Variable contenant le nom du répértoire courant
     private static String currentFolder = System.getProperty("user.dir");
 
@@ -33,35 +34,40 @@ public class Lanceur {
         if (!currentFolder.endsWith("app")) {
             currentFolder = currentFolder + File.separator + "app";
         }
+        File currentapp = new File(currentFolder + pathappCurrent);
+        File newVersionapp = new File(currentFolder + pathappNew);
+        File oldapp = new File(currentFolder + pathappOld);
         File current = new File(currentFolder + pathCurrent);
         File newVersion = new File(currentFolder + pathNew);
         File old = new File(currentFolder + pathOld);
-
         System.out.println(newVersion);
 
         Desktop desktop = Desktop.getDesktop();
         //Si une nouvelle version a été téléchargée
-        if (newVersion.exists()) {
+        if (newVersionapp.exists()) {
             //On renomme la version actuelle (donc la vielle)
             current.renameTo(old);
+            currentapp.renameTo(oldapp);
 
             //On renomme la nouvelle avec le nom de l'ancienne
             newVersion.renameTo(current);
+            newVersionapp.renameTo(currentapp);
 
             //On supprimme l'ancienne
             old.delete();
+            oldapp.delete();
 
             try {
                 //On lance le nouveau fichier .jar
-                desktop.open(current);
+                desktop.open(currentapp);
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(null, e.getMessage());
                 e.printStackTrace();
             }
             //S'il n'y a qu'une version courante et pas de nouvelles
-        } else if (current.exists()) {
+        } else if (currentapp.exists()) {
             try {
-                desktop.open(current);
+                desktop.open(currentapp);
             } catch (IOException e) {
                 e.printStackTrace();
             }

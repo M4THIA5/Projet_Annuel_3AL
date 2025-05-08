@@ -95,22 +95,22 @@ public class WebScrapper {
         return text.trim();
     }
 
-    public String summarizeWithGPT4(List<String> text) throws IOException, URISyntaxException {
+    public String summarizeWithGPT4(List<String> text, String keyword) throws IOException, URISyntaxException {
         HttpURLConnection connection = getHttpURLConnection();
 
         if (text.isEmpty()) {
             return ERROR_STRING;
         }
         String requestBody = "{  \"model\": \"llama-3.3-70b-versatile\", \"messages\": [{ \"role\": \"system\", " +
-                "\"content\": \"Tu dois analyser les informations que l'on te donne, et les résumer " +
-                "en un condensé pertinent et utilisable dans un article de blog. Toutes les informations ne " +
-                "sont pas forcément intéressantes à utiliser. À toi de garder le plus important. N'interagis pas avec " +
-                "l'utilisateur. Seule ta réponse relative au résumé est attendue. N'introduis pas ta réponse, ne donne " +
-                "pas de conclusion. Reste focalisé sur les termes réccurents du texte donné, et ne fais pas " +
-                "d'interprétations. Ta réponse peut être aussi longue que tu le souhaites. Je ne veux pas que" +
-                " tu résumes ton propre résumé. Fais attention à la logique de ta réponse. Tu ne dois pas" +
-                "renseigner d'informations que tu as récupéré si elles n'ont pas de lien avec l'ensemble de ta " +
-                "réponse.\" }," +
+                "\"content\": \"Tu dois analyser les informations que l'on te donne en lien avec ce mot : "+ keyword +
+                " , et les résumer en un condensé pertinent et utilisable dans un article de blog. Toutes les" +
+                " informations ne sont pas forcément intéressantes à utiliser. À toi de garder le plus important." +
+                " N'interagis pas avec l'utilisateur. Seule ta réponse relative au résumé est attendue. N'introduis" +
+                " pas ta réponse, ne donne pas de conclusion. Reste focalisé sur les termes réccurents du texte " +
+                "donné, et ne fais pas d'interprétations. Ta réponse peut être aussi longue que tu le souhaites. " +
+                "Je ne veux pas que tu résumes ton propre résumé. Fais attention à la logique de ta réponse. Tu ne " +
+                "dois pas renseigner d'informations que tu as récupéré si elles n'ont pas de lien avec l'ensemble" +
+                " de ta réponse.\" }," +
                 "{\"role\":\"user\", \"content\": \"J'ai ce texte là que j'ai récupéré, peux-tu m'en extraire les" +
                 " informations les plus intéressantes ? \\\"" + stringify(text) + "\\\"\"}] }";
 
@@ -198,7 +198,7 @@ public class WebScrapper {
         System.out.println("Step five : cleaning data");
         List<String> newdata = cleanData(data);
         System.out.println("Step six : summarizing data");
-        String finalString = this.summarizeWithGPT4(newdata);
+        String finalString = this.summarizeWithGPT4(newdata, keyword);
         System.out.println("Step seven : extracting response");
         return extractResponse(finalString);
 
@@ -240,7 +240,7 @@ public class WebScrapper {
         List<String> newdata = cleanData(data);
         progressCallback.accept(5*act, 100);
         System.out.println("Step six : summarizing data");
-        String finalString = this.summarizeWithGPT4(newdata);
+        String finalString = this.summarizeWithGPT4(newdata, keyword);
         progressCallback.accept(6*act, 100);
         System.out.println("Step seven : extracting response");
         String str = extractResponse(finalString);
