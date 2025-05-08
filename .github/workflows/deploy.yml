@@ -50,5 +50,7 @@ jobs:
             username: ${{ secrets.USERNAME }}
             key: ${{ secrets.PRIVATE_KEY }}
             port: 22
-            script: ls -la && create-release.sh <tag>
+            script: |
+              ls -la
+              create-release.sh <tag>
 ## release.sh doit modifier versions.json, build le projet et mettre jar à disposition
