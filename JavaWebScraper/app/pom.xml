@@ -7,12 +7,12 @@
     <groupId>pa</groupId>
     <artifactId>app</artifactId>
     <name>app</name>
+    <version>${project.version.shared}</version>
     <parent>
         <groupId>test</groupId>
         <artifactId>test</artifactId>
         <version>1.0.1</version>
     </parent>
-    <version>${project.version.shared}</version>
 
 
     <properties>

@@ -4,18 +4,11 @@ permissions:
   contents: write
   packages: write
 on:
-  workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
-      tags:
-        description: 'Test scenario tags'
   push:
-    branches: [ "feat/java" ]
-  pull_request:
-    branches: [ "feat/java" ]
+    paths:
+      - 'JavaWebScraper/app/pom.xml'
+      - 'JavaWebScraper/cli/pom.xml'
+      - 'JavaWebScraper/pom.xml'
 jobs:
     build:
       runs-on: ubuntu-latest
@@ -47,6 +40,19 @@ jobs:
             REMOTE_USER: ${{ secrets.USERNAME }}
             SOURCE: "./"
             TARGET: "~/java"
+        - name: Get app shared version with Maven
+          id: get_app_shared_version
+          run: |
+            cd app
+            VERSION=$(mvn help:evaluate -Dexpression=project.version.shared -q -DforceStdout)
+            echo "Shared app version: $VERSION"
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+        - name: Check if version is resolved
+          run: |
+            if [ "${{ steps.get_app_shared_version.outputs.version }}" = '${project.version.shared}' ]; then
+              echo "ERROR: property project.version.shared is not defined!"
+              exit 1
+            fi
         - name: Deploy using ssh
           uses: appleboy/ssh-action@master
           with:
@@ -56,6 +62,6 @@ jobs:
             port: 22
             script: |
               chmod +x java/JavaWebScraper/create-release.sh
-              ./java/JavaWebScraper/create-release.sh ${{ secrets.PATHTOJAVA }} "nom" v1.0.0 ${{ secrets.URL }}app-v1.0.0.jar app-v1.0.0.jar ${{ secrets.URL }}cli-v1.0.0.jar cli-v1.0.0.jar
+              ./java/JavaWebScraper/create-release.sh ${{ secrets.PATHTOJAVA }} "nom" v1.0.0 ${{ secrets.URL }}app-${{ steps.get_app_shared_version.outputs.version }}jar app-${{ steps.get_app_shared_version.outputs.version }}jar ${{ secrets.URL }}cli-${{ steps.get_app_shared_version.outputs.version }}jar cli-${{ steps.get_app_shared_version.outputs.version }}jar
 
 ## release.sh doit modifier versions.json, build le projet et mettre jar à disposition
