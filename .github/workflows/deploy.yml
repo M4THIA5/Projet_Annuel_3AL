@@ -3,15 +3,19 @@ name: Create new release
 permissions:
   contents: write
   packages: write
-
-
 on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+      tags:
+        description: 'Test scenario tags'
   push:
     branches: [ "feat/java" ]
   pull_request:
     branches: [ "feat/java" ]
-
-
 jobs:
     build:
       runs-on: ubuntu-latest
@@ -52,5 +56,6 @@ jobs:
             port: 22
             script: |
               chmod +x java/JavaWebScraper/create-release.sh
-              ./java/JavaWebScraper/create-release.sh
+              ./java/JavaWebScraper/create-release.sh ${{ secrets.PATHTOJAVA }} "nom" v1.0.0 ${{ secrets.URL }}app-v1.0.0.jar app-v1.0.0.jar ${{ secrets.URL }}cli-v1.0.0.jar cli-v1.0.0.jar
+
 ## release.sh doit modifier versions.json, build le projet et mettre jar à disposition
