@@ -62,6 +62,7 @@ jobs:
             port: 22
             script: |
               chmod +x java/JavaWebScraper/create-release.sh
+              echo "./java/JavaWebScraper/create-release.sh ${{ secrets.PATHTOJAVA }} "nom" v1.0.0 ${{ secrets.URL }}app-${{ steps.get_app_shared_version.outputs.version }}jar app-${{ steps.get_app_shared_version.outputs.version }}jar ${{ secrets.URL }}cli-${{ steps.get_app_shared_version.outputs.version }}jar cli-${{ steps.get_app_shared_version.outputs.version }}jar"
               ./java/JavaWebScraper/create-release.sh ${{ secrets.PATHTOJAVA }} "nom" v1.0.0 ${{ secrets.URL }}app-${{ steps.get_app_shared_version.outputs.version }}jar app-${{ steps.get_app_shared_version.outputs.version }}jar ${{ secrets.URL }}cli-${{ steps.get_app_shared_version.outputs.version }}jar cli-${{ steps.get_app_shared_version.outputs.version }}jar
 
 ## release.sh doit modifier versions.json, build le projet et mettre jar à disposition
