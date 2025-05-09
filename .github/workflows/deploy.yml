@@ -43,7 +43,7 @@ jobs:
         - name: Get app shared version with Maven
           id: get_app_shared_version
           run: |
-            cd app
+            cd JavaWebScraper/app
             VERSION=$(mvn help:evaluate -Dexpression=project.version.shared -q -DforceStdout)
             echo "Shared app version: $VERSION"
             echo "version=$VERSION" >> $GITHUB_OUTPUT
