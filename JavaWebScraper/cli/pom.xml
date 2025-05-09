@@ -6,6 +6,7 @@
     <groupId>pa</groupId>
     <artifactId>cli</artifactId>
     <name>cli</name>
+
     <version>${project.version.shared}</version>
 
     <parent>
