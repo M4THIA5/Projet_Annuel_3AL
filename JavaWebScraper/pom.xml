@@ -20,7 +20,6 @@
         <project.version.shared>1.0.2</project.version.shared>
     </properties>
     <dependencies>
-
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-chrome-driver</artifactId>
