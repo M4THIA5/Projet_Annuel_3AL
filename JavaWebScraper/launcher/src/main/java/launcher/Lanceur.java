@@ -46,7 +46,8 @@ public class Lanceur {
         File newVersion = new File(currentFolder + pathNew);
         File old = new File(currentFolder + pathOld);
         System.out.println(newVersion);
-
+        System.out.println(pathappCurrent);
+        System.out.println(pathappNew);
         Desktop desktop = Desktop.getDesktop();
         //Si une nouvelle version a été téléchargée
         if (newVersionapp.exists()) {

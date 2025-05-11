@@ -81,6 +81,13 @@ public class Updater {
                         downloadFile(fileNode.get("url").asText(), currentFolder +
                                 File.separator + fileNode.get("destination").asText());
                     }
+                    if (!currentFolder.endsWith("app")) {
+                        currentFolder = currentFolder + File.separator + "app";
+                    }
+                    File versionFile = new File(currentFolder + File.separator + ".version");
+                        BufferedWriter reader = new BufferedWriter(new FileWriter(versionFile));
+                        reader.write(versionChoisie);
+                        reader.close();
                     break;
                 }
             }
