@@ -1,15 +1,15 @@
 "use client"
-import { useEffect, useRef, useState } from "react"
-import { MySocket, useSocket } from "./socketProvider"
+import {useEffect, useRef, useState} from "react"
+import {MySocket, useSocket} from "./socketProvider"
 
 export function ChatWrapper({ firstName, lastName }: { firstName: string, lastName: string }) {
-  const [messages, setMessages] = useState()
+    const [messages, setMessages] = useState([])
     const socket = useSocket()
     const [typingStatus, setTypingStatus] = useState('')
     const lastMessageRef = useRef(null)
+    const userName: string = firstName + " " + lastName
     useEffect(() => {
-        if (!socket || !firstName || !lastName) return
-        socket.firstName = firstName
+        if (!socket) return
         const handleMessage = (data: Message[]) => {
             setMessages(data)
         }
@@ -20,7 +20,7 @@ export function ChatWrapper({ firstName, lastName }: { firstName: string, lastNa
         return () => {
             socket.off('message_sent', handleMessage)
         }
-    }, [socket, firstName, lastName])
+    }, [socket])
     useEffect(() => {
         // 👇️ scroll to bottom every time messages change
         lastMessageRef.current?.scrollIntoView({behavior: 'smooth'})
