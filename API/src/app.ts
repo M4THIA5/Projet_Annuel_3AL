@@ -1,11 +1,10 @@
-import express, { urlencoded } from "express"
-import type { Request, Response } from "express"
+import type {Request, Response} from "express"
+import express, {urlencoded} from "express"
 import cors from "cors"
-import cookieParser from "cookie-parser"
-import { config } from "./config/env"
+import {config} from "./config/env"
 
-import { PrismaClient as PostgresClient } from "../prisma/client/postgresClient"
-import { PrismaClient as MongoClient } from "../prisma/client/mongoClient"
+import {PrismaClient as PostgresClient} from "../prisma/client/postgresClient"
+import {PrismaClient as MongoClient} from "../prisma/client/mongoClient"
 
 import errorHandler from "./middleware/errorHandler"
 import notFoundHandler from "./middleware/notFoundHandler"
@@ -21,7 +20,6 @@ const app = express()
 app.use(express.json())
 app.use(cors({ credentials: true, origin: config.NODE_ENV === "production" ? `https://${config.HOST}:3000` : "http://localhost:3000" }))
 app.use(urlencoded({ extended: false }))
-app.use(cookieParser())
 
 app.get("/", async (req: Request, res: Response): Promise<void> => {
   res.status(200).json({ message: "Hello World !" })

@@ -15,3 +15,10 @@ model Data {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   data String
 }
+
+model JournalEntry {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  types      String[]
+  content    String
+  districtId Int
+}
