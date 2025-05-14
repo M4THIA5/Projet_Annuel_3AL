@@ -1,4 +1,4 @@
-import { API_URL } from "../config"
+import {API_URL} from "../config"
 
 class Api {
   private baseUrl: string
@@ -11,7 +11,7 @@ class Api {
   async get(endpoint: string, options?: { accessToken?: string }): Promise<Response> {
     const accessToken = options?.accessToken
     try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      return await fetch(`${this.baseUrl}${endpoint}`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -19,8 +19,6 @@ class Api {
           'Authorization': `Bearer ${accessToken}`,
         },
       })
-
-      return response
     } catch (error) {
       console.error('Erreur lors de la requête GET:', error)
       throw error
@@ -32,7 +30,7 @@ class Api {
     const accessToken = options?.accessToken
     const data = options?.data
     try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      return await fetch(`${this.baseUrl}${endpoint}`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -41,8 +39,6 @@ class Api {
         },
         body: JSON.stringify(data),
       })
-
-      return response
     } catch (error) {
       console.error('Erreur lors de la requête POST:', error)
       throw error
@@ -54,7 +50,7 @@ class Api {
     const accessToken = options?.accessToken
     const data = options?.data
     try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      return await fetch(`${this.baseUrl}${endpoint}`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -63,8 +59,6 @@ class Api {
         },
         body: JSON.stringify(data),
       })
-
-      return response
     } catch (error) {
       console.error('Erreur lors de la requête PUT:', error)
       throw error
@@ -75,7 +69,7 @@ class Api {
   async delete(endpoint: string, options?: { accessToken?: string }): Promise<Response> {
     const accessToken = options?.accessToken
     try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      return await fetch(`${this.baseUrl}${endpoint}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
@@ -83,8 +77,6 @@ class Api {
           'Authorization': `Bearer ${accessToken}`,
         },
       })
-
-      return response
     } catch (error) {
       console.error('Erreur lors de la requête DELETE:', error)
       throw error
