@@ -28,6 +28,7 @@ export default class JournalController {
     create: RequestHandler = async (req: Request, res: Response) => {
         const validator = createValidator.validate(req.body)
         if (validator.error != undefined) {
+            console.log(validator.error.message)
             res.status(400).send(validator.error.message)
             return
         }
@@ -42,13 +43,18 @@ export default class JournalController {
             res.status(400).send(validator.error.message)
             return
         }
-        const Validator = idValidator.validate(req.query)
+        const Validator = idValidator.validate(req.params)
         if (Validator.error != undefined) {
-            res.status(400).send(Validator.error.message)
+            res.status(409).send(Validator.error.message)
             return
         }
         const id = Validator.value.id
-        let journalEntries
+        let journalEntries: {
+            id?: string,
+            types: string[],
+            content: string,
+            districtId: number,
+        }
         try {
             journalEntries = await db.journalEntry.findUniqueOrThrow({
                 where: {
@@ -62,6 +68,7 @@ export default class JournalController {
         journalEntries.content = validator.value.content ? validator.value.content : journalEntries.content
         journalEntries.types = validator.value.types ? validator.value.types : journalEntries.types
         journalEntries.districtId = validator.value.districtId ? validator.value.districtId : journalEntries.districtId
+        delete journalEntries.id
         await db.journalEntry.update({
             where: {
                 id: id
@@ -73,7 +80,7 @@ export default class JournalController {
 
     }
     delete: RequestHandler = async (req: Request, res: Response) => {
-        const Validator = idValidator.validate(req.query)
+        const Validator = idValidator.validate(req.params)
         if (Validator.error != undefined) {
             res.status(400).send(Validator.error.message)
             return

@@ -12,6 +12,7 @@ import neighborhoodRoutes from "./routes/neighborhoodRoute"
 import authRoutes from "./routes/authRoutes"
 import userRoutes from "./routes/userRoutes"
 import userNeighborhoodRoutes from "./routes/userNeighborhoodRoute"
+import journalRoutes from "./routes/journalRoutes";
 
 const postgresClient = new PostgresClient()
 const mongoClient = new MongoClient()
@@ -41,8 +42,9 @@ app.use("/", authRoutes)
 app.use("/users", userRoutes)
 app.use("/neighborhoods", neighborhoodRoutes)
 app.use("/user-neighborhoods", userNeighborhoodRoutes)
+app.use("/journal", journalRoutes)
 
 app.use(notFoundHandler)
-app.use(errorHandler)
+// app.use(errorHandler)
 
 export default app
