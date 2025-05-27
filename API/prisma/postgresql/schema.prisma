@@ -21,6 +21,7 @@ model User {
   firstName         String?
   lastName          String?
   color             String @default("212529")
+  image             String?
 
   createdAt         DateTime  @default(now())
   updatedAt         DateTime? @updatedAt

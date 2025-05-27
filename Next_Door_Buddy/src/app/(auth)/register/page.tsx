@@ -6,9 +6,6 @@ import { RegisterData, registerFormData, registerUser } from "#/lib/api_requests
 import { Routes } from "#/Routes"
 import { FormEvent, useState } from "react"
 
-
-
-
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
