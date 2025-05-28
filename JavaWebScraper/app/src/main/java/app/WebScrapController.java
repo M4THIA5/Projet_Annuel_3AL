@@ -4,7 +4,6 @@ import app.utils.Loader;
 import app.utils.RingProgressIndicator;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -32,13 +31,21 @@ import java.io.*;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import cli.WebScrapper;
 
 import static launcher.Updater.getUserVersion;
 
+import java.util.prefs.Preferences;
+
 
 public class WebScrapController extends Thread {
+
+    private final Preferences prefs = Preferences.userNodeForPackage(WebScrapController.class);
+    private static final String THEME_KEY = "appTheme";
 
     @FXML
     public TextField keyword;
@@ -71,10 +78,14 @@ public class WebScrapController extends Thread {
     public TextArea textarea;
     public Button saveBt;
     public Button copyBt;
+    @FXML
+    public MenuItem changeThemeItem;
     Context currentContext = Context.getInstance();
+
 
     @FXML
     void initialize() {
+        changeThemeItem.setOnAction(_ -> showThemeDialog());
     }
 
     public void setup() {
@@ -90,7 +101,7 @@ public class WebScrapController extends Thread {
             System.out.println("Button is null! "); // check that the btn was injected properly through your fxml
         }
         assert btn != null;
-        btn.sceneProperty().addListener((observable, oldValue, newScene) -> {
+        btn.sceneProperty().addListener((_, _, newScene) -> {
             if (newScene != null) {
                 newScene.getAccelerators().put(
                         KeyCodeCombination.keyCombination("Ctrl+Enter"),
@@ -106,7 +117,7 @@ public class WebScrapController extends Thread {
         });
     }
 
-    public void click(ActionEvent mouseEvent) {
+    public void click() {
         if (keyword.getText().isEmpty()) {
             errors.setText("Au moins une valeur néessaire n'est pas remplie.");
             return;
@@ -148,11 +159,11 @@ public class WebScrapController extends Thread {
         };
         Stage loading = createLoadingPopup(task);
 
-        task.setOnRunning(e -> loading.show());
-        task.setOnSucceeded(e -> {
+        task.setOnRunning(_ -> loading.show());
+        task.setOnSucceeded(_ -> {
             loading.close();
             try {
-                Tab tab = new Tab("Request " + ++count +" : " + keyword.getText());
+                Tab tab = new Tab("Request " + ++count + " : " + keyword.getText());
                 Node node = Loader.load("result.fxml");
                 assert node != null;
                 textarea = (TextArea) node.lookup("#text");
@@ -170,7 +181,7 @@ public class WebScrapController extends Thread {
             }
         });
 
-        task.setOnFailed(e -> {
+        task.setOnFailed(_ -> {
             loading.close();
             errors.setText("Erreur : " + task.getException().getMessage());
             showError(task.getException());
@@ -211,6 +222,64 @@ public class WebScrapController extends Thread {
         tempFile.setExecutable(true);
     }
 
+    private void showThemeDialog() {
+        Dialog<String> dialog = new Dialog<>();
+        dialog.setTitle("Choisir un thème");
+        dialog.setHeaderText("Sélectionnez un thème pour l'application");
+
+        // Boutons
+        ButtonType applyButtonType = new ButtonType("Appliquer", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(applyButtonType, ButtonType.CANCEL);
+
+        // Thèmes disponibles
+        ToggleGroup group = new ToggleGroup();
+
+        VBox content = new VBox(10);
+        content.setPadding(new Insets(10));
+
+        // Liste des thèmes
+        Map<String, String> themeMap = Map.of(
+                "Clair", "/app/utils/theme-light.css",
+                "Sombre", "/app/utils/theme-dark.css",
+                "Bleu", "/app/utils/theme-blue.css",
+                "Vert", "/app/utils/theme-green.css",
+                "Sepia", "/app/utils/theme-sepia.css",
+                "Rose", "/app/utils/theme-pink.css",
+                "Contrasté", "/app/utils/theme-high-contrast.css"
+        );
+
+        for (String label : themeMap.keySet()) {
+            RadioButton rb = new RadioButton(label);
+            rb.setToggleGroup(group);
+            content.getChildren().add(rb);
+        }
+
+        dialog.getDialogPane().setContent(content);
+
+        // Résultat du choix
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == applyButtonType) {
+                RadioButton selected = (RadioButton) group.getSelectedToggle();
+                return selected != null ? selected.getText() : null;
+            }
+            return null;
+        });
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(themeLabel -> {
+            String cssFile = themeMap.get(themeLabel);
+            if (cssFile != null) {
+                applyTheme(cssFile);
+                prefs.put(THEME_KEY, cssFile);
+            }
+        });
+    }
+
+    private void applyTheme(String theme) {
+        Scene scene = changeThemeItem.getParentPopup().getOwnerWindow().getScene();
+        scene.getStylesheets().clear();
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(theme)).toExternalForm());
+    }
 
     private void showError(Throwable e) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -279,15 +348,14 @@ public class WebScrapController extends Thread {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setResizable(false);
-        dialog.setOnCloseRequest(event -> {
+        dialog.setOnCloseRequest(_ -> {
         });
         RingProgressIndicator ringProgressIndicator = new RingProgressIndicator();
         ringProgressIndicator.setRingWidth(200);
         ringProgressIndicator.makeIndeterminate();
 
-        task.progressProperty().addListener((obs, oldProgress, newProgress) -> {
-            ringProgressIndicator.setProgress((int) (newProgress.doubleValue() * 100));
-        });
+        task.progressProperty().addListener(
+                (_, _, newProgress) -> ringProgressIndicator.setProgress((int) (newProgress.doubleValue() * 100)));
 
 
         VBox box = new VBox(ringProgressIndicator, new Label("Chargement en cours..."));

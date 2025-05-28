@@ -1,0 +1,28 @@
+.root {
+    -fx-background-color: #fff0f5;
+    -fx-font-family: "Segoe UI";
+}
+
+.label {
+    -fx-text-fill: #800040;
+}
+
+.button {
+    -fx-background-color: #ff99cc;
+    -fx-text-fill: #ffffff;
+    -fx-border-radius: 5;
+}
+
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ffb6c1;
+    -fx-text-fill: #800040;
+}
+
+.tab-pane {
+    -fx-background-color: #ffe6f0;
+}
+
+.menu-bar {
+    -fx-background-color: #ffc0cb;
+}

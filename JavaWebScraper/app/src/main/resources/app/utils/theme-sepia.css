@@ -1,0 +1,28 @@
+.root {
+    -fx-background-color: #f4ecd8;
+    -fx-font-family: "Georgia";
+}
+
+.label {
+    -fx-text-fill: #5b4636;
+}
+
+.button {
+    -fx-background-color: #d2b48c;
+    -fx-text-fill: #3b2f2f;
+    -fx-border-radius: 5;
+}
+
+.text-field {
+    -fx-background-color: #fffaf0;
+    -fx-border-color: #d2b48c;
+    -fx-text-fill: #3b2f2f;
+}
+
+.tab-pane {
+    -fx-background-color: #f5f0e1;
+}
+
+.menu-bar {
+    -fx-background-color: #e6d3b3;
+}
