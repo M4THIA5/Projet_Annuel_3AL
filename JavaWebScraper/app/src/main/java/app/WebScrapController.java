@@ -245,7 +245,8 @@ public class WebScrapController extends Thread {
                 "Vert", "/app/utils/theme-green.css",
                 "Sepia", "/app/utils/theme-sepia.css",
                 "Rose", "/app/utils/theme-pink.css",
-                "Contrasté", "/app/utils/theme-high-contrast.css"
+                "Contrasté", "/app/utils/theme-high-contrast.css",
+                "Terminal", "/app/utils/theme-terminal.css"
         );
 
         for (String label : themeMap.keySet()) {

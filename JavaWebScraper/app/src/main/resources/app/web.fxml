@@ -19,7 +19,7 @@
             </Menu>
          <Menu text="_Options">
            <items>
-               <MenuItem mnemonicParsing="false" text="Change Theme" />
+               <MenuItem fx:id="changeThemeItem" mnemonicParsing="false" text="Change Theme" />
                <MenuItem mnemonicParsing="false" text="Plugins" />
                <MenuItem mnemonicParsing="false" text="Something" />
            </items>
@@ -38,6 +38,7 @@
                         <Text text="Welcome">Welcome</Text>
                   <Label text="Mots-clés" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
                          <TextField fx:id="keyword" maxHeight="1.7976931348623157E308" prefHeight="0.0" prefWidth="358.0" GridPane.rowIndex="2" />
+                        <Text fx:id="errors"/>
                         <Button fx:id="btn" onAction="#click" prefHeight="46.0" prefWidth="451.0" styleClass="btn, btn-success" text="Rechercher" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" />
                   <columnConstraints>
                      <ColumnConstraints />
