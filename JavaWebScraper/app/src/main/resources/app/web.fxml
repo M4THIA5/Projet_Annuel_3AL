@@ -1,23 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Text?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.WebScrapController">
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.WebScrapController">
     <top>
         <MenuBar>
             <Menu text="_File">
@@ -29,6 +17,13 @@
                 <MenuItem fx:id="Copy" onAction="#notImplemented" text="Copy" />
                 <MenuItem fx:id="Paste" onAction="#notImplemented" text="Paste" />
             </Menu>
+         <Menu text="_Options">
+           <items>
+               <MenuItem mnemonicParsing="false" text="Change Theme" />
+               <MenuItem mnemonicParsing="false" text="Plugins" />
+               <MenuItem mnemonicParsing="false" text="Something" />
+           </items>
+         </Menu>
             <Menu text="_Help">
                 <MenuItem fx:id="Show" onAction="#showShortcuts" text="Show shortcuts" />
                 <MenuItem fx:id="About" onAction="#showAbout" text="About" />
@@ -40,17 +35,10 @@
             <TabPane fx:id="tabPane">
                 <Tab fx:id="searcher" closable="false" text="Form">
                     <GridPane hgap="10" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="458.0" prefWidth="856.0" styleClass="page" vgap="10">
-                        <Text GridPane.columnIndex="0" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0">Welcome</Text>
-
-                        <HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6">
-                            <TextField fx:id="keyword" maxHeight="1.7976931348623157E308" prefHeight="0.0" prefWidth="358.0" />
-                            <padding>
-                                <Insets bottom="20" left="20" right="20" top="20" />
-                            </padding>
-                        </HBox>
-                        <Text fx:id="errors" styleClass="text-danger" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" />
-                        <Button fx:id="btn" onAction="#click" styleClass="btn, btn-success" text="Rechercher" GridPane.hgrow="ALWAYS" GridPane.rowIndex="8" />
-                         <Label text="Mot-clé" GridPane.halignment="CENTER" GridPane.rowIndex="3">Mot-clé </Label>
+                        <Text text="Welcome">Welcome</Text>
+                  <Label text="Mots-clés" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                         <TextField fx:id="keyword" maxHeight="1.7976931348623157E308" prefHeight="0.0" prefWidth="358.0" GridPane.rowIndex="2" />
+                        <Button fx:id="btn" onAction="#click" prefHeight="46.0" prefWidth="451.0" styleClass="btn, btn-success" text="Rechercher" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" />
                   <columnConstraints>
                      <ColumnConstraints />
                   </columnConstraints>
@@ -58,7 +46,6 @@
                      <RowConstraints />
                      <RowConstraints />
                      <RowConstraints />
-                     <RowConstraints maxHeight="17.0" minHeight="17.0" prefHeight="17.0" />
                      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
                      <RowConstraints />
                      <RowConstraints />
