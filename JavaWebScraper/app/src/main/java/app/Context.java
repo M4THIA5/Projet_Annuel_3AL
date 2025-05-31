@@ -12,6 +12,11 @@ public class Context {
 
     private final List<String> requests = new ArrayList<>();
 
+    public PluginService getPluginService() {
+        return pluginService;
+    }
+
+    private final PluginService pluginService = new PluginService();
 
     public List<String> getRequests() {
         return requests;

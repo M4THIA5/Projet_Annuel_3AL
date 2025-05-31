@@ -48,6 +48,11 @@
             </exclusions>
         </dependency>
         <dependency>
+        <groupId>org.pf4j</groupId>
+        <artifactId>pf4j</artifactId>
+        <version>3.10.0</version>
+    </dependency>
+        <dependency>
             <groupId>org.kordamp.ikonli</groupId>
             <artifactId>ikonli-javafx</artifactId>
             <version>12.3.1</version>
@@ -69,7 +74,18 @@
             <version>${project.version.shared}</version>
             <scope>compile</scope>
         </dependency>
-
+        <dependency>
+            <groupId>pa</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version.shared}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>pa</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0.3</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

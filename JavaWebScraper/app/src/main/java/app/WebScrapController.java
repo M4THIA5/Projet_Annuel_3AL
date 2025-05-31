@@ -1,11 +1,13 @@
 package app;
 
 import app.utils.Loader;
-import app.utils.RingProgressIndicator;
+import pa.common.RingProgressIndicator;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -15,8 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
+import javafx.scene.input.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.geometry.Insets;
@@ -31,11 +32,14 @@ import java.io.*;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 import cli.WebScrapper;
+import org.pf4j.PluginManager;
+import pa.common.LoadingPopupCustomizer;
 
 import static launcher.Updater.getUserVersion;
 
@@ -80,12 +84,51 @@ public class WebScrapController extends Thread {
     public Button copyBt;
     @FXML
     public MenuItem changeThemeItem;
+    @FXML
+    public VBox baseVBOX;
     Context currentContext = Context.getInstance();
 
 
     @FXML
     void initialize() {
         changeThemeItem.setOnAction(_ -> showThemeDialog());
+        baseVBOX.setOnDragOver(new EventHandler<DragEvent>() {
+
+            @Override
+            public void handle(DragEvent event) {
+                if (event.getGestureSource() != baseVBOX
+                        && event.getDragboard().hasFiles()) {
+                    /* allow for both copying and moving, whatever user chooses */
+                    event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+                }
+                event.consume();
+            }
+        });
+
+        baseVBOX.setOnDragDropped(new EventHandler<DragEvent>() {
+
+            @Override
+            public void handle(DragEvent event) {
+                Dragboard db = event.getDragboard();
+                boolean success = false;
+                if (db.hasFiles()) {
+                    success = true;
+                    File file = db.getFiles().getFirst();
+                    PluginService pluginService = currentContext.getPluginService();
+                    if (file.getName().endsWith(".jar")) {
+                        pluginService.loadPlugin(file.toPath());
+                    } else {
+                        showError(new Throwable("Fichier non supporté !"));
+                    }
+                }
+                /* let the source know whether the string was successfully
+                 * transferred and used */
+                event.setDropCompleted(success);
+
+                event.consume();
+            }
+        });
+
     }
 
     public void setup() {
@@ -157,7 +200,7 @@ public class WebScrapController extends Thread {
                 return null;
             }
         };
-        Stage loading = createLoadingPopup(task);
+        Stage loading = createLoadingPopup(task,keyword.getText());
 
         task.setOnRunning(_ -> loading.show());
         task.setOnSucceeded(_ -> {
@@ -281,7 +324,19 @@ public class WebScrapController extends Thread {
         scene.getStylesheets().clear();
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(theme)).toExternalForm());
     }
-
+    @FXML
+    private void showPlugins() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("plugins.fxml"));
+            Scene scene = new Scene(loader.load());
+            Stage stage = new Stage();
+            stage.setTitle("Manage Plugins");
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     private void showError(Throwable e) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error alert");
@@ -345,7 +400,15 @@ public class WebScrapController extends Thread {
         alert.showAndWait();
     }
 
-    public Stage createLoadingPopup(Task<?> task) {
+    public Stage createLoadingPopup(Task<?> task, String keywords) {
+        PluginManager pluginManager = currentContext.getPluginService().getPluginManager();
+        List<LoadingPopupCustomizer> customizers = pluginManager.getExtensions(LoadingPopupCustomizer.class);
+        System.out.println("Found customizers: " + customizers);
+
+        if (!customizers.isEmpty()) {
+            return customizers.getFirst().createLoadingPopup(task, keywords);
+        }
+
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setResizable(false);
