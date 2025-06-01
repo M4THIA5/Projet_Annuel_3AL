@@ -8,6 +8,7 @@ import javafx.scene.layout.HBox;
 import org.pf4j.PluginManager;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
+import pa.common.Context;
 
 import java.net.URL;
 import java.util.ResourceBundle;

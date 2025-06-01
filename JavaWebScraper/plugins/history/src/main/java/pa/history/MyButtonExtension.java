@@ -1,22 +1,19 @@
 package pa.history;
 
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import org.pf4j.Extension;
+import pa.common.Context;
 import pa.common.HistoryExtension;
+
+import java.util.List;
 
 @Extension
 public class MyButtonExtension implements HistoryExtension {
     @Override
-    public String getName() {
-        return "Mon Bouton Plugin";
-    }
-
-    @Override
-    public Node createContent() {
-        VBox box = new VBox();
-        box.getChildren().add(new Label("Hello depuis le plugin !"));
-        return box;
+    public void injectInto(Menu pluginMenu, Context context) {
+        MenuItem item = new MenuItem("Plugin - Action");
+        item.setOnAction(e -> System.out.println("Action depuis le plugin"));
+        pluginMenu.getItems().add(item);
     }
 }

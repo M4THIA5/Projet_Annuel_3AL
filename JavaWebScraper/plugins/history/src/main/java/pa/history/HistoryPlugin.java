@@ -5,6 +5,7 @@ import org.pf4j.PluginWrapper;
 
 import javax.swing.*;
 
+
 public class HistoryPlugin extends Plugin {
 
     public HistoryPlugin(PluginWrapper wrapper) {
@@ -28,4 +29,4 @@ public class HistoryPlugin extends Plugin {
     }
 }
 
-b
+

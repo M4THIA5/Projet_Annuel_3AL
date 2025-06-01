@@ -17,13 +17,11 @@
                 <MenuItem fx:id="Copy" onAction="#notImplemented" text="Copy" />
                 <MenuItem fx:id="Paste" onAction="#notImplemented" text="Paste" />
             </Menu>
-         <Menu text="_Options">
-           <items>
-               <MenuItem fx:id="changeThemeItem" mnemonicParsing="false" text="Change Theme" />
-               <MenuItem mnemonicParsing="false" text="Plugins"  onAction="#showPlugins"  />
-               <MenuItem mnemonicParsing="false" text="Something" />
-           </items>
-         </Menu>
+            <Menu fx:id="options" text="_Options">
+                <MenuItem fx:id="changeThemeItem" mnemonicParsing="false" text="Change Theme"/>
+                <MenuItem mnemonicParsing="false" text="Plugins" onAction="#showPlugins"/>
+                <MenuItem mnemonicParsing="false" text="Something"/>
+            </Menu>
             <Menu text="_Help">
                 <MenuItem fx:id="Show" onAction="#showShortcuts" text="Show shortcuts" />
                 <MenuItem fx:id="About" onAction="#showAbout" text="About" />

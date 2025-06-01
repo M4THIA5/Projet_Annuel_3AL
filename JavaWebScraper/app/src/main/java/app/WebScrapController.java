@@ -1,6 +1,8 @@
 package app;
 
 import app.utils.Loader;
+import pa.common.Context;
+import pa.common.PluginService;
 import pa.common.RingProgressIndicator;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -32,10 +34,7 @@ import java.io.*;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import cli.WebScrapper;
 import org.pf4j.PluginManager;
@@ -77,8 +76,10 @@ public class WebScrapController extends Thread {
     public MenuItem About;
     @FXML
     public Button btn;
-    @FXML
 
+    @FXML
+    public Menu options;
+    @FXML
     public TextArea textarea;
     public Button saveBt;
     public Button copyBt;
@@ -116,7 +117,11 @@ public class WebScrapController extends Thread {
                     File file = db.getFiles().getFirst();
                     PluginService pluginService = currentContext.getPluginService();
                     if (file.getName().endsWith(".jar")) {
-                        pluginService.loadPlugin(file.toPath());
+                        if (file.getName().contains("history")) {
+                            pluginService.loadPlugin(file.toPath(), options, currentContext);
+                        } else {
+                            pluginService.loadPlugin(file.toPath());
+                        }
                     } else {
                         showError(new Throwable("Fichier non supporté !"));
                     }

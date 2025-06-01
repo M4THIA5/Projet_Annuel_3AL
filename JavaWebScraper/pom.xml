@@ -24,9 +24,9 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-chrome-driver</artifactId>
-            <version>4.9.1</version>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>20.0.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -36,9 +36,15 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>20.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>pa</groupId>
             <artifactId>common</artifactId>
-            <version>1.0.3</version>
+            <version>1.1.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
