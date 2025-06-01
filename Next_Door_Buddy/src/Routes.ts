@@ -11,4 +11,7 @@ export const Routes = {
   admin: {
     toString: () => "/admin" as const,
   },
+  neighborhood:{
+    toString : () => "/neighborhood" as const,
+  }
 }
