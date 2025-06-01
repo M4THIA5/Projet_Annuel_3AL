@@ -10,9 +10,9 @@
 
     <modules>
         <module>launcher</module>
+        <module>common</module>
         <module>app</module>
         <module>cli</module>
-        <module>common</module>
         <module>plugins/gif</module>
         <module>plugins/history</module>
     </modules>
@@ -39,12 +39,6 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>20.0.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>pa</groupId>
-            <artifactId>common</artifactId>
-            <version>1.1.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

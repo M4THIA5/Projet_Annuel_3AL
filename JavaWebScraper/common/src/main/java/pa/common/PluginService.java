@@ -1,6 +1,7 @@
 package pa.common;
 
 import javafx.scene.control.Menu;
+import javafx.scene.control.TabPane;
 import org.pf4j.DefaultPluginManager;
 import org.pf4j.PluginManager;
 
@@ -24,7 +25,7 @@ public class PluginService {
             System.out.println("Plugin loaded and started: " + wrapper);
         }
     }
-    public void loadPlugin(Path pluginJar, Menu pluginMenu, Context results) {
+    public void loadPlugin(Path pluginJar, Menu pluginMenu, Context results, TabPane tab) {
         String wrapper = pluginManager.loadPlugin(pluginJar);
         if (wrapper != null) {
             pluginManager.startPlugin(wrapper);
@@ -33,7 +34,7 @@ public class PluginService {
                 List<HistoryExtension> extensions = pluginManager.getExtensions(HistoryExtension.class);
                 if (!extensions.isEmpty()) {
                     System.out.println("HistoryExtension found: " + extensions.getFirst().toString());
-                    extensions.getFirst().injectInto(pluginMenu, results);
+                    extensions.getFirst().injectInto(pluginMenu, results, tab);
                 } else {
                     System.out.println("No HistoryExtension found in the plugin.");
                 }

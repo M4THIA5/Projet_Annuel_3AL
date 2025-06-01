@@ -13,6 +13,7 @@
     <groupId>test</groupId>
     <artifactId>test</artifactId>
     <version>1.0.1</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

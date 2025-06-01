@@ -7,7 +7,6 @@ import pa.common.RingProgressIndicator;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -93,45 +92,37 @@ public class WebScrapController extends Thread {
     @FXML
     void initialize() {
         changeThemeItem.setOnAction(_ -> showThemeDialog());
-        baseVBOX.setOnDragOver(new EventHandler<DragEvent>() {
-
-            @Override
-            public void handle(DragEvent event) {
-                if (event.getGestureSource() != baseVBOX
-                        && event.getDragboard().hasFiles()) {
-                    /* allow for both copying and moving, whatever user chooses */
-                    event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-                }
-                event.consume();
+        baseVBOX.setOnDragOver(event -> {
+            if (event.getGestureSource() != baseVBOX
+                    && event.getDragboard().hasFiles()) {
+                /* allow for both copying and moving, whatever user chooses */
+                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
             }
+            event.consume();
         });
 
-        baseVBOX.setOnDragDropped(new EventHandler<DragEvent>() {
-
-            @Override
-            public void handle(DragEvent event) {
-                Dragboard db = event.getDragboard();
-                boolean success = false;
-                if (db.hasFiles()) {
-                    success = true;
-                    File file = db.getFiles().getFirst();
-                    PluginService pluginService = currentContext.getPluginService();
-                    if (file.getName().endsWith(".jar")) {
-                        if (file.getName().contains("history")) {
-                            pluginService.loadPlugin(file.toPath(), options, currentContext);
-                        } else {
-                            pluginService.loadPlugin(file.toPath());
-                        }
+        baseVBOX.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            boolean success = false;
+            if (db.hasFiles()) {
+                success = true;
+                File file = db.getFiles().getFirst();
+                PluginService pluginService = currentContext.getPluginService();
+                if (file.getName().endsWith(".jar")) {
+                    if (file.getName().contains("history")) {
+                        pluginService.loadPlugin(file.toPath(), options, currentContext, tabPane);
                     } else {
-                        showError(new Throwable("Fichier non supporté !"));
+                        pluginService.loadPlugin(file.toPath());
                     }
+                } else {
+                    showError(new Throwable("Fichier non supporté !"));
                 }
-                /* let the source know whether the string was successfully
-                 * transferred and used */
-                event.setDropCompleted(success);
-
-                event.consume();
             }
+            /* let the source know whether the string was successfully
+             * transferred and used */
+            event.setDropCompleted(success);
+
+            event.consume();
         });
 
     }
@@ -190,7 +181,7 @@ public class WebScrapController extends Thread {
                 try {
                     String url = "https://www.google.com/search?q=" + URLEncoder.encode(keyword.getText(), StandardCharsets.UTF_8);
                     scrappedValues[0] = webScrapper.scrap(driver, url, keyword.getText(), this::updateProgress);
-                    currentContext.addRequest(scrappedValues[0]);
+                    currentContext.addRequest(keyword.getText(),scrappedValues[0]);
                     System.out.println("added. len : " + currentContext.getRequests().size());
                     sleep(3000);
                     updateProgress(100, 100);
@@ -219,8 +210,8 @@ public class WebScrapController extends Thread {
                 textarea.setEditable(false);
                 saveBt = (Button) node.lookup("#copyBtn");
                 copyBt = (Button) node.lookup("#saveBtn");
-                saveBt.setId("copyBtn" + count);
-                copyBt.setId("saveBtn" + count);
+                saveBt.setId("copyBtn" + keyword.getText());
+                copyBt.setId("saveBtn" + keyword.getText());
                 tab.setContent(node);
                 tabPane.getTabs().add(tab);
             } catch (Exception ex) {

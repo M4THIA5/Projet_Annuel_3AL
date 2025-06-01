@@ -1,6 +1,6 @@
 package pa.common;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Context {
@@ -10,7 +10,7 @@ public class Context {
         return instance;
     }
 
-    private final List<String> requests = new ArrayList<>();
+    private final HashMap<String, String> requests = new HashMap<>();
 
     public PluginService getPluginService() {
         return pluginService;
@@ -18,11 +18,15 @@ public class Context {
 
     private final PluginService pluginService = new PluginService();
 
-    public List<String> getRequests() {
+    public HashMap<String, String> getRequests() {
         return requests;
     }
 
-    public void addRequest(String request) {
-        this.requests.add(request);
+    public void addRequest(String keyword,String request) {
+        this.requests.put(keyword, request);
+    }
+
+    public List<String> getRequestsTitles() {
+        return requests.keySet().stream().toList();
     }
 }

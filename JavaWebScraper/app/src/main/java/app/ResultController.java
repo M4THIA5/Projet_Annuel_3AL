@@ -28,10 +28,9 @@ public class ResultController  implements Initializable {
     public Button copyBtn;
 
     public void saveValueClipBoard(ActionEvent actionEvent) {
-        System.out.println("Save value");
         Button btn = (Button) actionEvent.getSource();
-        int id = Integer.parseInt(btn.getId().substring("copyBtn".length()));
-        String str = context.getRequests().get(id-1);
+        String id = btn.getId().substring("copyBtn".length());
+        String str = context.getRequests().get(id);
         Clipboard clip = Toolkit.getDefaultToolkit()
                 .getSystemClipboard();
         StringSelection strse1 = new StringSelection(str);
@@ -43,12 +42,12 @@ public class ResultController  implements Initializable {
     public void saveInFile(ActionEvent actionEvent) throws IOException {
         System.out.println("Save value");
         Button btn = (Button) actionEvent.getSource();
-        int id = Integer.parseInt(btn.getId().substring("saveBtn".length()));
+        String id =btn.getId().substring("saveBtn".length());
         System.out.println(id);
         JFileChooser fileChooser = new JFileChooser();
         if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
-            String str = context.getRequests().get(id - 1);
+            String str = context.getRequests().get(id);
             FileOutputStream outputStream = new FileOutputStream(file + ".txt");
             byte[] strToBytes = str.getBytes();
             outputStream.write(strToBytes);
