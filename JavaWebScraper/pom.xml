@@ -15,6 +15,7 @@
         <module>cli</module>
         <module>plugins/gif</module>
         <module>plugins/history</module>
+
     </modules>
 
     <properties>
