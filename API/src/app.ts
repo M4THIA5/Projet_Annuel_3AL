@@ -13,8 +13,8 @@ import authRoutes from "./routes/authRoutes"
 import userRoutes from "./routes/userRoutes"
 import userNeighborhoodRoutes from "./routes/userNeighborhoodRoute"
 import journalRoutes from "./routes/journalRoutes";
-import geocodeController from "./controllers/geocodeController";
-import geocodeRoutes from "./routes/geocodeRoutes";
+import geocodeController from "./controllers/mapBoxController";
+import mapBoxRoutes from "./routes/mapBoxRoutes";
 
 const postgresClient = new PostgresClient()
 const mongoClient = new MongoClient()
@@ -45,7 +45,7 @@ app.use("/users", userRoutes)
 app.use("/neighborhoods", neighborhoodRoutes)
 app.use("/user-neighborhoods", userNeighborhoodRoutes)
 app.use("/journal", journalRoutes)
-app.use("/geocode",geocodeRoutes)
+app.use("/geocode",mapBoxRoutes)
 
 app.use(notFoundHandler)
 // app.use(errorHandler)
