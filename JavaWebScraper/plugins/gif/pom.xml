@@ -6,8 +6,9 @@
 
     <groupId>pa</groupId>
     <artifactId>gif</artifactId>
-    <version>1.0.3</version>
     <name>gif</name>
+
+    <version>${project.version.shared}</version>
 
     <parent>
         <groupId>test</groupId>

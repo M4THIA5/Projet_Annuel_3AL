@@ -22,16 +22,6 @@ jobs:
             distribution: 'temurin'
         - name: Build with maven
           run: cd JavaWebScraper && chmod +x builder.sh && ./builder.sh
-        #        - name: Create release # créer l'installer ???
-        #          id: create_release
-        #          uses: softprops/action-gh-release@v1
-        #          with:
-        #            tag_name: v1.0.0
-        #            release_name: Release v1.0.0
-        #            body: |
-        #                This is the release notes for version 1.0.0.
-        #          env:
-        #            GITHUB_TOKEN: ${{ github.token }}
         - name: Deploy project with SSH
           uses: easingthemes/ssh-deploy@v2.1.4
           env:
@@ -53,6 +43,22 @@ jobs:
               echo "ERROR: property project.version.shared is not defined!"
               exit 1
             fi
+        - name: Create release # créer l'installer ???
+          id: create_release
+          uses: softprops/action-gh-release@v1
+          with:
+            tag_name: v${{ steps.get_app_shared_version.outputs.version }}
+            release_name: Release v${{ steps.get_app_shared_version.outputs.version }}
+            body: |
+              Plugins for the JavaWebScraper project :
+              - History plugin
+              - Gif plugin
+            files: |
+              JavaWebScraper/plugins/gif/target/gif-${{ steps.get_app_shared_version.outputs.version }}.jar
+              JavaWebScraper/plugins/history/target/history-${{ steps.get_app_shared_version.outputs.version }}.jar
+          env:
+            GITHUB_TOKEN: ${{ github.token }}
+
         - name: Deploy using ssh
           uses: appleboy/ssh-action@master
           with:
