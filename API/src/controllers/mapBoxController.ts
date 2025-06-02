@@ -23,7 +23,7 @@ class MapBoxController {
 
         try {
             const encodedAddress = encodeURIComponent(address);
-            const url = `https://api.mapbox.com/search/geocode/v6/forward?q=${encodedAddress}&access_token=${MAPBOX_API_KEY}&limit=1`;
+            const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodedAddress}.json?access_token=${MAPBOX_API_KEY}&limit=1`;
 
             const response = await fetch(url);
             if (!response.ok) {
@@ -41,19 +41,26 @@ class MapBoxController {
             const context = feature.context ?? feature.properties?.context ?? {};
 
             const district =
-                context?.district?.name ??
-                context?.locality?.name ??
-                context?.neighborhood?.name ??
-                context?.place?.name ??
+                context.find((c: any) => c.id.startsWith('district'))?.text ??
+                context.find((c: any) => c.id.startsWith('locality'))?.text ??
+                context.find((c: any) => c.id.startsWith('neighborhood'))?.text ??
+                context.find((c: any) => c.id.startsWith('place'))?.text ??
                 feature.text ??
                 feature.place_name ??
                 null;
 
-            res.status(200).json({district});
+            const [longitude, latitude] = feature.center ?? [null, null];
+
+            res.status(200).json({
+                district,
+                latitude,
+                longitude,
+            });
         } catch (err: any) {
             res.status(500).send(err.message || "Erreur serveur");
         }
-    }
+    };
+
 }
 
 
