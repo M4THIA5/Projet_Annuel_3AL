@@ -8,6 +8,7 @@ import { userRole } from "./types/user"
 const PUBLIC_ROUTES = [
   Routes.login.toString(),
   Routes.register.toString(),
+  Routes.forgotPassword.toString(),
 ]
 
 export async function middleware(req: NextRequest) {

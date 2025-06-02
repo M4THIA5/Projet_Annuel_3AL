@@ -8,6 +8,9 @@ export const Routes = {
   register: {
     toString: () => "/register" as const,
   },
+  forgotPassword: {
+    toString: () => "/password" as const,
+  },
   admin: {
     toString: () => "/admin" as const,
   },

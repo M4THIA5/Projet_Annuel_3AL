@@ -47,7 +47,7 @@ export default function RegisterPage() {
       }
     }
   return (
-    <form onSubmit={handleSubmit} noValidate>
+    <form onSubmit={handleSubmit} noValidate className="max-w-md w-full mx-auto mt-24 px-4">
       <Card>
         <CardHeader>
           <CardTitle>Sign in</CardTitle>

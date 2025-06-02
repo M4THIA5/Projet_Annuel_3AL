@@ -49,7 +49,7 @@ export default function PrivateLayout({children}: { children: React.ReactNode })
                             La Porte à côté
                         </div>
                     </Link>
-                    <div className="flex ">
+                    <div className="flex">
                         <NavigationMenu className={"pr-6"}>
                             <NavigationMenuItem className={"flex align-middle"}>
                                 <Link href="/" legacyBehavior passHref>
@@ -101,7 +101,7 @@ export default function PrivateLayout({children}: { children: React.ReactNode })
                     </div>
                 </div>
             </nav>
-            <div >
+            <div className="h-auto" >
                 {children}
             </div>
         </>
