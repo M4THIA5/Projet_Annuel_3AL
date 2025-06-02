@@ -24,11 +24,13 @@ export default function NeighborhoodForm() {
 
     const [imagePreview, setImagePreview] = useState<string | null>(null)
     const [formErrors, setFormErrors] = useState<Record<string, string>>({})
+    const [coordinates, setCoordinates] = useState<{ latitude: number; longitude: number } | null>(null)
+    const [mapVisible, setMapVisible] = useState(false)
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
         setFormData((prev) => ({ ...prev, [name]: value }))
-        setFormErrors((prev) => ({ ...prev, [name]: "" })) // clear error on change
+        setFormErrors((prev) => ({ ...prev, [name]: "" }))
     }
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +39,6 @@ export default function NeighborhoodForm() {
             setFormData((prev) => ({ ...prev, image: file }))
             setFormErrors((prev) => ({ ...prev, image: "" }))
 
-            // Create preview URL
             const reader = new FileReader()
             reader.onload = () => {
                 setImagePreview(reader.result as string)
@@ -83,7 +84,28 @@ export default function NeighborhoodForm() {
 
         if (Object.keys(errors).length === 0) {
             console.log("Formulaire valide:", formData)
-            // Ici tu peux faire ton appel API ou autre action
+        }
+    }
+
+    const handleGenerateMap = async () => {
+        const fullAddress = `${formData.address}, ${formData.postalCode} ${formData.city}, ${formData.country}`
+
+        try {
+            const res = await fetch(
+                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}`
+            )
+            const data = await res.json()
+
+            if (data.length > 0) {
+                const { lat, lon } = data[0]
+                setCoordinates({ latitude: parseFloat(lat), longitude: parseFloat(lon) })
+                setMapVisible(true)
+            } else {
+                alert("Adresse introuvable.")
+            }
+        } catch (err) {
+            console.error("Erreur de géocodage:", err)
+            alert("Échec lors de la génération de la carte.")
         }
     }
 
@@ -94,8 +116,9 @@ export default function NeighborhoodForm() {
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+                    {/* Image + Champs */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Image à gauche */}
+                        {/* Image */}
                         <div className="flex flex-col gap-1 justify-center">
                             <Image
                                 src={imagePreview || logo}
@@ -120,95 +143,61 @@ export default function NeighborhoodForm() {
                             )}
                         </div>
 
-                        {/* Champs à droite */}
+                        {/* Champs texte */}
                         <div className="flex flex-col gap-4">
-                            <div>
+                            <Input
+                                id="name"
+                                name="name"
+                                placeholder="Nom"
+                                value={formData.name}
+                                onChange={handleChange}
+                                required
+                                minLength={2}
+                                maxLength={100}
+                                className={formErrors.name ? "border-red-500" : ""}
+                            />
+                            {formErrors.name && <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>}
+
+                            <div className="grid grid-cols-2 gap-4">
                                 <Input
-                                    id="name"
-                                    name="name"
-                                    placeholder="Nom"
-                                    value={formData.name}
+                                    id="city"
+                                    name="city"
+                                    placeholder="Ville"
+                                    value={formData.city}
                                     onChange={handleChange}
                                     required
-                                    minLength={2}
-                                    maxLength={100}
-                                    className={formErrors.name ? "border-red-500" : ""}
+                                    className={formErrors.city ? "border-red-500" : ""}
                                 />
-                                {formErrors.name && (
-                                    <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
-                                )}
+                                <Input
+                                    id="country"
+                                    name="country"
+                                    placeholder="Pays"
+                                    value={formData.country}
+                                    onChange={handleChange}
+                                    required
+                                    className={formErrors.country ? "border-red-500" : ""}
+                                />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <Input
-                                        id="city"
-                                        name="city"
-                                        placeholder="Ville"
-                                        value={formData.city}
-                                        onChange={handleChange}
-                                        required
-                                        pattern="^[A-Za-zÀ-ÿ\s\-']{2,}$"
-                                        title="La ville doit contenir uniquement des lettres."
-                                        className={formErrors.city ? "border-red-500" : ""}
-                                    />
-                                    {formErrors.city && (
-                                        <p className="text-red-500 text-sm mt-1">{formErrors.city}</p>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <Input
-                                        id="country"
-                                        name="country"
-                                        placeholder="Pays"
-                                        value={formData.country}
-                                        onChange={handleChange}
-                                        required
-                                        pattern="^[A-Za-zÀ-ÿ\s\-']{2,}$"
-                                        title="Le pays doit contenir uniquement des lettres."
-                                        className={formErrors.country ? "border-red-500" : ""}
-                                    />
-                                    {formErrors.country && (
-                                        <p className="text-red-500 text-sm mt-1">{formErrors.country}</p>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <Input
-                                        id="address"
-                                        name="address"
-                                        placeholder="Adresse"
-                                        value={formData.address}
-                                        onChange={handleChange}
-                                        required
-                                        minLength={5}
-                                        maxLength={200}
-                                        className={formErrors.address ? "border-red-500" : ""}
-                                    />
-                                    {formErrors.address && (
-                                        <p className="text-red-500 text-sm mt-1">{formErrors.address}</p>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <Input
-                                        id="postalCode"
-                                        name="postalCode"
-                                        placeholder="Code Postal"
-                                        value={formData.postalCode}
-                                        onChange={handleChange}
-                                        required
-                                        pattern="^\d{4,10}$"
-                                        title="Code postal invalide. Utilisez entre 4 et 10 chiffres."
-                                        className={formErrors.postalCode ? "border-red-500" : ""}
-                                    />
-                                    {formErrors.postalCode && (
-                                        <p className="text-red-500 text-sm mt-1">{formErrors.postalCode}</p>
-                                    )}
-                                </div>
+                                <Input
+                                    id="address"
+                                    name="address"
+                                    placeholder="Adresse"
+                                    value={formData.address}
+                                    onChange={handleChange}
+                                    required
+                                    className={formErrors.address ? "border-red-500" : ""}
+                                />
+                                <Input
+                                    id="postalCode"
+                                    name="postalCode"
+                                    placeholder="Code Postal"
+                                    value={formData.postalCode}
+                                    onChange={handleChange}
+                                    required
+                                    className={formErrors.postalCode ? "border-red-500" : ""}
+                                />
                             </div>
 
                             <Textarea
@@ -223,17 +212,24 @@ export default function NeighborhoodForm() {
                         </div>
                     </div>
 
-                    <div className="h-[500px]">
-                        <div className="w-full h-[500px] rounded-lg border overflow-hidden">
-                            <MapNeighborhood
-                                latitude={48.8584}
-                                longitude={2.2945}
-                                districtName="Quartier Exemple"
-                            />
-                        </div>
+                    {/* Génération de la carte */}
+                    <div className="mt-6 space-y-4">
+                        <Button type="button" onClick={handleGenerateMap}>
+                            Régénérer la carte
+                        </Button>
+
+                        {mapVisible && coordinates && (
+                            <div className="h-[500px] w-full rounded-lg border overflow-hidden">
+                                <MapNeighborhood
+                                    latitude={coordinates.latitude}
+                                    longitude={coordinates.longitude}
+                                    districtName={formData.name || "Quartier"}
+                                />
+                            </div>
+                        )}
                     </div>
 
-
+                    {/* Boutons */}
                     <div className="flex justify-end gap-4 mt-4">
                         <Button type="button" variant="outline" onClick={handleCancel}>
                             Annuler
