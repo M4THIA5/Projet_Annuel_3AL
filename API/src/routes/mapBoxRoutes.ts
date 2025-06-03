@@ -7,6 +7,7 @@ const geocodeController = new GeocodeController()
 
 const mapBoxRoutes = Router()
 mapBoxRoutes.get('/getNeighborhood', geocodeController.getNeighborhood)
+mapBoxRoutes.get('/getAdresseMapBox', geocodeController.getAdresseMapBox)
 
 
 export default mapBoxRoutes
