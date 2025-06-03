@@ -4,6 +4,7 @@ import {config} from '../config/env'
 import argon2 from 'argon2'
 import jwt from 'jsonwebtoken'
 import type {CurrentUser} from '../types'
+import nodemailer from 'nodemailer';
 import {
     accessTokenExpiration,
     refreshTokenExpiration,
@@ -15,6 +16,16 @@ import {
 import crypto from 'crypto';
 
 const postgresClient = new PostgresClient()
+
+const transporter = nodemailer.createTransport({
+    host: config.EMAIL_HOST,
+    port: config.EMAIL_PORT,
+    secure: false,
+    auth: {
+        user: config.EMAIL_USER,
+        pass: config.EMAIL_PASSWORD,
+    },
+});
 
 class AuthController {
     login: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
@@ -104,6 +115,15 @@ class AuthController {
 
             const otp = crypto.randomInt(100000, 999999).toString();
 
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: 'Votre code OTP pour vérification',
+                text: `Bonjour ${firstName},\n\nVoici votre code de vérification OTP : ${otp}\n\nCe code est valide pendant 10 minutes.\n\nMerci.`,
+            };
+
+            await transporter.sendMail(mailOptions);
+
             await postgresClient.user.create({
                 data: {
                     firstName,
@@ -122,9 +142,16 @@ class AuthController {
                 },
             });
 
-            res.status(201).json({message: 'User registered successfully'});
+            res.status(201).json({message: 'User registered successfully. OTP sent by email.'});
         } catch (error) {
             next(error);
+            transporter.verify((error, success) => {
+                if (error) {
+                    console.error('Erreur de configuration mail:', error);
+                } else {
+                    console.log('Serveur mail prêt à envoyer');
+                }
+            });
         }
     };
 

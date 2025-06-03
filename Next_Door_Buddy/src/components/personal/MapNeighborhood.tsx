@@ -3,6 +3,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import mapboxgl from 'mapbox-gl'
 import MapboxDraw from '@mapbox/mapbox-gl-draw'
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
+import {MAPBOX_API_KEY} from "#/lib/config"
 
 type MapNeighborhoodProps = {
     latitude: number
@@ -18,7 +19,7 @@ const MapNeighborhood: React.FC<MapNeighborhoodProps> = ({ latitude, longitude, 
 
     useEffect(() => {
         if (!map.current && mapContainer.current && latitude && longitude) {
-            mapboxgl.accessToken = process.env.MAPBOX_API_KEY || 'pk.eyJ1Ijoid2F5a29lIiwiYSI6ImNtYmUwbnR2ajIxZzgybnM2cTdudDYwaGgifQ.caKqkcYVeiWLtpuf3VLoVA'
+            mapboxgl.accessToken = MAPBOX_API_KEY || 'pk.eyJ1Ijoid2F5a29lIiwiYSI6ImNtYmUwbnR2ajIxZzgybnM2cTdudDYwaGgifQ.caKqkcYVeiWLtpuf3VLoVA'
 
             map.current = new mapboxgl.Map({
                 container: mapContainer.current,
