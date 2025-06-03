@@ -8,7 +8,16 @@ export const Routes = {
   register: {
     toString: () => "/register" as const,
   },
+  verify: {
+    toString: () => "/verify" as const,
+  },
+  forgotPassword: {
+    toString: () => "/password" as const,
+  },
   admin: {
     toString: () => "/admin" as const,
   },
+  neighborhood:{
+    toString : () => "/neighborhood" as const,
+  }
 }

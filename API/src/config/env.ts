@@ -13,4 +13,11 @@ export const config = {
 
   ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET || "",
   REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET || "",
+
+  MAPBOX_API_KEY: process.env.MAPBOX_API_KEY || "",
+
+  EMAIL_USER: process.env.EMAIL_USER || "",
+  EMAIL_PASSWORD: process.env.EMAIL_PASSWORD || "",
+  EMAIL_HOST: process.env.EMAIL_HOST || "",
+  EMAIL_PORT: process.env.EMAIL_PORT || 465,
 }
