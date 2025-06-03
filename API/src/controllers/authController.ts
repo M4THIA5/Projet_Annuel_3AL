@@ -155,6 +155,97 @@ class AuthController {
         }
     };
 
+    verifyOtp: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const { email, otp } = req.body;
+
+        try {
+            const user = await postgresClient.user.findUnique({
+                where: { email },
+            });
+
+            if (!user) {
+                res.status(404).json({ error: 'Utilisateur non trouvé' });
+                return;
+            }
+
+            if (user.otpVerified) {
+                res.status(400).json({ error: 'OTP déjà vérifié' });
+                return;
+            }
+
+            const now = new Date();
+            const otpAgeMinutes = (now.getTime() - new Date(user.otpCreatedAt).getTime()) / 1000 / 60;
+
+            if (otpAgeMinutes > 10) {
+                res.status(400).json({ error: 'OTP expiré' });
+                return;
+            }
+
+            if (user.otpCode !== otp) {
+                res.status(400).json({ error: 'OTP invalide' });
+                return;
+            }
+
+            await postgresClient.user.update({
+                where: { email },
+                data: {
+                    otpVerified: true,
+                    otpCode: null,
+                    otpCreatedAt: null,
+                },
+            });
+
+            res.status(200).json({ message: 'OTP vérifié avec succès' });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    resendOtp: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const { email } = req.body;
+
+        try {
+            const user = await postgresClient.user.findUnique({
+                where: { email },
+            });
+
+            if (!user) {
+                res.status(404).json({ error: 'Utilisateur non trouvé' });
+                return;
+            }
+
+            if (user.otpVerified) {
+                res.status(400).json({ error: 'OTP déjà vérifié. Aucun besoin de renvoyer le code.' });
+                return;
+            }
+
+            const newOtp = crypto.randomInt(100000, 999999).toString();
+
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: 'Nouveau code OTP de vérification',
+                text: `Bonjour ${user.firstName},\n\nVoici votre nouveau code de vérification OTP : ${newOtp}\n\nCe code est valide pendant 10 minutes.\n\nMerci.`,
+            };
+
+            await transporter.sendMail(mailOptions);
+
+            await postgresClient.user.update({
+                where: { email },
+                data: {
+                    otpCode: newOtp,
+                    otpCreatedAt: new Date(),
+                },
+            });
+
+            res.status(200).json({ message: 'Nouveau code OTP envoyé par email.' });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+
+
 
     logout: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {

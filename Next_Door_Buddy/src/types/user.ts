@@ -23,4 +23,14 @@ export enum userRole {
   classic = "classic"
 }
 
+export type  VerifyOtpData  = {
+  email: string
+  otp: string
+}
+
+export type  ResendOtpData = {
+  email: string
+}
+
+
 export type UserRole = keyof typeof userRole

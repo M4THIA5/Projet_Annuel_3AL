@@ -145,7 +145,7 @@ export default function RegisterPage() {
 
             const response = await registerUser(data)
             if(response.ok){
-                router.push(Routes.verify.toString())
+                router.push(`${Routes.verify.toString()}?email=${encodeURIComponent(email)}`)
             }
         } catch (err) {
             console.error(err)

@@ -1,5 +1,5 @@
 import {API} from '#/lib/api_requests/fetchRequest'
-import {UserProfile, UserRole, User} from '#/types/user'
+import {UserProfile, UserRole, User, VerifyOtpData, ResendOtpData} from '#/types/user'
 import {getAccessToken} from '../authentification'
 import {RegisterUserData} from "#/types/mapbox";
 
@@ -66,4 +66,38 @@ export const registerUser = async (data: RegisterUserData): Promise<Response> =>
     } catch (error) {
         throw error
     }
-};
+}
+export const verifyOtp = async (data: VerifyOtpData): Promise<Response> => {
+    try {
+        const response = await API.post('/verify-otp', {
+            accessToken: await getAccessToken(),
+            data,
+        })
+
+        if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Échec de la vérification du code OTP')
+        }
+
+        return response
+    } catch (error) {
+        throw error
+    }
+}
+
+export const resendOtp = async (data: ResendOtpData): Promise<Response> => {
+    try {
+        const response = await API.post('/resend-otp', {
+            accessToken: await getAccessToken(),
+            data,
+        })
+
+        if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Échec de l’envoi du nouveau code OTP')
+        }
+
+        return response
+    } catch (error) {
+        throw error
+    }
