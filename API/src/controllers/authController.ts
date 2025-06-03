@@ -12,6 +12,7 @@ import {
     UserRole,
     userRole
 } from '../config/utils'
+import crypto from 'crypto';
 
 const postgresClient = new PostgresClient()
 
@@ -101,6 +102,8 @@ class AuthController {
 
             const hashedPassword = await argon2.hash(password);
 
+            const otp = crypto.randomInt(100000, 999999).toString();
+
             await postgresClient.user.create({
                 data: {
                     firstName,
@@ -113,6 +116,9 @@ class AuthController {
                     address,
                     city,
                     postalCode,
+                    otpCode: otp,
+                    otpCreatedAt: new Date(),
+                    otpVerified: false,
                 },
             });
 
