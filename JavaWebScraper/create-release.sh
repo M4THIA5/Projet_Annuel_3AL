@@ -33,4 +33,6 @@ jq --arg key "$VERSION_CLE" \
    '.versions[$key] = {nom: $nom, files: $files}' \
    "$JSON_PATH" > "$TMP_FILE" && mv "$TMP_FILE" "$JSON_PATH"
 
+chmod a+r "$JSON_PATH"
+
 echo "Version '$VERSION_CLE' ajoutée/modifiée avec succès."
