@@ -1,7 +1,7 @@
 import {API} from '#/lib/api_requests/fetchRequest'
 import {UserProfile, UserRole, User, VerifyOtpData, ResendOtpData} from '#/types/user'
 import {getAccessToken} from '../authentification'
-import {RegisterUserData} from "#/types/mapbox";
+import {RegisterUserData} from "#/types/mapbox"
 
 export const getprofile = async (): Promise<UserProfile> => {
     try {
@@ -101,3 +101,4 @@ export const resendOtp = async (data: ResendOtpData): Promise<Response> => {
     } catch (error) {
         throw error
     }
+}

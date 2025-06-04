@@ -18,14 +18,15 @@ import crypto from 'crypto';
 const postgresClient = new PostgresClient()
 
 const transporter = nodemailer.createTransport({
-    host: config.EMAIL_HOST,
-    port: config.EMAIL_PORT,
-    secure: false,
+    service: 'ionos',
+    host: process.env.EMAIL_HOST,
+    port: Number(process.env.EMAIL_PORT) || 587,
     auth: {
-        user: config.EMAIL_USER,
-        pass: config.EMAIL_PASSWORD,
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
     },
-});
+    secure: false,
+})
 
 class AuthController {
     login: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
@@ -174,6 +175,10 @@ class AuthController {
             }
 
             const now = new Date();
+            if (!user.otpCreatedAt) {
+                res.status(400).json({ error: 'OTP expiré' });
+                return;
+            }
             const otpAgeMinutes = (now.getTime() - new Date(user.otpCreatedAt).getTime()) / 1000 / 60;
 
             if (otpAgeMinutes > 10) {
@@ -298,13 +303,8 @@ class AuthController {
                 config.ACCESS_TOKEN_SECRET,
                 {expiresIn: accessTokenExpiration}
             )
-            res.cookie(accessTokenName, accessToken, {
-                httpOnly: true,
-                secure: config.NODE_ENV === 'production',
-                sameSite: 'lax',
-                path: '/',
-                maxAge: 10 * 60 * 1000 // 10 minutes
-            })
+
+            // Cookie refresh côté frontend
             res.status(200).json({accessToken})
         } catch (_) {
             res.status(401).json({error: 'Unauthorized'})
