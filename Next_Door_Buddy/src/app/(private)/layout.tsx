@@ -14,6 +14,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "#/components/ui/avatar"
 import {UserProfile} from "#/types/user"
 import {getprofile} from "#/lib/api_requests/user"
 import {useEffect, useState} from "react"
+import { Routes } from "#/Routes"
 
 export default function PrivateLayout({children}: { children: React.ReactNode }) {
 
@@ -43,7 +44,7 @@ export default function PrivateLayout({children}: { children: React.ReactNode })
     return (<>
             <nav className="--background">
                 <div className="py-4 flex justify-between">
-                    <Link className="text-3xl ml-5" href="/">
+                    <Link className="text-3xl ml-5" href={Routes.home.toString()} legacyBehavior passHref>
                         <div style={{display: 'flex', alignItems: 'center'}}>
                             <Image width={60} height={60} className="mr-2" src={logo} alt="logo"/>
                             La Porte à côté
@@ -52,43 +53,43 @@ export default function PrivateLayout({children}: { children: React.ReactNode })
                     <div className="flex">
                         <NavigationMenu className={"pr-6"}>
                             <NavigationMenuItem className={"flex align-middle"}>
-                                <Link href="/" legacyBehavior passHref>
+                                <Link href={Routes.home.toString()} legacyBehavior passHref>
                                     <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                                         Accueil
                                     </NavigationMenuLink>
                                 </Link>
                                 &nbsp;
-                                <Link href="/neighborhood" legacyBehavior passHref>
+                                <Link href={Routes.neighborhood.toString()} legacyBehavior passHref>
                                     <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                                         Mes quartiers
                                     </NavigationMenuLink>
                                 </Link>
                                 &nbsp;
-                                <Link href="/chat" legacyBehavior passHref>
+                                <Link href={Routes.chat.toString()} legacyBehavior passHref>
                                     <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                                         Discussion
                                     </NavigationMenuLink>
                                 </Link>
                                 &nbsp;
-                                <Link href="/" legacyBehavior passHref>
+                                <Link href={Routes.undefined.toString()} legacyBehavior passHref>
                                     <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                                         Mes échanges
                                     </NavigationMenuLink>
                                 </Link>
                                 &nbsp;
-                                <Link href="/" legacyBehavior passHref>
+                                <Link href={Routes.undefined.toString()} legacyBehavior passHref>
                                     <NavigationMenuLink className={`${navigationMenuTriggerStyle()} p-1`}>
                                         <Icon path={mdiBellOutline} size={1}/>
                                     </NavigationMenuLink>
                                 </Link>
                                 &nbsp;
-                                <Link href="/" legacyBehavior passHref>
+                                <Link href={Routes.undefined.toString()} legacyBehavior passHref>
                                     <NavigationMenuLink className={`${navigationMenuTriggerStyle()} p-1`}>
                                         <Icon path={mdiCog} size={1} />
                                     </NavigationMenuLink>
                                 </Link>
                                 &nbsp;
-                                <Link href="/" legacyBehavior passHref>
+                                <Link href={Routes.undefined.toString()} legacyBehavior passHref>
                                     <NavigationMenuLink className={`${navigationMenuTriggerStyle()} p-1`}>
                                         <Avatar>
                                             <AvatarImage src={profile?.image} alt={profile?.firstName} />

@@ -19,5 +19,12 @@ export const Routes = {
   },
   neighborhood:{
     toString : () => "/neighborhood" as const,
-  }
+  },
+  chat: {
+    toString: () => "/chat" as const,
+  },
+
+  undefined: {
+    toString: () => "/#" as const,
+  },
 }
