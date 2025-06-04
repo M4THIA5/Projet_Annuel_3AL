@@ -3,7 +3,7 @@ rm -rf build-jpackage
 mkdir build-jpackage
 
 echo "Compilation Maven..."
-mvn clean install -P windows || { echo "Erreur Maven"; exit 1; }
+mvn clean package -P windows || { echo "Erreur Maven"; exit 1; }
 
 echo "Fusion des targets..."
 
