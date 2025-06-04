@@ -8,19 +8,14 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Objects;
+
 /**
  * Cette classe est un lanceur pour votre application, elle va rechercher si une
  * nouvelle version a été téléchargée et le cas échéant, va remplacer l'actuelle
  * par la nouvelle.
  */
 public class Lanceur {
-    //Variables contenant les noms des fichiers à charger
-    private static final String pathappCurrent = File.separator + "app-" + Updater.getUserVersion() + ".jar";
-    private static final String pathappNew = File.separator + "app-" + Updater.resolveLastVersion() + ".jar";
-    private static final String pathappOld = File.separator + "app-old.jar";
-    private static final String pathCurrent = File.separator + "cli-" + Updater.getUserVersion() + ".jar";
-    private static final String pathNew = File.separator + "cli-" + Updater.resolveLastVersion() + ".jar";
-    private static final String pathOld = File.separator + "old.jar";
     //Variable contenant le nom du répértoire courant
     private static String currentFolder = System.getProperty("user.dir");
 
@@ -37,33 +32,41 @@ public class Lanceur {
         if (!currentFolder.endsWith("app")) {
             currentFolder = currentFolder + File.separator + "app";
         }
-        File currentapp = new File(currentFolder + pathappCurrent);
-        File newVersionapp = new File(currentFolder + pathappNew);
-        File oldapp = new File(currentFolder + pathappOld);
-        File current = new File(currentFolder + pathCurrent);
-        File newVersion = new File(currentFolder + pathNew);
-        File old = new File(currentFolder + pathOld);
-        System.out.println(newVersion);
-        System.out.println(pathappCurrent);
-        System.out.println(pathappNew);
-        Desktop desktop = Desktop.getDesktop();
+        String lastVersion = Updater.resolveLastVersion();
+        File currentapp = new File(currentFolder + File.separator + "app-" + Updater.getUserVersion() + ".jar");
+        File newVersion = new File(currentFolder + File.separator + "app-" + lastVersion + ".jar");
         //Si une nouvelle version a été téléchargée
-        if (newVersionapp.exists()) {
-            //On renomme la version actuelle (donc la vielle)
-            current.renameTo(old);
-            currentapp.renameTo(oldapp);
+        if (newVersion.exists() && !newVersion.equals(currentapp)) {
+            for (File file : Objects.requireNonNull(new File(currentFolder).listFiles())) {
+                if ((file.getName().startsWith("app-") && file.getName().endsWith(".jar") && !checkVersion(file.getName(), lastVersion)) ||
+                        (file.getName().startsWith("cli-") && file.getName().endsWith(".jar") && !checkVersion(file.getName(), lastVersion)) ||
+                        (file.getName().startsWith("common-") && file.getName().endsWith(".jar") && !checkVersion(file.getName(), lastVersion))
+                ) {
+                    if (!file.delete()) {
+                        JOptionPane.showMessageDialog(null, "Impossible de supprimer le fichier " + file.getName());
+                    }
+                }
+            }
 
-            //On renomme la nouvelle avec le nom de l'ancienne
-            newVersion.renameTo(current);
-            newVersionapp.renameTo(currentapp);
+            File version = new File(currentFolder + File.separator + ".version");
 
-            //On supprimme l'ancienne
-            old.delete();
-            oldapp.delete();
+            if (version.exists()) {
+                if (!version.delete()) {
+                    JOptionPane.showMessageDialog(null, "Impossible de supprimer le fichier '.version'.");
+                }
+                File versionFile = new File(currentFolder + File.separator + ".version");
+                BufferedWriter reader = new BufferedWriter(new FileWriter(versionFile));
+                reader.write(Updater.resolveLastVersion());
+                reader.close();
+            } else {
+                JOptionPane.showMessageDialog(null, "Le fichier '.version' n'existe pas.");
+            }
 
             try {
                 //On lance le nouveau fichier .jar
-                desktop.open(currentapp);
+                JOptionPane.showMessageDialog(null, "Lancement de : " + newVersion.getAbsolutePath());
+
+                new ProcessBuilder("java", "-Dprism.order=sw", "-jar", newVersion.getAbsolutePath()).inheritIO().start();
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(null, e.getMessage());
                 e.printStackTrace();
@@ -71,7 +74,8 @@ public class Lanceur {
             //S'il n'y a qu'une version courante et pas de nouvelles
         } else if (currentapp.exists()) {
             try {
-                desktop.open(currentapp);
+                JOptionPane.showMessageDialog(null, "Lancement de : " + currentapp.getAbsolutePath());
+                new ProcessBuilder("java", "-Dprism.order=sw", "-jar", currentapp.getAbsolutePath()).inheritIO().start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -82,10 +86,19 @@ public class Lanceur {
         }
     }
 
+    private static boolean checkVersion(String name, String lastVersion) {
+        String version = name
+                .replace("app-", "")
+                .replace("cli-", "")
+                .replace("common-", "")
+                .replace(".jar", "");
+        return version.equals(lastVersion);
+    }
+
     private static void checkEnvVariables() throws IOException {
         Dotenv dotenv;
         dotenv = Dotenv.configure().ignoreIfMissing().load();
-        String apiKey =dotenv.get("API_KEY");
+        String apiKey = dotenv.get("API_KEY");
         if (apiKey == null) {
             apiKey = JOptionPane.showInputDialog("Veuillez saisir une api key créée sur : https://console.groq.com/keys");
             if (apiKey == null || apiKey.trim().isEmpty()) {
@@ -93,7 +106,7 @@ public class Lanceur {
                 System.exit(1);
             }
             BufferedWriter writer = new BufferedWriter(new FileWriter(".env"));
-            writer.write("API_KEY=\""+apiKey+ "\"");
+            writer.write("API_KEY=\"" + apiKey + "\"");
             writer.close();
         }
     }

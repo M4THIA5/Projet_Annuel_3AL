@@ -98,6 +98,20 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>windows</id>
+      <properties>
+        <javafx.platform>win</javafx.platform>
+      </properties>
+    </profile>
+    <profile>
+      <id>linux</id>
+      <properties>
+        <javafx.platform>linux</javafx.platform>
+      </properties>
+    </profile>
+  </profiles>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>5.10.2</junit.version>
