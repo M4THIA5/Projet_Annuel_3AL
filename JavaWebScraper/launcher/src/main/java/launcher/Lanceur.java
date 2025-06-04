@@ -1,15 +1,13 @@
 package launcher;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URISyntaxException;
-
-import io.github.cdimascio.dotenv.Dotenv;
-import io.github.cdimascio.dotenv.DotenvException;
 /**
  * Cette classe est un lanceur pour votre application, elle va rechercher si une
  * nouvelle version a été téléchargée et le cas échéant, va remplacer l'actuelle
@@ -90,6 +88,10 @@ public class Lanceur {
         String apiKey =dotenv.get("API_KEY");
         if (apiKey == null) {
             apiKey = JOptionPane.showInputDialog("Veuillez saisir une api key créée sur : https://console.groq.com/keys");
+            if (apiKey == null || apiKey.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Aucune API Key fournie, l'application ne peut pas démarrer.");
+                System.exit(1);
+            }
             BufferedWriter writer = new BufferedWriter(new FileWriter(".env"));
             writer.write("API_KEY=\""+apiKey+ "\"");
             writer.close();
