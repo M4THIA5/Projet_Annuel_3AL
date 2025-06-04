@@ -11,9 +11,6 @@ type LoginFormData = z.infer<typeof loginFormData>
 export const loginUser = async (loginData: LoginFormData): Promise<{ accessToken: string }> => {
   try {
     const response = await API.post('/login', { data: loginData })
-    if (!response.ok) {
-      throw new Error('Failed to login')
-    }
     const data = await response.json()
     return data
   }
@@ -25,27 +22,17 @@ export const loginUser = async (loginData: LoginFormData): Promise<{ accessToken
 
 export const logout = async (accessToken: string): Promise<void> => {
   try {
-    const response = await API.post('/logout', { accessToken })
-    if (!response.ok) {
-      throw new Error('Failed to logout')
-    }
+    await API.post('/logout', { accessToken })
   } catch (error) {
     console.error('Error during logout:', error)
     throw error
   }
 }
 
-export const refreshToken = async (refreshToken: string | undefined): Promise<{ accessToken: string }> => {
+export const refreshToken = async (refreshToken: string | undefined): Promise<{ accessToken?: string }> => {
   try {
-    if (!refreshToken) {
-      throw new Error('Refresh token is required')
-    }
-
     const response = await API.post('/refresh-access-token', { data: { refreshToken } })
     const data = await response.json()
-    if (!response.ok) {
-      throw new Error('Failed to refresh token')
-    }
     return data
   } catch (error) {
     console.error('Error during token refresh:', error)

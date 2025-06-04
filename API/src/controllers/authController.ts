@@ -278,7 +278,6 @@ class AuthController {
         try {
             const token = req.body.refreshToken || req.cookies[refreshTokenName]
             if (!token) {
-                console.log('mathias 0')
                 res.status(401).json({error: 'Unauthorized'})
                 return
             }
@@ -286,7 +285,6 @@ class AuthController {
             const payload = jwt.verify(token, config.REFRESH_TOKEN_SECRET) as CurrentUser
             const user = await postgresClient.user.findUnique({where: {id: Number(payload.id)}})
             if (!user) {
-                console.log('mathias 1')
                 res.status(404).json({error: 'User not found'})
                 return
             }
