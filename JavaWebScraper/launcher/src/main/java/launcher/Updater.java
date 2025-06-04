@@ -84,27 +84,11 @@ public class Updater {
                     if (!currentFolder.endsWith("app")) {
                         currentFolder = currentFolder + File.separator + "app";
                     }
-                    File versionFile = new File(currentFolder + File.separator + ".version");
-                        BufferedWriter reader = new BufferedWriter(new FileWriter(versionFile));
-                        reader.write(versionChoisie);
-                        reader.close();
                     break;
                 }
             }
             JOptionPane.showMessageDialog(null, "La nouvelle version a été téléchargée, " +
                     "le programme va être relancé");
-
-//            try {
-//
-//                lanceurPath = currentFolder + "app-0.0.15.jar";
-//                //On lance le lanceur
-//                new ProcessBuilder("java", "-jar", lanceurPath).start();
-//
-//                //On quitte le programme
-//                System.exit(0);
-//            } catch (IOException e) {
-//                JOptionPane.showMessageDialog(null, "Impossible de relancer le programme");
-//            }
         }
     }
 
