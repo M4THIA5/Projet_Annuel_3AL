@@ -40,13 +40,10 @@
       <groupId>org.controlsfx</groupId>
       <artifactId>controlsfx</artifactId>
       <version>11.2.1</version>
-  <classifier>${javafx.platform}</classifier>
-
 </dependency><dependency>
       <groupId>com.dlsc.formsfx</groupId>
       <artifactId>formsfx-core</artifactId>
       <version>11.6.0</version>
-    <classifier>${javafx.platform}</classifier>
 
     <exclusions>
         <exclusion>
@@ -58,7 +55,6 @@
       <groupId>org.kordamp.bootstrapfx</groupId>
       <artifactId>bootstrapfx-core</artifactId>
       <version>0.4.0</version>
-    <classifier>${javafx.platform}</classifier>
     </dependency>
 <dependency>
       <groupId>org.junit.jupiter</groupId>
