@@ -76,7 +76,7 @@ import {handleImageUpload, MAX_FILE_SIZE} from "#/lib/tiptap-utils"
 import "#/components/tiptap-templates/simple/simple-editor.scss"
 
 import {useState} from "react"
-import {createJournal} from "#/lib/api_requests/jounal";
+// import {createJournal} from "#/lib/api_requests/jounal"
 
 const MainToolbarContent = ({
                                 onHighlighterClick,
@@ -155,9 +155,9 @@ const MainToolbarContent = ({
 }
 
 const MobileToolbarContent = ({
-                                  type,
-                                  onBack,
-                              }: {
+    type,
+    onBack,
+}: {
     type: "highlighter" | "link"
     onBack: () => void
 }) => (
