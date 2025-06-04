@@ -22,7 +22,7 @@ jobs:
             java-version: '24'
             distribution: 'temurin'
         - name: Build with maven
-          run: cd JavaWebScraper && chmod +x builder.sh && ./builder.sh
+          run: cd JavaWebScraper && mvn -v && chmod +x builder.sh && ./builder.sh
         - name: Deploy project with SSH
           uses: easingthemes/ssh-deploy@v2.1.4
           env:
