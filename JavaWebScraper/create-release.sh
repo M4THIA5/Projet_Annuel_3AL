@@ -10,20 +10,17 @@ VERSION_CLE="$2"
 VERSION_NOM="$3"
 shift 3
 
-# Construire le tableau des fichiers
-FILES_JSON="["
+FILES_JSON=$(jq -n '[]')  # tableau vide
 
-while [ "$#" -gt 0 ]; do
+while [ "$#" -gt 1 ]; do
     URL="$1"
     DEST="$2"
-    FILES_JSON="${FILES_JSON}{\"url\": \"$URL\", \"destination\": \"$DEST\"},"
+    ENTRY=$(jq -n --arg url "$URL" --arg dest "$DEST" '{url: $url, destination: $dest}')
+    FILES_JSON=$(jq --argjson arr "$FILES_JSON" --argjson new "$ENTRY" '$arr + [$new]' <<< "")
+    FILES_JSON=$(jq --argjson files "$FILES_JSON" '$files' <<< "")
     shift 2
 done
 
-# Enlever la dernière virgule et fermer le tableau
-FILES_JSON="${FILES_JSON%,}]"
-
-FILES_JSON= jq -n "$(FILES_JSON)"
 
 # Mettre à jour le fichier JSON
 TMP_FILE=$(mktemp)
