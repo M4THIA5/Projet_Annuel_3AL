@@ -21,7 +21,7 @@
     <properties>
         <java.version>20</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.version.shared>1.1.19</project.version.shared>
+        <project.version.shared>1.1.20</project.version.shared>
     </properties>
     <dependencies>
         <dependency>
