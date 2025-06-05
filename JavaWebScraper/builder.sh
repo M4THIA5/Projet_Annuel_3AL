@@ -1,3 +1,4 @@
+#!/bin/bash
 echo "Nettoyage des anciens builds..."
 rm -rf build-jpackage
 mkdir build-jpackage
