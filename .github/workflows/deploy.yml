@@ -17,7 +17,7 @@ jobs:
         - name: Checkout
           uses: actions/checkout@v2
         - name: Set up JDK 24
-          uses: graalvm/setup-graalvm@v1.2
+          uses: graalvm/setup-graalvm@v1
           with:
             distribution: 'liberica'
             java-version: '24'
