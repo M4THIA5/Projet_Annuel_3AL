@@ -80,14 +80,14 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ needs.build.outputs.version }}
-          release_name: Release v${{ needs.build.outputs.version }}
+          name: Release v${{ needs.build.outputs.version }}
           body: |
             Plugins for the JavaWebScraper project:
             - History plugin
             - Gif plugin
           files: |
-            jars/gif-${{ needs.build.outputs.version }}.jar
-            jars/history-${{ needs.build.outputs.version }}.jar
+            ./plugins/gif/target/gif-${{ needs.build.outputs.version }}.jar
+            ./plugins/history/target/history-${{ needs.build.outputs.version }}.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

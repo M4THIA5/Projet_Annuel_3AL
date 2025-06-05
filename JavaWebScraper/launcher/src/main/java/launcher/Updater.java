@@ -35,11 +35,15 @@ public class Updater {
         //Version actuelle
         String version = getUserVersion();
         System.out.println("version =" + version);
+        versions.sort(new VersionComparator());
+        System.out.println("Versions disponibles : " + versions);
+
         //Si la version est nulle
         if (versions.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Impossible de se connecter au service, vérifiez votre " +
                     "connection internet");
         } else {
+
             //Si la dernière version n'est pas la même que l'actuelle
             if (!versions.getLast().equals(version)) {
                 //                String versionChoisie = (String) JOptionPane.showInputDialog(null, "Choississez la version à installer", "Versions disponibles", JOptionPane.QUESTION_MESSAGE,
@@ -166,6 +170,7 @@ public class Updater {
         }
 
         String jsonResponse = response.toString();
+        System.out.println("JSON Response: " + jsonResponse);
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readTree(jsonResponse);
     }
