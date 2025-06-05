@@ -87,8 +87,8 @@ jobs:
             - History plugin
             - Gif plugin
           files: |
-            ./plugins/gif/target/gif-${{ needs.build.outputs.version }}.jar
-            ./plugins/history/target/history-${{ needs.build.outputs.version }}.jar
+            ./jars/gif/target/gif-${{ needs.build.outputs.version }}.jar
+            ./jars/history/target/history-${{ needs.build.outputs.version }}.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -102,8 +102,8 @@ jobs:
           script: |
             ls -la
             cd
-            chmod +x ~/java/JavaWebScraper/create-release.sh
-            ~/java/JavaWebScraper/create-release.sh \
+            chmod +x ~/java/create-release.sh
+            ~/java/create-release.sh \
               ${{ secrets.PATHTOJAVA }} \
               v${{ needs.build.outputs.version }} \
               ${{ needs.build.outputs.version }} \
