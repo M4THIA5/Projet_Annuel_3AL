@@ -40,10 +40,9 @@ jobs:
         id: get_version
         run: |
           cd JavaWebScraper/app
-          VERSION=$(mvn help:evaluate -Dexpression=project.version.shared -q -DforceStdout)
-          echo "Shared app version: $VERSION"
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
+          $version = & mvn help:evaluate -Dexpression=project.version.shared -q -DforceStdout
+          Write-Host "Shared app version: $version"
+          "version=$version" >> $env:GITHUB_OUTPUT
       - name: Upload JAR artifacts
         uses: actions/upload-artifact@v4
         with:
