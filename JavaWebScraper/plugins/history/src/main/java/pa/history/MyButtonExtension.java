@@ -16,7 +16,7 @@ public class MyButtonExtension implements HistoryExtension {
     @Override
     public void injectInto(Menu pluginMenu, Context context, TabPane tabPane) {
         MenuItem item = new MenuItem("Plugin - Action");
-        item.setOnAction(_ ->
+        item.setOnAction(evt ->
                 {
                     // Ouvre une boîte de dialogue avec une ListView de tous les éléments dans context.getRequests()
                     javafx.scene.control.Dialog<String> dialog = new javafx.scene.control.Dialog<>();

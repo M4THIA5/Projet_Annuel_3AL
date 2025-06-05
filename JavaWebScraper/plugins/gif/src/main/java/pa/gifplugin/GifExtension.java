@@ -61,14 +61,14 @@ public class GifExtension implements LoadingPopupCustomizer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        dialog.setOnCloseRequest(_ -> {
+        dialog.setOnCloseRequest(evt -> {
         });
         RingProgressIndicator ringProgressIndicator = new RingProgressIndicator();
         ringProgressIndicator.setRingWidth(200);
         ringProgressIndicator.makeIndeterminate();
 
         task.progressProperty().addListener(
-                (_, _, newProgress) -> ringProgressIndicator.setProgress((int) (newProgress.doubleValue() * 100)));
+                (osb, num, newProgress) -> ringProgressIndicator.setProgress((int) (newProgress.doubleValue() * 100)));
 
 
         ImageView gifView;

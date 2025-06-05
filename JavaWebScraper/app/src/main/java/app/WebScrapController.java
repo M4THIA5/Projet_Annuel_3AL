@@ -91,7 +91,7 @@ public class WebScrapController extends Thread {
 
     @FXML
     void initialize() {
-        changeThemeItem.setOnAction(_ -> showThemeDialog());
+        changeThemeItem.setOnAction(evt -> showThemeDialog());
         baseVBOX.setOnDragOver(event -> {
             if (event.getGestureSource() != baseVBOX
                     && event.getDragboard().hasFiles()) {
@@ -140,7 +140,7 @@ public class WebScrapController extends Thread {
             System.out.println("Button is null! "); // check that the btn was injected properly through your fxml
         }
         assert btn != null;
-        btn.sceneProperty().addListener((_, _, newScene) -> {
+        btn.sceneProperty().addListener((obs, scene, newScene) -> {
             if (newScene != null) {
                 newScene.getAccelerators().put(
                         KeyCodeCombination.keyCombination("Ctrl+Enter"),
@@ -198,8 +198,8 @@ public class WebScrapController extends Thread {
         };
         Stage loading = createLoadingPopup(task,keyword.getText());
 
-        task.setOnRunning(_ -> loading.show());
-        task.setOnSucceeded(_ -> {
+        task.setOnRunning(evt -> loading.show());
+        task.setOnSucceeded(evt -> {
             loading.close();
             try {
                 Tab tab = new Tab("Request " + ++count + " : " + keyword.getText());
@@ -220,7 +220,7 @@ public class WebScrapController extends Thread {
             }
         });
 
-        task.setOnFailed(_ -> {
+        task.setOnFailed(evt -> {
             loading.close();
             errors.setText("Erreur : " + task.getException().getMessage());
             showError(task.getException());
@@ -408,14 +408,14 @@ public class WebScrapController extends Thread {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setResizable(false);
-        dialog.setOnCloseRequest(_ -> {
+        dialog.setOnCloseRequest(evt -> {
         });
         RingProgressIndicator ringProgressIndicator = new RingProgressIndicator();
         ringProgressIndicator.setRingWidth(200);
         ringProgressIndicator.makeIndeterminate();
 
         task.progressProperty().addListener(
-                (_, _, newProgress) -> ringProgressIndicator.setProgress((int) (newProgress.doubleValue() * 100)));
+                (obs, progress, newProgress) -> ringProgressIndicator.setProgress((int) (newProgress.doubleValue() * 100)));
 
 
         VBox box = new VBox(ringProgressIndicator, new Label("Chargement en cours..."));
