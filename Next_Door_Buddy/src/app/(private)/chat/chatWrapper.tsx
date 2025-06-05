@@ -2,18 +2,22 @@
 import {useEffect, useRef, useState} from "react"
 import {MySocket, useSocket} from "./socketProvider"
 
-export function ChatWrapper({ firstName, lastName }: { firstName: string, lastName: string }) {
-    const [messages, setMessages] = useState([])
+export function ChatWrapper({firstName, lastName}: { firstName: string, lastName: string }) {
+    const [messages, setMessages] = useState<Message[]>([])
     const socket = useSocket()
     const [typingStatus, setTypingStatus] = useState('')
     const lastMessageRef = useRef(null)
     const userName: string = firstName + " " + lastName
     useEffect(() => {
         if (!socket) return
-        const handleMessage = (data: Message[]) => {
-            setMessages(data)
-        }
 
+        const handleMessage = (data: Message) => {
+            setMessages((prev: Message[]) => [...prev, data])
+        }
+        socket.on('connected', (data: Message[]) => {
+            console.log("Connected messages:", data)
+            setMessages(() => data.messageData)
+        })
         socket.on('message_sent', handleMessage)
         socket.on('typingResponse', (data) => setTypingStatus(data))
 
@@ -32,7 +36,7 @@ export function ChatWrapper({ firstName, lastName }: { firstName: string, lastNa
             <div className="chat__main">
                 <ChatBody
                     messages={messages}
-                    user={ firstName, lastName }
+                    user={{firstName, lastName}}
                     lastMessageRef={lastMessageRef}
                     typingStatus={typingStatus}
                 />
@@ -65,6 +69,8 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
         localStorage.removeItem('userName')
         window.location.reload()
     }
+    const username = user.firstName + " " + user.lastName
+    console.log(messages)
     return (
         <>
             <header className="chat__mainHeader">
@@ -73,11 +79,10 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
                     LEAVE CHAT
                 </button>
             </header>
-
             {/*This shows messages sent from you*/}
             <div className="message__container">
                 {messages.map((message) =>
-                    message.name.firstName === user.firstName && message.name.lastName === user.lastName ? (
+                    message.name === username ? (
                         <div className="message__chats" key={message.id}>
                             <p className="sender__name">You</p>
                             <div className="message__sender">
@@ -86,7 +91,7 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
                         </div>
                     ) : (
                         <div className="message__chats" key={message.id}>
-                            <p>{`${message.name.firstName} ${message.name.lastName}`}</p>
+                            <p>{`${message.name}`}</p>
                             <div className="message__recipient">
                                 <p>{message.text}</p>
                             </div>
@@ -104,7 +109,7 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
     )
 }
 
-function ChatFooter({ socket, user }: {
+function ChatFooter({socket, user}: {
     user: {
         firstName: string
         lastName: string
@@ -118,7 +123,7 @@ function ChatFooter({ socket, user }: {
     const handleSendMessage = (e: { preventDefault: () => void }) => {
         e.preventDefault()
         if (message.trim()) {
-            if (!socket){
+            if (!socket) {
                 console.log("socket is not ready")
                 return
             }
@@ -149,10 +154,10 @@ function ChatFooter({ socket, user }: {
     )
 }
 
-function ChatBar({socket}: {socket: MySocket}) {
+function ChatBar({socket}: { socket: MySocket }) {
     const [users, setUsers] = useState([])
     useEffect(() => {
-        if (!socket){
+        if (!socket) {
             console.log("Socket not ready yet")
             return
         }
@@ -166,7 +171,7 @@ function ChatBar({socket}: {socket: MySocket}) {
                 <h4 className="chat__header">ACTIVE USERS</h4>
                 <div className="chat__users">
                     {users.map((user) => (
-                    <p key={user.userID+""+Math.random()}>{user.username}</p>
+                        <p key={user.userID + "" + Math.random()}>{user.username}</p>
                     ))}
                 </div>
             </div>

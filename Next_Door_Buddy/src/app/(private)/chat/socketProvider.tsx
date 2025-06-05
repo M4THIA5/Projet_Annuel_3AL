@@ -1,7 +1,7 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
-import { io, Socket } from 'socket.io-client'
+import React, {createContext, useContext, useEffect, useState} from 'react'
+import {io, Socket} from 'socket.io-client'
 
 interface SocketContextType {
     socket: Socket | null
@@ -18,7 +18,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
 
     useEffect(() => {
-        const port = process.env.NEXT_PUBLIC_SOCKET_PORT || 3000
+        const port = process.env.NEXT_PUBLIC_SOCKET_PORT || 3002
         // const socketInstance = io("http://localhost:3005")  for different server websocket url
         const socketInstance = io("http://localhost:"+port, {
             transports: ['websocket'],

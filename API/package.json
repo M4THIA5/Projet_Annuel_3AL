@@ -10,7 +10,7 @@
     "prisma:generate:posgresql": "prisma generate --schema=./prisma/postgresql/schema.prisma",
     "prisma:generate:mongodb": "prisma generate --schema=./prisma/mongodb/schema.prisma",
     "prisma:migrate:postgresql": "prisma migrate dev --schema prisma/postgresql/schema.prisma",
-    "prisma:migrate:mongodb": "prisma migrate dev --schema prisma/mongodb/schema.prisma",
+    "prisma:migrate:mongodb": "prisma db push --schema prisma/mongodb/schema.prisma",
 
     "prisma:seed:postgresql": "npx prisma db seed",
 
@@ -33,7 +33,7 @@
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.13.3",
-    "sqlite3": "^5.1.7"
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.26.0",
