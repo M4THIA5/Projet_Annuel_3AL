@@ -47,6 +47,7 @@ jobs:
         with:
           name: jars
           path: |
+            JavaWebScraper/create-release.sh
             JavaWebScraper/plugins/gif/target/*.jar
             JavaWebScraper/plugins/history/target/*.jar
             JavaWebScraper/app/target/*.jar
@@ -86,8 +87,8 @@ jobs:
             - History plugin
             - Gif plugin
           files: |
-            ./plugins/gif/target/gif-${{ needs.build.outputs.version }}.jar
-            ./plugins/history/target/history-${{ needs.build.outputs.version }}.jar
+            ./java/plugins/gif/target/gif-${{ needs.build.outputs.version }}.jar
+            ./java/plugins/history/target/history-${{ needs.build.outputs.version }}.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
