@@ -87,8 +87,8 @@ jobs:
             - History plugin
             - Gif plugin
           files: |
-            ./jars/gif/target/gif-${{ needs.build.outputs.version }}.jar
-            ./jars/history/target/history-${{ needs.build.outputs.version }}.jar
+            /home/runner/work/Projet_Annuel_3AL/Projet_Annuel_3AL/jars/gif/target/gif-${{ needs.build.outputs.version }}.jar
+            /home/runner/work/Projet_Annuel_3AL/Projet_Annuel_3AL/jars/history/target/history-${{ needs.build.outputs.version }}.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -103,7 +103,7 @@ jobs:
             ls -la
             cd
             chmod +x ~/java/create-release.sh
-            ~/java/create-release.sh \
+             sh ~/java/create-release.sh \
               ${{ secrets.PATHTOJAVA }} \
               v${{ needs.build.outputs.version }} \
               ${{ needs.build.outputs.version }} \
