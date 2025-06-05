@@ -33,8 +33,7 @@ jobs:
         run: |
           cd JavaWebScraper
           mvn -v
-          chmod +x builder.sh
-          ./builder.sh
+          sh builder.sh
 
       - name: Get shared app version from Maven
         id: get_version
