@@ -50,10 +50,12 @@ class AuthController {
                     {expiresIn: refreshTokenExpiration}
                 )
 
-                postgresClient.user.update({
+                await postgresClient.user.update({
                     where: {id: user.id},
                     data: {refreshToken}
                 })
+
+                console.log(await postgresClient.user.findUnique({where: {id: user.id}}))
 
                 res.cookie(refreshTokenName, refreshToken, {
                     httpOnly: true,

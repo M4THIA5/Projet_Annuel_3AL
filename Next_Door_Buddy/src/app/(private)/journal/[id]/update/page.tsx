@@ -25,7 +25,6 @@ export default function Page({params}: Props) {
     return (
         <form className='w-[500px] mx-auto pt-20 flex flex-col gap-2' onSubmit={async (e) => {
             e.preventDefault()
-            console.log(id.current)
             await updateJournal(
                 id.current,
                 {content: content}

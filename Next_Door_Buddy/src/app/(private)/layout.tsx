@@ -24,7 +24,6 @@ export default function PrivateLayout({children}: { children: React.ReactNode })
         async function fetchProfile() {
             const data = await getprofile()
             setProfile(data)
-            console.log(profile)
         }
         fetchProfile()
     }, [])

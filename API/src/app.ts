@@ -15,6 +15,8 @@ import userNeighborhoodRoutes from "./routes/userNeighborhoodRoute"
 import journalRoutes from "./routes/journalRoutes";
 import geocodeController from "./controllers/mapBoxController";
 import mapBoxRoutes from "./routes/mapBoxRoutes";
+import { verifyJwt } from "./middleware/verifyJwt"
+import cookieParser from "cookie-parser"
 
 const postgresClient = new PostgresClient()
 const mongoClient = new MongoClient()
@@ -23,6 +25,7 @@ const app = express()
 app.use(express.json())
 app.use(cors({ credentials: true, origin: config.NODE_ENV === "production" ? `https://${config.HOST}:3000` : "http://localhost:3000" }))
 app.use(urlencoded({ extended: false }))
+app.use(cookieParser())
 
 app.get("/", async (req: Request, res: Response): Promise<void> => {
   res.status(200).json({ message: "Hello World !" })
@@ -41,11 +44,11 @@ app.get("/health", async (req: Request, res: Response): Promise<void> => {
 })
 
 app.use("/", authRoutes)
-app.use("/users", userRoutes)
-app.use("/neighborhoods", neighborhoodRoutes)
-app.use("/user-neighborhoods", userNeighborhoodRoutes)
-app.use("/journal", journalRoutes)
-app.use("/geocode",mapBoxRoutes)
+app.use("/users", verifyJwt, userRoutes)
+app.use("/neighborhoods", verifyJwt, neighborhoodRoutes)
+app.use("/user-neighborhoods", verifyJwt, userNeighborhoodRoutes)
+app.use("/journal", verifyJwt, journalRoutes)
+app.use("/geocode", verifyJwt, mapBoxRoutes)
 
 app.use(notFoundHandler)
 // app.use(errorHandler)
