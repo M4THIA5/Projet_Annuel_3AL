@@ -107,3 +107,8 @@ jobs:
               ${{ secrets.URL }}app-${{ needs.build.outputs.version }}.jar app-${{ needs.build.outputs.version }}.jar \
               ${{ secrets.URL }}cli-${{ needs.build.outputs.version }}.jar cli-${{ needs.build.outputs.version }}.jar \
               ${{ secrets.URL }}common-${{ needs.build.outputs.version }}.jar common-${{ needs.build.outputs.version }}.jar
+            mv ./java/app/target/app-${{ steps.get_app_shared_version.outputs.version }}.jar \
+            ./java/cli/target/cli-${{ steps.get_app_shared_version.outputs.version }}.jar \
+            ./java/common/target/common-${{ steps.get_app_shared_version.outputs.version }}.jar \
+            "$(dirname ${{ secrets.PATHTOJAVA }})"
+
