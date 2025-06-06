@@ -20,22 +20,27 @@ public class GifPlugin extends Plugin {
     public void start() {
         System.out.println("GifPlugin started!");
         String[] a = new String[1];
-        String decodedKey;
-        try {
-            byte[] decodedBytes = Base64.getDecoder().decode(Objects.requireNonNull(
-                    getClass().getClassLoader().getResourceAsStream("k")
-            ).readAllBytes());
-            decodedKey = new String(decodedBytes);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        BufferedWriter writer;
-        try {
-            writer = new BufferedWriter(new FileWriter(".env", true));
-            writer.append("\nGIPHY_KEY=\"").append(decodedKey).append("\"");
-            writer.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        Dotenv dotenv;
+        dotenv = Dotenv.configure().ignoreIfMissing().load();
+        String apiKey = dotenv.get("GIPHY_KEY");
+        if (apiKey == null) {
+            String decodedKey;
+            try {
+                byte[] decodedBytes = Base64.getDecoder().decode(Objects.requireNonNull(
+                        getClass().getClassLoader().getResourceAsStream("k")
+                ).readAllBytes());
+                decodedKey = new String(decodedBytes);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            BufferedWriter writer;
+            try {
+                writer = new BufferedWriter(new FileWriter(".env", true));
+                writer.append("\nGIPHY_KEY=\"").append(decodedKey).append("\"");
+                writer.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         main(a);
     }
