@@ -102,6 +102,7 @@ jobs:
           script: |
             cd
             chmod +x ~/java/create-release.sh
+            dos2unix ~/java/create-release.sh
              bash ~/java/create-release.sh \
               ${{ secrets.PATHTOJAVA }} \
               v${{ needs.build.outputs.version }} \

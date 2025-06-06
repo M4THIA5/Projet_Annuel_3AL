@@ -2,7 +2,7 @@
 
 # Vérifier les arguments
 if [ "$#" -lt 5 ] || [ $(( ($# - 3) % 2 )) -ne 0 ]; then
-    echo "Usage: $0 <json_path> <version_cle> <version_nom> <url1> <dest1> [<url2> <dest2> ...]"
+    echo "Usage: $0 <json_path> <version_cle> <version_nom> <url1> <dest1> [<url2> <dest2> ...] "
     exit 1
 fi
 
