@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # Vérifier les arguments
 if [ "$#" -lt 5 ] || [ $(( ($# - 3) % 2 )) -ne 0 ]; then
     echo "Usage: $0 <json_path> <version_cle> <version_nom> <url1> <dest1> [<url2> <dest2> ...]"
@@ -10,17 +11,18 @@ VERSION_CLE="$2"
 VERSION_NOM="$3"
 shift 3
 
-FILES_JSON=$(jq -n '[]')  # tableau vide
+# Construire le tableau des fichiers
+FILES_JSON="["
 
-while [ "$#" -gt 1 ]; do
+while [ "$#" -gt 0 ]; do
     URL="$1"
     DEST="$2"
-    ENTRY=$(jq -n --arg url "$URL" --arg dest "$DEST" '{url: $url, destination: $dest}')
-    FILES_JSON=$(jq --argjson arr "$FILES_JSON" --argjson new "$ENTRY" '$arr + [$new]' <<< "")
-    FILES_JSON=$(jq --argjson files "$FILES_JSON" '$files' <<< "")
+    FILES_JSON="${FILES_JSON}{\"url\": \"$URL\", \"destination\": \"$DEST\"},"
     shift 2
 done
 
+# Enlever la dernière virgule et fermer le tableau
+FILES_JSON="${FILES_JSON%,}]"
 
 # Mettre à jour le fichier JSON
 TMP_FILE=$(mktemp)
