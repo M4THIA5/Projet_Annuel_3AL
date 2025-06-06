@@ -13,7 +13,8 @@ import {
     UserRole,
     userRole
 } from '../config/utils'
-import crypto from 'crypto';
+import crypto from 'crypto'
+import { valid } from 'joi'
 
 const postgresClient = new PostgresClient()
 
@@ -270,6 +271,9 @@ class AuthController {
             res.cookie(refreshTokenName, '', {maxAge: 0})
             res.clearCookie(refreshTokenName, {httpOnly: true, sameSite: 'lax', secure: true})
 
+            res.cookie(accessTokenName, '', {maxAge: 0})
+            res.clearCookie(accessTokenName, {httpOnly: true, sameSite: 'lax', secure: true})
+
             res.status(200).json({message: 'Logout successful'})
         } catch (error) {
             next(error)
@@ -308,6 +312,106 @@ class AuthController {
             res.status(200).json({accessToken})
         } catch (_) {
             res.status(401).json({error: 'Unauthorized'})
+        }
+    }
+
+    isValidEmail: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+        const email = req.params.email
+        if (!email || typeof email !== 'string') {
+            res.status(400).json({error: 'Invalid email format'})
+            return
+        }
+        try {
+            const user = await postgresClient.user.findUnique({where: {email}})
+            if (user) {
+                res.status(200).json({isValid: true})
+            } else {
+                res.status(404).json({isValid: false})
+            }
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    resetPasswordCode: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+        const {email} = req.body
+
+        if (!email) {
+            res.status(400).json({error: 'Email is required'})
+            return
+        }
+
+        try {
+            const user = await postgresClient.user.findUnique({where: {email}})
+            if (!user) {
+                res.status(404).json({error: 'User not found'})
+                return
+            }
+
+            const resetCode = crypto.randomInt(100000, 999999).toString()
+
+            await postgresClient.user.update({
+                where: { email },
+                data: { resetPasswordCode: resetCode }
+            })
+
+            res.status(200).json({resetPasswordCode: resetCode})
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    checkResetPasswordCode: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+        const {email, resetPasswordCode} = req.body
+
+        if (!email || !resetPasswordCode) {
+            res.status(400).json({ isValid: false })
+            return
+        }
+
+        try {
+            const user = await postgresClient.user.findUnique({where: {email}})
+            if (!user) {
+                res.status(404).json({ isValid: false})
+                return
+            }
+
+            if (user.resetPasswordCode !== resetPasswordCode) {
+                res.status(400).json({isValid: false})
+                return
+            }
+
+            res.status(200).json({isValid: true})
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    resetPassword: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+        const {email, newPassword} = req.body
+
+        if (!email || !newPassword) {
+            res.status(400).json({error: 'Email and new password are required'})
+            return
+        }
+        console.log(email, newPassword)
+        try {
+            const user = await postgresClient.user.findUnique({where: {email}})
+            if (!user) {
+                res.status(404).json({error: 'User not found'})
+                return
+            }
+
+            const hashedPassword = await argon2.hash(newPassword)
+
+            await postgresClient.user.update({
+                where: {email},
+                data: {password: hashedPassword, resetPasswordCode: null}
+            })
+
+            res.status(200).json({message: 'Password reset successfully'})
+        } catch (error) {
+            next(error)
         }
     }
 }

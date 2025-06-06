@@ -102,3 +102,46 @@ export const resendOtp = async (data: ResendOtpData): Promise<Response> => {
         throw error
     }
 }
+
+export const isValidEmail = async (email: string): Promise<boolean> => {
+    try {
+        const response = await API.get(`/isValid/${email}`, {accessToken: await getAccessToken()})
+        if (!response.ok) {
+            return false
+        }
+        const { isValid } = await response.json()
+        if (isValid) {
+            return true
+        }
+        return false
+    } catch (error) {
+        throw error
+    }
+}
+
+
+export const resetPassWord = async (email: string, resetUrl: string): Promise<Response> => {
+    try {
+        const resetPasswordResponse = await API.put('/reset-password-code', { data: { email } })
+        if (!resetPasswordResponse.ok) {
+            const errorData = await resetPasswordResponse.json()
+            throw new Error(errorData.error || 'Failed to generate reset password code')
+        }
+        const { resetPasswordCode } = await resetPasswordResponse.json()
+
+        const response = await fetch('/api/reset-password', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, resetUrl: `${resetUrl}?code=${resetPasswordCode}` }),
+        })
+
+        if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Failed to reset password')
+        }
+
+        return response
+    } catch (error) {
+        throw error
+    }
+}

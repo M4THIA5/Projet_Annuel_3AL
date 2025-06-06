@@ -43,7 +43,7 @@ export default function PrivateLayout({children}: { children: React.ReactNode })
     return (<>
             <nav className="--background">
                 <div className="py-4 flex justify-between">
-                    <Link className="text-3xl ml-5" href={Routes.home.toString()} legacyBehavior passHref>
+                    <Link className="text-3xl ml-5" href={Routes.home.toString()} passHref>
                         <div style={{display: 'flex', alignItems: 'center'}}>
                             <Image width={60} height={60} className="mr-2" src={logo} alt="logo"/>
                             La Porte à côté
@@ -52,50 +52,45 @@ export default function PrivateLayout({children}: { children: React.ReactNode })
                     <div className="flex">
                         <NavigationMenu className={"pr-6"}>
                             <NavigationMenuItem className={"flex align-middle"}>
-                                <Link href={Routes.home.toString()} legacyBehavior passHref>
-                                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                                        Accueil
-                                    </NavigationMenuLink>
-                                </Link>
+                                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                                    <Link href={Routes.home.toString()}>Accueil</Link>
+                                </NavigationMenuLink>
                                 &nbsp;
-                                <Link href={Routes.neighborhood.toString()} legacyBehavior passHref>
-                                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                                        Mes quartiers
-                                    </NavigationMenuLink>
-                                </Link>
+                                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                                    <Link href={Routes.neighborhood.toString()}>Mes quartiers</Link>
+                                </NavigationMenuLink>
                                 &nbsp;
-                                <Link href={Routes.chat.toString()} legacyBehavior passHref>
-                                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                                        Discussion
-                                    </NavigationMenuLink>
-                                </Link>
+                                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                                    <Link href={Routes.chat.toString()}>Discussion</Link>
+                                </NavigationMenuLink>
                                 &nbsp;
-                                <Link href={Routes.undefined.toString()} legacyBehavior passHref>
-                                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                                        Mes échanges
-                                    </NavigationMenuLink>
-                                </Link>
+                                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                                    <Link href={Routes.undefined.toString()}>Mes échanges</Link>
+                                </NavigationMenuLink>
                                 &nbsp;
-                                <Link href={Routes.undefined.toString()} legacyBehavior passHref>
-                                    <NavigationMenuLink className={`${navigationMenuTriggerStyle()} p-1`}>
+                                {/* Notification */}
+                                <NavigationMenuLink asChild className={`${navigationMenuTriggerStyle()} p-1`}>
+                                    <Link href={Routes.undefined.toString()}>
                                         <Icon path={mdiBellOutline} size={1}/>
-                                    </NavigationMenuLink>
-                                </Link>
+                                    </Link>
+                                </NavigationMenuLink>
                                 &nbsp;
-                                <Link href={Routes.undefined.toString()} legacyBehavior passHref>
-                                    <NavigationMenuLink className={`${navigationMenuTriggerStyle()} p-1`}>
+                                {/* Settings */}
+                                <NavigationMenuLink asChild className={`${navigationMenuTriggerStyle()} p-1`}>
+                                    <Link href={Routes.undefined.toString()}>
                                         <Icon path={mdiCog} size={1} />
-                                    </NavigationMenuLink>
-                                </Link>
+                                    </Link>
+                                </NavigationMenuLink>
                                 &nbsp;
-                                <Link href={Routes.undefined.toString()} legacyBehavior passHref>
-                                    <NavigationMenuLink className={`${navigationMenuTriggerStyle()} p-1`}>
+                                {/* Profile */}
+                                <NavigationMenuLink asChild className={`${navigationMenuTriggerStyle()} p-1 group relative`}>
+                                    <Link href={Routes.profile.toString()}>
                                         <Avatar>
                                             <AvatarImage src={profile?.image} alt={profile?.firstName} />
                                             <AvatarFallback>{getInitials()}</AvatarFallback>
                                         </Avatar>
-                                    </NavigationMenuLink>
-                                </Link>
+                                    </Link>
+                                </NavigationMenuLink>
                             </NavigationMenuItem>
                         </NavigationMenu>
                     </div>

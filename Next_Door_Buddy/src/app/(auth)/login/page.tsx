@@ -99,13 +99,13 @@ export default function SigninPage() {
 
               <div className="flex justify-between text-sm mt-2">
                 <a
-                    href={Routes.register.toString()}
+                    href={Routes.auth.register.toString()}
                     className=" hover:underline"
                 >
-                  Don't have an account ?
+                  Don&apos;t have an account ?
                 </a>
                 <a
-                    href={Routes.forgotPassword.toString()}
+                    href={Routes.auth.resetPassword.toString()}
                     className=" hover:underline"
                 >
                   Forgot password ?

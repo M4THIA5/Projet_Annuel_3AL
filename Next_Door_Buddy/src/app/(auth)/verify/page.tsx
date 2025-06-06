@@ -7,11 +7,11 @@ import { Button } from '#/components/ui/button'
 import { Label } from '#/components/ui/label'
 import { cn } from '#/lib/utils'
 import { resendOtp, verifyOtp } from '#/lib/api_requests/user'
-import {useRouter, useSearchParams} from "next/navigation";
-import {Routes} from "#/Routes";
+import {useRouter, useSearchParams} from "next/navigation"
+import {Routes} from "#/Routes"
 
 export default function OTPForm() {
-    const router = useRouter();
+    const router = useRouter()
     const [otp, setOtp] = useState<string[]>(['', '', '', '', '', ''])
     const [error, setError] = useState('')
     const [resendCooldown, setResendCooldown] = useState(0)
@@ -104,7 +104,7 @@ export default function OTPForm() {
                                 value={digit}
                                 onChange={(e) => handleChange(index, e.target.value)}
                                 onKeyDown={(e) => handleKeyDown(e, index)}
-                                ref={(el) => (inputs.current[index] = el)}
+                                ref={(el) => { inputs.current[index] = el }}
                                 className={cn(
                                     'w-12 h-12 text-center text-lg font-medium',
                                     'focus-visible:ring-2 focus-visible:ring-ring'
