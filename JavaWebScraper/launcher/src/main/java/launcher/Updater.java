@@ -35,7 +35,6 @@ public class Updater {
         //Version actuelle
         String version = getUserVersion();
         System.out.println("version =" + version);
-        versions.sort(new VersionComparator());
         System.out.println("Versions disponibles : " + versions);
 
         //Si la version est nulle
@@ -43,7 +42,6 @@ public class Updater {
             JOptionPane.showMessageDialog(null, "Impossible de se connecter au service, vérifiez votre " +
                     "connection internet");
         } else {
-
             //Si la dernière version n'est pas la même que l'actuelle
             if (!versions.getLast().equals(version)) {
                 //                String versionChoisie = (String) JOptionPane.showInputDialog(null, "Choississez la version à installer", "Versions disponibles", JOptionPane.QUESTION_MESSAGE,
@@ -82,6 +80,7 @@ public class Updater {
                     // On liste tous les fichiers d'une version
                     for (JsonNode fileNode : filesNode) {
                         // On télécharge le fichier
+                        System.out.println("Téléchargement de " + fileNode.get("destination").asText() + "...");
                         downloadFile(fileNode.get("url").asText(), currentFolder +
                                 File.separator + fileNode.get("destination").asText());
                     }
@@ -139,7 +138,7 @@ public class Updater {
             }
 
             //On trie la liste
-            Collections.sort(versions);
+            versions.sort(new VersionComparator());
 
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());

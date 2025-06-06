@@ -35,6 +35,14 @@ public class Lanceur {
         String lastVersion = Updater.resolveLastVersion();
         File currentapp = new File(currentFolder + File.separator + "app-" + Updater.getUserVersion() + ".jar");
         File newVersion = new File(currentFolder + File.separator + "app-" + lastVersion + ".jar");
+
+        JOptionPane.showMessageDialog(null, currentapp.getAbsolutePath());
+        JOptionPane.showMessageDialog(null, newVersion.getAbsolutePath());
+        JOptionPane.showMessageDialog(null, newVersion.exists() ? "La nouvelle version existe." : "La nouvelle version n'existe pas.");
+        JOptionPane.showMessageDialog(null, "Version actuelle : " + Updater.getUserVersion());
+        JOptionPane.showMessageDialog(null, !newVersion.equals(currentapp) ? "Une nouvelle version a été téléchargée." : "Aucune nouvelle version n'a été téléchargée.");
+
+
         //Si une nouvelle version a été téléchargée
         if (newVersion.exists() && !newVersion.equals(currentapp)) {
             for (File file : Objects.requireNonNull(new File(currentFolder).listFiles())) {
@@ -56,7 +64,7 @@ public class Lanceur {
                 }
                 File versionFile = new File(currentFolder + File.separator + ".version");
                 BufferedWriter reader = new BufferedWriter(new FileWriter(versionFile));
-                reader.write(Updater.resolveLastVersion());
+                reader.write(lastVersion);
                 reader.close();
             } else {
                 JOptionPane.showMessageDialog(null, "Le fichier '.version' n'existe pas.");
@@ -74,7 +82,7 @@ public class Lanceur {
             //S'il n'y a qu'une version courante et pas de nouvelles
         } else if (currentapp.exists()) {
             try {
-                JOptionPane.showMessageDialog(null, "Lancement de : " + currentapp.getAbsolutePath());
+                JOptionPane.showMessageDialog(null, "ALancement de : " + currentapp.getAbsolutePath());
                 new ProcessBuilder("java", "-Dprism.order=sw", "-jar", currentapp.getAbsolutePath()).inheritIO().start();
             } catch (IOException e) {
                 e.printStackTrace();

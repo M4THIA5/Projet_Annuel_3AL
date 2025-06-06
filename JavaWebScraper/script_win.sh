@@ -34,7 +34,7 @@ echo "Lancement de jpackage..."
   --name MonApp \
   --input build-jpackage \
   --icon build-jpackage/icon.ico \
-  --main-jar launcher-1.0.0.jar \
+  --main-jar launcher-1.0.1.jar \
   --main-class launcher.Lanceur \
   --resource-dir app/src/main/resources \
   --win-dir-chooser \
