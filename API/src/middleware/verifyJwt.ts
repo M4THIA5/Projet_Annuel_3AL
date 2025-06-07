@@ -10,7 +10,7 @@ const postgresClient = new PostgresClient()
 export async function verifyJwt(req: Request, res: Response, next: NextFunction): Promise<void> {
   const token = req.header('Authorization')?.replace('Bearer ', '')
   const refreshCookie = req.cookies?.refreshToken
-  console.log(refreshCookie)
+
   if (!token || !refreshCookie) {
     res.status(401).json({ error: 'Unauthorized' })
     return
