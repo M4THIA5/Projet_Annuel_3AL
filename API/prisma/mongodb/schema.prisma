@@ -22,3 +22,14 @@ model JournalEntry {
   content    String
   districtId Int
 }
+
+
+model Message {
+  m_id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String
+  name      String
+  socketID  String
+  text      String?
+  createdAt DateTime @default(now())
+  room      String
+}
