@@ -6,8 +6,10 @@ import { getRoles } from "./lib/api_requests/user"
 import { userRole } from "./types/user"
 
 const PUBLIC_ROUTES = [
-  Routes.login.toString(),
-  Routes.register.toString(),
+  Routes.auth.login.toString(),
+  Routes.auth.register.toString(),
+  Routes.auth.verify.toString(),
+  Routes.auth.resetPassword.toString(),
 ]
 
 export async function middleware(req: NextRequest) {
@@ -16,7 +18,7 @@ export async function middleware(req: NextRequest) {
   const isAdminRoute = req.nextUrl.pathname.startsWith(Routes.admin.toString())
 
   if (!isAuth && !isPublicRoute) {
-    return NextResponse.redirect(new URL(Routes.login.toString(), req.url))
+    return NextResponse.redirect(new URL(Routes.auth.login.toString(), req.url))
   }
   if (isAuth && isPublicRoute) {
     return NextResponse.redirect(new URL(Routes.home.toString(), req.url))

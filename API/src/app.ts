@@ -1,11 +1,10 @@
-import express, { urlencoded } from "express"
-import type { Request, Response } from "express"
+import type {Request, Response} from "express"
+import express, {urlencoded} from "express"
 import cors from "cors"
-import cookieParser from "cookie-parser"
-import { config } from "./config/env"
+import {config} from "./config/env"
 
-import { PrismaClient as PostgresClient } from "../prisma/client/postgresClient"
-import { PrismaClient as MongoClient } from "../prisma/client/mongoClient"
+import {PrismaClient as PostgresClient} from "../prisma/client/postgresClient"
+import {PrismaClient as MongoClient} from "../prisma/client/mongoClient"
 
 import errorHandler from "./middleware/errorHandler"
 import notFoundHandler from "./middleware/notFoundHandler"
@@ -13,6 +12,11 @@ import neighborhoodRoutes from "./routes/neighborhoodRoute"
 import authRoutes from "./routes/authRoutes"
 import userRoutes from "./routes/userRoutes"
 import userNeighborhoodRoutes from "./routes/userNeighborhoodRoute"
+import journalRoutes from "./routes/journalRoutes";
+import geocodeController from "./controllers/mapBoxController";
+import mapBoxRoutes from "./routes/mapBoxRoutes";
+import { verifyJwt } from "./middleware/verifyJwt"
+import cookieParser from "cookie-parser"
 
 const postgresClient = new PostgresClient()
 const mongoClient = new MongoClient()
@@ -40,11 +44,13 @@ app.get("/health", async (req: Request, res: Response): Promise<void> => {
 })
 
 app.use("/", authRoutes)
-app.use("/users", userRoutes)
-app.use("/neighborhoods", neighborhoodRoutes)
-app.use("/user-neighborhoods", userNeighborhoodRoutes)
+app.use("/users", verifyJwt, userRoutes)
+app.use("/neighborhoods", verifyJwt, neighborhoodRoutes)
+app.use("/user-neighborhoods", verifyJwt, userNeighborhoodRoutes)
+app.use("/journal", verifyJwt, journalRoutes)
+app.use("/geocode", verifyJwt, mapBoxRoutes)
 
 app.use(notFoundHandler)
-app.use(errorHandler)
+// app.use(errorHandler)
 
 export default app

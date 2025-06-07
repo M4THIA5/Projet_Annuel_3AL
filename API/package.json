@@ -7,15 +7,17 @@
     "dev": "nodemon --exec ts-node src/server.ts",
     "build": "rm -rf dist && tsc",
 
-    "prisma:generate:posgresql": "prisma generate --schema=./prisma/postgresql/schema.prisma",
+    "prisma:generate:postgresql": "prisma generate --schema=./prisma/postgresql/schema.prisma",
     "prisma:generate:mongodb": "prisma generate --schema=./prisma/mongodb/schema.prisma",
     "prisma:migrate:postgresql": "prisma migrate dev --schema prisma/postgresql/schema.prisma",
     "prisma:migrate:mongodb": "prisma db push --schema prisma/mongodb/schema.prisma",
-
     "prisma:seed:postgresql": "npx prisma db seed",
 
     "prisma:reset:postgresql": "prisma migrate reset --force --schema prisma/postgresql/schema.prisma",
-    "prisma:reset:mongodb": "prisma migrate reset --force --schema prisma/mongodb/schema.prisma"
+    "prisma:reset:mongodb": "prisma migrate reset --force --schema prisma/mongodb/schema.prisma",
+
+    "prisma:show:postgresql": "prisma studio --schema prisma/postgresql/schema.prisma",
+    "prisma:show:mongodb": "prisma studio --schema prisma/mongodb/schema.prisma"
   },
   "prisma": {
     "seed": "ts-node src/scripts/seed.ts"
@@ -31,9 +33,11 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
-    "pg": "^8.13.3",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "nodemailer": "^7.0.3",
+    "pg": "^8.13.3"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.26.0",
@@ -41,6 +45,7 @@
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.10.1",
+    "@types/nodemailer": "^6.4.17",
     "nodemon": "^3.1.7",
     "prisma": "^6.4.1",
     "ts-node": "^10.9.2",

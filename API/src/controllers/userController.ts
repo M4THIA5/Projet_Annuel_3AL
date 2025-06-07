@@ -17,7 +17,18 @@ class UserController {
 
   getAllUsers: RequestHandler = async (req: Request, res: Response, next) => {
     try {
-      const users = await postgresClient.user.findMany()
+      const users = await postgresClient.user.findMany({
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          color: true,
+          image: true,
+          latitude: true,
+          longitude: true,
+        },
+      })
       res.status(200).json(users)
     } catch (error) {
       next(error)

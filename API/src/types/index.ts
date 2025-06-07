@@ -8,6 +8,7 @@ export interface User {
   color?: string
   password: string
   roles?: UserRole[]
+  image?: string
 }
 
 export type CurrentUser = {

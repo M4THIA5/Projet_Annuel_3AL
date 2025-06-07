@@ -2,7 +2,18 @@ import { jwtDecode, JwtPayload } from "jwt-decode"
 
 export const ACCESS_TOKEN_NAME = 'accessToken'
 export const REFRESH_TOKEN_SECRET = "refreshToken"
-export const API_URL = process.env.NEXT_PUBLIC_API_URL
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+export const NODE_ENV = process.env.NODE_ENV || "development"
+export const NEXT_PUBLIC_URL = process.env.NEXT_PUBLIC_URL || "http://localhost:3000"
+
+export const MAPBOX_API_KEY = process.env.NEXT_PUBLIC_API_URL
+export const SMTP = {
+  HOST: process.env.SMTP_HOST || "smtp.ionos.fr",
+  PORT: Number(process.env.SMTP_PORT) || 465,
+  USER: process.env.SMTP_USER,
+  PASS: process.env.SMTP_PASS,
+  FROM: process.env.SMTP_FROM
+}
 
 export const isTokenValid = (token: string): boolean => {
   try {
