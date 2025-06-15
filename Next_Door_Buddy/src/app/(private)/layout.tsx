@@ -11,8 +11,8 @@ import {
 import Icon from '@mdi/react'
 import {mdiBellOutline, mdiCog} from '@mdi/js'
 import {Avatar, AvatarFallback, AvatarImage} from "#/components/ui/avatar"
-import {UserProfile} from "#/types/user"
-import {getprofile} from "#/lib/api_requests/user"
+import {UserProfile, userRole} from "#/types/user"
+import {getProfile} from "#/lib/api_requests/user"
 import {useEffect, useState} from "react"
 import { Routes } from "#/Routes"
 
@@ -22,7 +22,7 @@ export default function PrivateLayout({children}: { children: React.ReactNode })
 
     useEffect(() => {
         async function fetchProfile() {
-            const data = await getprofile()
+            const data = await getProfile()
             setProfile(data)
         }
         fetchProfile()
@@ -52,10 +52,11 @@ export default function PrivateLayout({children}: { children: React.ReactNode })
                     <div className="flex">
                         <NavigationMenu className={"pr-6"}>
                             <NavigationMenuItem className={"flex align-middle"}>
-                                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                                    <Link href={Routes.home.toString()}>Accueil</Link>
-                                </NavigationMenuLink>
-                                &nbsp;
+                                {profile && profile.roles.includes(userRole.admin) && (
+                                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                                        <Link href={Routes.admin.dashboard.toString()}>Dashboard</Link>
+                                    </NavigationMenuLink>
+                                )}
                                 <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                                     <Link href={Routes.neighborhood.toString()}>Mes quartiers</Link>
                                 </NavigationMenuLink>
@@ -96,7 +97,7 @@ export default function PrivateLayout({children}: { children: React.ReactNode })
                     </div>
                 </div>
             </nav>
-            <div className="h-auto" >
+            <div className="h-auto px-4 md:px-8 lg:px-16">
                 {children}
             </div>
         </>

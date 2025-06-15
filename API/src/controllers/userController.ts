@@ -17,19 +17,37 @@ class UserController {
 
   getAllUsers: RequestHandler = async (req: Request, res: Response, next) => {
     try {
-      const users = await postgresClient.user.findMany({
-        select: {
-          id: true,
-          email: true,
-          firstName: true,
-          lastName: true,
-          color: true,
-          image: true,
-          latitude: true,
-          longitude: true,
-        },
+      const { page = 1, pageSize = 10, ...filters } = req.query
+
+      const pageNumber = Number(page)
+      const pageSizeNumber = Number(pageSize)
+
+      const where: any = {}
+      if (filters.firstName) {
+        where.firstName = { contains: String(filters.firstName), mode: 'insensitive' }
+      }
+      if (filters.lastName) {
+        where.lastName = { contains: String(filters.lastName), mode: 'insensitive' }
+      }
+      if (filters.email) {
+        where.email = { contains: String(filters.email), mode: 'insensitive' }
+      }
+      const [users, total] = await Promise.all([
+        postgresClient.user.findMany({
+          where,
+          skip: Math.max(0, (pageNumber - 1) * pageSizeNumber),
+          take: pageSizeNumber,
+        }),
+        postgresClient.user.count({ where }),
+      ])
+
+      res.status(200).json({
+        users,
+        total,
+        page: pageNumber,
+        pageSize: pageSizeNumber,
+        totalPages: Math.ceil(total / pageSizeNumber),
       })
-      res.status(200).json(users)
     } catch (error) {
       next(error)
     }
@@ -70,7 +88,7 @@ class UserController {
 
   me: RequestHandler = async (req: Request, res: Response, next) => {
     try {
-      const { id, email } = (req as any).user
+      const { email } = (req as any).user
       const user = await postgresClient.user.findUnique({ where: { email: email } })
       if (!user) {
         res.status(404).json({ error: 'User not found' })

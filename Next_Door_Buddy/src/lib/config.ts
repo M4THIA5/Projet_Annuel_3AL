@@ -1,3 +1,4 @@
+import { userRole } from "#/types/user"
 import { jwtDecode, JwtPayload } from "jwt-decode"
 
 export const ACCESS_TOKEN_NAME = 'accessToken'
@@ -20,6 +21,19 @@ export const isTokenValid = (token: string): boolean => {
     const decodedToken = jwtDecode<JwtPayload>(token)
     const currentTime = Date.now() / 1000 // Convert to seconds
     return decodedToken.exp ? decodedToken.exp > currentTime : false
+  } catch (error) {
+    console.error("Error decoding token:", error)
+    return false
+  }
+}
+
+export const isAdmin = (token?: string): boolean => {
+  if (!token) {
+    return false
+  }
+  try {
+    const decodedToken = jwtDecode<JwtPayload & { roles?: string[] }>(token)
+    return decodedToken.roles ? decodedToken.roles.includes(userRole.admin) : false
   } catch (error) {
     console.error("Error decoding token:", error)
     return false

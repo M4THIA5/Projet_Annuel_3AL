@@ -1,6 +1,8 @@
 import { hash } from 'argon2'
 import { PrismaClient as PostgresClient } from '../../prisma/client/postgresClient'
 import { userRole } from '../config/utils'
+import fs from 'fs'
+import path from 'path'
 
 const postgresql = new PostgresClient()
 
@@ -12,7 +14,7 @@ async function main() {
       firstName: 'Mathias',
       lastName: 'Collas-Jourdan',
       email: 'mathias@admin.io',
-      password: await hash('admin'),
+      password: await hash('Azerty1234!'),
       roles: [ userRole.admin, userRole.classic ],
     }
   })
@@ -28,7 +30,26 @@ async function main() {
       roles: [ userRole.admin, userRole.classic ],
     }
   })
+
+  const usersPath = path.resolve(__dirname, './users.json')
+  const usersData = JSON.parse(fs.readFileSync(usersPath, 'utf-8'))
+
+  for (const user of usersData) {
+    await postgresql.user.upsert({
+      where: { email: user.email },
+      update: {},
+      create: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        password: await hash(user.password),
+        roles: user.roles,
+      }
+    })
+  }
 }
+
+
 
 main()
   .then(async () => {

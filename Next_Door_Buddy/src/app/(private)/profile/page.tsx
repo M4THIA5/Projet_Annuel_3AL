@@ -1,5 +1,5 @@
 "use client"
-import { getprofile } from "#/lib/api_requests/user"
+import { getProfile } from "#/lib/api_requests/user"
 import { useEffect, useState } from "react"
 import { UserProfile } from '#/types/user'
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
@@ -19,7 +19,7 @@ export default function ProfilePage() {
   }
   useEffect(() => {
     async function fetchProfile() {
-      const data = await getprofile()
+      const data = await getProfile()
       setProfile(data)
     }
     fetchProfile()

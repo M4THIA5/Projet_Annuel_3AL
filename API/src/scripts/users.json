@@ -1,0 +1,177 @@
+[
+  {
+    "firstName": "User1",
+    "lastName": "User1",
+    "email": "user1@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User2",
+    "lastName": "User2",
+    "email": "user2@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User3",
+    "lastName": "User3",
+    "email": "user3@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User4",
+    "lastName": "User4",
+    "email": "user4@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User5",
+    "lastName": "User5",
+    "email": "user5@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User6",
+    "lastName": "User6",
+    "email": "user6@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User7",
+    "lastName": "User7",
+    "email": "user7@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User8",
+    "lastName": "User8",
+    "email": "user8@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User9",
+    "lastName": "User9",
+    "email": "user9@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User10",
+    "lastName": "User10",
+    "email": "user10@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User11",
+    "lastName": "User11",
+    "email": "user11@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User12",
+    "lastName": "User12",
+    "email": "user12@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User13",
+    "lastName": "User13",
+    "email": "user13@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User14",
+    "lastName": "User14",
+    "email": "user14@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User15",
+    "lastName": "User15",
+    "email": "user15@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User16",
+    "lastName": "User16",
+    "email": "user16@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User17",
+    "lastName": "User17",
+    "email": "user17@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User18",
+    "lastName": "User18",
+    "email": "user18@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User19",
+    "lastName": "User19",
+    "email": "user19@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User20",
+    "lastName": "User20",
+    "email": "user20@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User21",
+    "lastName": "User21",
+    "email": "user21@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User22",
+    "lastName": "User22",
+    "email": "user22@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User23",
+    "lastName": "User23",
+    "email": "user23@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User24",
+    "lastName": "User24",
+    "email": "user24@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  },
+  {
+    "firstName": "User25",
+    "lastName": "User25",
+    "email": "user25@example.com",
+    "password": "hashed_password",
+    "roles": ["classic"]
+  }
+]
