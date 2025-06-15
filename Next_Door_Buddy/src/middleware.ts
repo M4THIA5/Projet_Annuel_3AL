@@ -1,9 +1,9 @@
 import { isAuthenticated } from "#/lib/authentification"
 import { Routes } from "#/Routes"
-import type { NextRequest } from "next/server"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { getRoles } from "./lib/api_requests/user"
 import { userRole } from "./types/user"
+import { isAdmin } from "./lib/config"
 
 const PUBLIC_ROUTES = [
   Routes.auth.login.toString(),
@@ -25,8 +25,9 @@ export async function middleware(req: NextRequest) {
   }
 
   if (isAuth && isAdminRoute) {
-    const roles = await getRoles()
-    if (!roles.includes(userRole.admin)) {
+    const refreshToken = req.cookies.get('refreshToken')?.value
+
+    if (!isAdmin(refreshToken)) {
       return NextResponse.redirect(new URL(Routes.home.toString(), req.url))
     }
   }

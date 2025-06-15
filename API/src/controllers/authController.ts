@@ -56,8 +56,6 @@ class AuthController {
                     data: {refreshToken}
                 })
 
-                console.log(await postgresClient.user.findUnique({where: {id: user.id}}))
-
                 res.cookie(refreshTokenName, refreshToken, {
                     httpOnly: true,
                     secure: config.NODE_ENV === 'production',
@@ -394,7 +392,6 @@ class AuthController {
             res.status(400).json({error: 'Email and new password are required'})
             return
         }
-        console.log(email, newPassword)
         try {
             const user = await postgresClient.user.findUnique({where: {email}})
             if (!user) {
