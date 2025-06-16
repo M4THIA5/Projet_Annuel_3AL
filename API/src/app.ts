@@ -11,6 +11,7 @@ import notFoundHandler from "./middleware/notFoundHandler"
 import neighborhoodRoutes from "./routes/neighborhoodRoute"
 import authRoutes from "./routes/authRoutes"
 import userRoutes from "./routes/userRoutes"
+import serviceRoutes from "./routes/serviceRoutes"
 import userNeighborhoodRoutes from "./routes/userNeighborhoodRoute"
 import journalRoutes from "./routes/journalRoutes";
 
@@ -43,6 +44,7 @@ app.use("/users", userRoutes)
 app.use("/neighborhoods", neighborhoodRoutes)
 app.use("/user-neighborhoods", userNeighborhoodRoutes)
 app.use("/journal", journalRoutes)
+app.use("/services", serviceRoutes)
 
 app.use(notFoundHandler)
 // app.use(errorHandler)

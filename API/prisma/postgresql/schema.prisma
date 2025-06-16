@@ -13,18 +13,20 @@ datasource db {
 }
 
 model User {
-  id                Int    @id @default(autoincrement())
-  email             String @unique
-  password          String
-  roles             String[] @default(["classic"])
-  refreshToken      String?
-  firstName         String?
-  lastName          String?
-  color             String @default("212529")
-  image             String?
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  password     String
+  roles        String[] @default(["classic"])
+  refreshToken String?
+  firstName    String?
+  lastName     String?
+  color        String   @default("212529")
+  image        String?
 
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime? @updatedAt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime? @updatedAt
+  serviceAsker    Service[] @relation("ServiceAsker")
+  serviceProvider Service[] @relation("ServiceProvider")
 
   Score             Score[]
   userNeighborhoods UserNeighborhood[]
@@ -47,9 +49,17 @@ model Score {
   createdAt DateTime @default(now())
 }
 
-model Data {
-  id   Int    @id @default(autoincrement())
-  data String
+model Service {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  asker       User     @relation("ServiceAsker", fields: [askerId], references: [id])
+  askerId     Int
+  open        Boolean  @default(true)
+  ended       Boolean  @default(false)
+  provider    User?    @relation("ServiceProvider", fields: [providerId], references: [id])
+  providerId  Int?
+  createdAt   DateTime @default(now())
 }
 
 model Neighborhood {

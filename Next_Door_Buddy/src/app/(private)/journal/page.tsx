@@ -2,11 +2,12 @@ import Link from 'next/link'
 import React from 'react'
 import Item from './item'
 import {getJournals} from "#/lib/api_requests/jounal"
+import {Post} from "#/types/post"
 
 
 const Page = async () => {
 
-    const posts: object = await getJournals()
+    const posts: Array<Post> = await getJournals()
 
     return (
         <div className='w-[1200px] mx-auto py-20'>
@@ -14,7 +15,7 @@ const Page = async () => {
                   className='px-3 py-2 bg-zinc-900 hover:bg-zinc-800 rounded-md text-white'>Create</Link>
 
             <div className='grid grid-cols-3 gap-5 mt-8'>
-                {posts?.map((post: { id: string, content: string, title: string }, i: number) => (
+                {posts?.map((post: Post, i: number) => (
                     <Item key={i} post={post}/>
                 )).sort().reverse()}
             </div>
