@@ -4,10 +4,8 @@ import {MapboxAdresse, MapboxNeighborhood} from "#/types/mapbox"
 
 export const getMapBoxNeighborhood = async (address: string): Promise<MapboxNeighborhood> => {
     try {
-        const accessToken = await getAccessToken()
         const response = await API.get(
-            `/geocode/getNeighborhood?address=${encodeURIComponent(address)}`,
-            { accessToken }
+            `/geocode/getNeighborhood?address=${encodeURIComponent(address)}`
         )
 
         const data = await response.json()
@@ -25,10 +23,8 @@ export const getMapBoxNeighborhood = async (address: string): Promise<MapboxNeig
 
 export const getMapBoxAdresse = async (lat: number, lon: number): Promise<MapboxAdresse> => {
     try {
-        const accessToken = await getAccessToken()
         const response = await API.get(
-            `/geocode/getAdresseMapBox?lat=${lat}&lon=${lon}`,
-            { accessToken }
+            `/geocode/getAdresseMapBox?lat=${lat}&lon=${lon}`
         )
 
         const data = await response.json()

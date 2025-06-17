@@ -66,7 +66,7 @@ model Data {
 
 model Neighborhood {
   id          Int       @id @default(autoincrement())
-  name        String
+  name        String    @unique
   city        String?
   postalCode  String?
   members     Int       @default(1)

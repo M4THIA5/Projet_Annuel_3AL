@@ -48,7 +48,7 @@ app.use("/users", verifyJwt, userRoutes)
 app.use("/neighborhoods", verifyJwt, neighborhoodRoutes)
 app.use("/user-neighborhoods", verifyJwt, userNeighborhoodRoutes)
 app.use("/journal", verifyJwt, journalRoutes)
-app.use("/geocode", verifyJwt, mapBoxRoutes)
+app.use("/geocode", mapBoxRoutes)
 
 app.use(notFoundHandler)
 // app.use(errorHandler)
