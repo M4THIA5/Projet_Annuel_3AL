@@ -13,7 +13,11 @@ export default function NeighborhoodsPage() {
     const router = useRouter()
     const [profile, setProfile] = useState<UserProfile | undefined>(undefined)
     const [neighborhooduser, setNeighborhoodUser] = useState<Neighborhood[] | undefined>(undefined)
-    const [neighborhoodsAround, setNeighborhoodsAround] = useState<Neighborhood[] | undefined>([])
+    const [neighborhoodsAround, setNeighborhoodsAround] = useState<Neighborhood[]>([])
+
+    const handleClick = (n :Neighborhood) => {
+        router.push(`/neighborhood/${n.id}`)
+    }
 
     useEffect(() => {
         async function fetchNeighborhoods() {
@@ -49,7 +53,7 @@ export default function NeighborhoodsPage() {
 
                 <div className="grid md:grid-cols-2 gap-6">
                     {neighborhooduser.map((n) => (
-                        <Card key={n.name} className="flex">
+                        <Card key={n.name} className="flex" onClick={() => handleClick(n)} >
                             <div className="flex">
                                 <div className="flex flex-1/3 align-middle justify-center">
                                     {n.image ? (
@@ -90,7 +94,7 @@ export default function NeighborhoodsPage() {
                 </div>
                 <div className="grid md:grid-cols-3 gap-6">
                     {neighborhoodsAround.map((n) => (
-                        <Card key={n.name} className="flex">
+                        <Card key={n.name} className="flex" onClick={() => handleClick(n)}>
                             <div className="flex">
                                 <div className="flex flex-1/3 align-middle justify-center">
                                     {n.image ? (

@@ -33,7 +33,6 @@ class UserNeighborhoodController {
         }
     }
 
-    // Get neighborhoods of a user
     getNeighborhoodsOfUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const userId = Number(req.params.userId)
@@ -58,7 +57,6 @@ class UserNeighborhoodController {
         }
     }
 
-    // À ajouter dans la classe UserNeighborhoodController
     getNearbyNeighborhoodsBasedOnUsers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         const MAX_DISTANCE_KM = 10
 
@@ -88,7 +86,7 @@ class UserNeighborhoodController {
 
             const userNeighborhoods = await postgresClient.userNeighborhood.findMany({
                 where: {
-                    userId: {not: userId}, // exclure l'utilisateur lui-même
+                    userId: {not: userId},
                     user: {
                         latitude: {not: null},
                         longitude: {not: null},
