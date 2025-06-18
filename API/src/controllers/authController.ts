@@ -15,6 +15,7 @@ import {
 } from '../config/utils'
 import crypto from 'crypto'
 import { valid } from 'joi'
+import MapBoxController from "./mapBoxController";
 
 const postgresClient = new PostgresClient()
 
@@ -192,6 +193,47 @@ class AuthController {
                 return;
             }
 
+            const controller = new MapBoxController();
+            const response = await controller['fetchNeighborhoodFromAddress'](user.address);
+
+            let neighborhood = await postgresClient.neighborhood.findUnique({
+                where: { name: response.district },
+            });
+
+            if (!neighborhood) {
+                neighborhood = await postgresClient.neighborhood.create({
+                    data: {
+                        name: response.district,
+                        city: response.city,
+                        postalCode: response.postalCode,
+                        description: null,
+                        members: 1,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                        image: null,
+                    },
+                });
+            }else {
+                await postgresClient.neighborhood.update({
+                    where: { id: neighborhood.id },
+                    data: {
+                        members: { increment: 1 },
+                        updatedAt: new Date(),
+                    },
+                });
+            }
+
+            const isFirstMember = neighborhood.members === 1;
+
+            await postgresClient.userNeighborhood.create({
+                data: {
+                    userId: user.id,
+                    neighborhoodId: neighborhood.id,
+                    joinedAt: new Date(),
+                    roleInArea: isFirstMember ? "admin" : "member",
+                },
+            });
+
             await postgresClient.user.update({
                 where: { email },
                 data: {
@@ -200,6 +242,7 @@ class AuthController {
                     otpCreatedAt: null,
                 },
             });
+
 
             res.status(200).json({ message: 'OTP vérifié avec succès' });
         } catch (error) {

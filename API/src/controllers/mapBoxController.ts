@@ -4,72 +4,70 @@ import {config} from "../config/env";
 const MAPBOX_API_KEY = config.MAPBOX_API_KEY;
 
 class MapBoxController {
+
+    private async fetchNeighborhoodFromAddress(address: string) {
+        if (!MAPBOX_API_KEY) {
+            throw new Error("API key Mapbox manquante");
+        }
+
+        const encodedAddress = encodeURIComponent(address);
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodedAddress}.json?access_token=${MAPBOX_API_KEY}&limit=1`;
+
+        const response = await fetch(url);
+        const mapboxStatus = response.status;
+
+        if (!response.ok) {
+            throw new Error(`Erreur API Mapbox: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const feature = data.features?.[0];
+        if (!feature) {
+            throw new Error("Adresse non trouvée");
+        }
+
+        const context = feature.context ?? feature.properties?.context ?? [];
+
+        const district =
+            context.find((c: any) => typeof c.id === "string" && c.id.startsWith("district"))?.text ??
+            context.find((c: any) => typeof c.id === "string" && c.id.startsWith("locality"))?.text ??
+            context.find((c: any) => typeof c.id === "string" && c.id.startsWith("neighborhood"))?.text ??
+            context.find((c: any) => typeof c.id === "string" && c.id.startsWith("place"))?.text ??
+            feature.text ??
+            feature.place_name ??
+            null;
+
+        const fullAddress = feature.place_name ?? null;
+
+        const city =
+            context.find((c: any) => typeof c.id === "string" && c.id.startsWith("place"))?.text ?? null;
+
+        const postalCode =
+            context.find((c: any) => typeof c.id === "string" && c.id.startsWith("postcode"))?.text ?? null;
+
+        const [longitude, latitude] = feature.center ?? [null, null];
+
+        return {
+            status: mapboxStatus,
+            district,
+            city,
+            postalCode,
+            latitude,
+            longitude,
+            address: fullAddress,
+        };
+    }
+
     getNeighborhood: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         const address = req.query.address as string;
-
         if (!address || address.trim().length === 0) {
             res.status(400).send("Paramètre 'address' manquant ou vide");
             return;
         }
 
-        if (!MAPBOX_API_KEY) {
-            res.status(500).send("API key Mapbox manquante");
-            return;
-        }
-
         try {
-            const encodedAddress = encodeURIComponent(address);
-            const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodedAddress}.json?access_token=${MAPBOX_API_KEY}&limit=1`;
-
-            const response = await fetch(url);
-            const mapboxStatus = response.status;
-
-            if (!response.ok) {
-                res.status(mapboxStatus).json({
-                    status: mapboxStatus,
-                    error: `Erreur API Mapbox: ${response.statusText}`
-                });
-                return;
-            }
-
-            const data = await response.json();
-            const feature = data.features?.[0];
-
-            if (!feature) {
-                res.status(404).json({ status: 404, error: "Adresse non trouvée" });
-                return;
-            }
-
-            const context = feature.context ?? feature.properties?.context ?? [];
-
-            const district =
-                context.find((c: any) => typeof c.id === "string" && c.id.startsWith("district"))?.text ??
-                context.find((c: any) => typeof c.id === "string" && c.id.startsWith("locality"))?.text ??
-                context.find((c: any) => typeof c.id === "string" && c.id.startsWith("neighborhood"))?.text ??
-                context.find((c: any) => typeof c.id === "string" && c.id.startsWith("place"))?.text ??
-                feature.text ??
-                feature.place_name ??
-                null;
-
-            const fullAddress = feature.place_name ?? null;
-
-            const city =
-                context.find((c: any) => typeof c.id === "string" && c.id.startsWith("place"))?.text ?? null;
-
-            const postalCode =
-                context.find((c: any) => typeof c.id === "string" && c.id.startsWith("postcode"))?.text ?? null;
-
-            const [longitude, latitude] = feature.center ?? [null, null];
-
-            res.status(200).json({
-                status: mapboxStatus,
-                district,
-                city,
-                postalCode,
-                latitude,
-                longitude,
-                address: fullAddress,
-            });
+            const data = await this.fetchNeighborhoodFromAddress(address);
+            res.status(200).json(data);
         } catch (err: any) {
             res.status(500).json({
                 status: 500,

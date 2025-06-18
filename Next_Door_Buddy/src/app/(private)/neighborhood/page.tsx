@@ -1,30 +1,38 @@
 "use client"
 import {useEffect, useState} from "react"
 import {Card, CardContent, CardHeader, CardTitle} from "#/components/ui/card"
-import {getAllNeighborhoods} from "#/lib/api_requests/neighborhood"
-import { mdiPlusCircleOutline } from "@mdi/js"
-import Icon from "@mdi/react"
-import {Button} from "#/components/ui/button"
+import {getNeighborhoodsAroundMe, getNeighborhoodsOfUser} from "#/lib/api_requests/neighborhood"
 import logo from "@/logo.png"
 import Image from "next/image"
 import {Neighborhood} from "#/types/neighborghood"
 import { useRouter } from 'next/navigation'
-import {Routes} from "#/Routes"
+import {UserProfile} from "#/types/user"
+import {getprofile} from "#/lib/api_requests/user"
 
 export default function NeighborhoodsPage() {
     const router = useRouter()
-    const [neighborhoods, setNeighborhoods] = useState<Neighborhood[] | undefined>(undefined)
+    const [profile, setProfile] = useState<UserProfile | undefined>(undefined)
+    const [neighborhooduser, setNeighborhoodUser] = useState<Neighborhood[] | undefined>(undefined)
+    const [neighborhoodsAround, setNeighborhoodsAround] = useState<Neighborhood[]>([])
+
+    const handleClick = (n :Neighborhood) => {
+        router.push(`/neighborhood/${n.id}`)
+    }
 
     useEffect(() => {
-        async function fetchProfile() {
-            const data = await getAllNeighborhoods()
-            setNeighborhoods(data)
+        async function fetchNeighborhoods() {
+            const user = await getprofile()
+            setProfile(user)
+            const data = await getNeighborhoodsOfUser(user.id)
+            setNeighborhoodUser(data)
+            const data2 = await getNeighborhoodsAroundMe(user.id)
+            setNeighborhoodsAround(data2)
         }
 
-        fetchProfile()
+        fetchNeighborhoods()
     }, [])
 
-    if (!neighborhoods) {
+    if (!neighborhooduser) {
         return (
             <Card>
                 <CardHeader>
@@ -40,16 +48,12 @@ export default function NeighborhoodsPage() {
         <div>
             <div className="p-6 space-y-6 ">
                 <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-bold">Mes Quartiers</h2>
-                    <Button className="bg-black text-white rounded-full px-6 py-2"
-                            onClick={() => router.push(Routes.neighborhood + "/create")}>
-                        <Icon path={mdiPlusCircleOutline} size={1}/> Create a neighborhood
-                    </Button>
+                    <h2 className="text-xl font-bold">Mon Quartier</h2>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
-                    {neighborhoods.map((n) => (
-                        <Card key={n.name} className="flex">
+                    {neighborhooduser.map((n) => (
+                        <Card key={n.name} className="flex" onClick={() => handleClick(n)} >
                             <div className="flex">
                                 <div className="flex flex-1/3 align-middle justify-center">
                                     {n.image ? (
@@ -89,8 +93,8 @@ export default function NeighborhoodsPage() {
                     <h2 className="text-xl font-bold">Quartiers autours de moi </h2>
                 </div>
                 <div className="grid md:grid-cols-3 gap-6">
-                    {neighborhoods.map((n) => (
-                        <Card key={n.name} className="flex">
+                    {neighborhoodsAround.map((n) => (
+                        <Card key={n.name} className="flex" onClick={() => handleClick(n)}>
                             <div className="flex">
                                 <div className="flex flex-1/3 align-middle justify-center">
                                     {n.image ? (

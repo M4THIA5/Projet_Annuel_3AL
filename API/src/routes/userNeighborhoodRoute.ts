@@ -7,5 +7,6 @@ userNeighborhoodRoutes.post('/', userNeighborhoodController.linkUserToNeighborho
 userNeighborhoodRoutes.get('/', userNeighborhoodController.getAllUserNeighborhoods)
 userNeighborhoodRoutes.get('/user/:userId', userNeighborhoodController.getNeighborhoodsOfUser)
 userNeighborhoodRoutes.get('/neighborhood/:neighborhoodId', userNeighborhoodController.getUsersOfNeighborhood)
+userNeighborhoodRoutes.get('/neighborhoodsAroundMe/:userId', userNeighborhoodController.getNearbyNeighborhoodsBasedOnUsers)
 
 export default userNeighborhoodRoutes

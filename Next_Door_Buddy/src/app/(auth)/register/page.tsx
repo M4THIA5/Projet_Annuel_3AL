@@ -44,13 +44,8 @@ export default function RegisterPage() {
         if (!lastName) newFieldErrors.lastName = "Last name is required"
         if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
             newFieldErrors.email = "Valid email is required"
-        } else {
-            const users = await getAllUsers()
-            const emailAlreadyUsed = users.some(user => user.email === email)
-            if (emailAlreadyUsed) {
-                newFieldErrors.email = "This email is already registered"
-            }
         }
+
         if (!password || password.length < 6) newFieldErrors.password = "Password must be at least 6 characters"
         if (password !== confirmPassword) newFieldErrors.confirmPassword = "Passwords do not match"
         if (!acceptedTerms) newFieldErrors.terms = "You must accept the terms"
@@ -129,6 +124,8 @@ export default function RegisterPage() {
                     resolvedPostalCode = response.postalCode
                 }
             }
+
+
 
             const data: RegisterUserData = {
                 email,
