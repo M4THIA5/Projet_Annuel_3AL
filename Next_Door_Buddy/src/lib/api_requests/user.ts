@@ -1,9 +1,10 @@
 import {API} from '#/lib/api_requests/fetchRequest'
-import {UserProfile, UserRole, User, VerifyOtpData, ResendOtpData} from '#/types/user'
+import {UserProfile, UserRole, VerifyOtpData, ResendOtpData} from '#/types/user'
 import {getAccessToken} from '../authentification'
 import {RegisterUserData} from "#/types/mapbox"
+import { buildUrl } from '../utils'
 
-export const getprofile = async (): Promise<UserProfile> => {
+export const getProfile = async (): Promise<UserProfile> => {
     try {
         const response = await API.get('/users/me', {accessToken: await getAccessToken()})
         if (!response.ok) {
@@ -34,24 +35,55 @@ export const getRoles = async (): Promise<UserRole[]> => {
         throw error
     }
 }
-export const getAllUsers = async (): Promise<User[]> => {
+export const getAllUsers = async (
+    params?:Record<string, string | number | undefined>): 
+    Promise<{
+    users: UserProfile[],
+    total: number,
+    page: number,
+    pageSize: number,
+    totalPages: number
+    }> => {
     try {
-        const response = await API.get('/users/', {accessToken: await getAccessToken()})
+        const url = buildUrl('/users', params)
+        const response = await API.get(url, {accessToken: await getAccessToken()})
         if (!response.ok) {
             throw new Error('Failed to get users')
         }
 
-        const data = await response.json() as User[]
-        if (!data || !Array.isArray(data)) {
-            throw new Error('No data found or invalid format')
-        }
+        const { users, total, page, pageSize, totalPages } = await response.json()
 
-        return data
+        return {
+            users: users.map((user: UserProfile) => ({
+            id: user.id,
+            firstName: user.firstName || '',
+            lastName: user.lastName || '',
+            email: user.email,
+            image: user.image || '',
+            roles: user.roles || []
+            })),
+            total,
+            page,
+            pageSize,
+            totalPages
+        }
     } catch (error) {
         throw error
     }
 }
 
+export const deleteUserById = async (userId: string): Promise<Response> => {
+    try {
+        const response = await API.delete(`/users/${userId}`, {accessToken: await getAccessToken()})
+        if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Failed to delete user')
+        }
+        return response
+    } catch (error) {
+        throw error
+    }
+}
 
 export const registerUser = async (data: RegisterUserData): Promise<Response> => {
     try {

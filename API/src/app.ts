@@ -7,13 +7,11 @@ import {PrismaClient as PostgresClient} from "../prisma/client/postgresClient"
 import {PrismaClient as MongoClient} from "../prisma/client/mongoClient"
 
 import errorHandler from "./middleware/errorHandler"
-import notFoundHandler from "./middleware/notFoundHandler"
 import neighborhoodRoutes from "./routes/neighborhoodRoute"
 import authRoutes from "./routes/authRoutes"
 import userRoutes from "./routes/userRoutes"
 import userNeighborhoodRoutes from "./routes/userNeighborhoodRoute"
 import journalRoutes from "./routes/journalRoutes";
-import geocodeController from "./controllers/mapBoxController";
 import mapBoxRoutes from "./routes/mapBoxRoutes";
 import { verifyJwt } from "./middleware/verifyJwt"
 import cookieParser from "cookie-parser"
@@ -23,9 +21,9 @@ const mongoClient = new MongoClient()
 
 const app = express()
 app.use(express.json())
+app.use(cookieParser())
 app.use(cors({ credentials: true, origin: config.NODE_ENV === "production" ? `https://${config.HOST}:3000` : "http://localhost:3000" }))
 app.use(urlencoded({ extended: false }))
-app.use(cookieParser())
 
 app.get("/", async (req: Request, res: Response): Promise<void> => {
   res.status(200).json({ message: "Hello World !" })
@@ -50,7 +48,7 @@ app.use("/user-neighborhoods", verifyJwt, userNeighborhoodRoutes)
 app.use("/journal", verifyJwt, journalRoutes)
 app.use("/geocode", mapBoxRoutes)
 
-app.use(notFoundHandler)
-// app.use(errorHandler)
+// app.use(notFoundHandler)
+app.use(errorHandler)
 
 export default app
