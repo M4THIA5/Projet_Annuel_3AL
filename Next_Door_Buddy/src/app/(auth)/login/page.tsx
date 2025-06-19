@@ -1,6 +1,7 @@
 "use client"
 
 import { FormEvent, useState } from "react"
+import { useRouter } from "next/navigation"
 
 import {
   Card,
@@ -20,6 +21,7 @@ import { Mail, Lock } from "lucide-react"
 export default function SigninPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -31,7 +33,10 @@ export default function SigninPage() {
       const formData = new FormData(form)
       const loginData = loginFormData.parse(Object.fromEntries(formData.entries()))
 
-      const { accessToken } = await loginUser(loginData)
+      const { accessToken, optVerified } = await loginUser(loginData)
+      if (!optVerified) {
+        router.push(`${Routes.auth.verify.toString()}?email=${encodeURIComponent(loginData.email)}`)
+      }
       if (!accessToken || !isTokenValid(accessToken.toString())) {
         throw new Error('Failed to login')
       }
