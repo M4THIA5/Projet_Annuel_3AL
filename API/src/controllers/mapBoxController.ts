@@ -5,7 +5,7 @@ const MAPBOX_API_KEY = config.MAPBOX_API_KEY;
 
 class MapBoxController {
 
-    private async fetchNeighborhoodFromAddress(address: string) {
+    public async fetchNeighborhoodFromAddress(address: string) {
         if (!MAPBOX_API_KEY) {
             throw new Error("API key Mapbox manquante");
         }

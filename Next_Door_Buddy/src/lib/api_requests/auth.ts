@@ -8,10 +8,14 @@ export const loginFormData = z.object({
 
 type LoginFormData = z.infer<typeof loginFormData>
 
-export const loginUser = async (loginData: LoginFormData): Promise<{ accessToken: string }> => {
+export const loginUser = async (loginData: LoginFormData): Promise<{ accessToken: string, optVerified?: boolean }> => {
   try {
     const response = await API.post('/login', { data: loginData })
     const data = await response.json()
+    if (response.status === 403) {
+      // if the opt verification fails, return false
+      return { accessToken: '', optVerified: false }
+    }
     return data
   }
   catch (error) {

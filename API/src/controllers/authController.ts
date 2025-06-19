@@ -4,7 +4,7 @@ import {config} from '../config/env'
 import argon2 from 'argon2'
 import jwt from 'jsonwebtoken'
 import type {CurrentUser} from '../types'
-import nodemailer from 'nodemailer';
+import nodemailer from 'nodemailer'
 import {
     accessTokenExpiration,
     refreshTokenExpiration,
@@ -14,8 +14,7 @@ import {
     userRole
 } from '../config/utils'
 import crypto from 'crypto'
-import { valid } from 'joi'
-import MapBoxController from "./mapBoxController";
+import MapBoxController from "./mapBoxController"
 
 const postgresClient = new PostgresClient()
 
@@ -37,6 +36,11 @@ class AuthController {
             const user = await postgresClient.user.findUnique({where: {email}})
             if (!user) {
                 res.status(404).json({error: 'User not found'})
+                return
+            }
+
+            if (!user.otpVerified) {
+                res.status(403).json({ accessToken: '', optVerified: false })
                 return
             }
 
@@ -73,7 +77,7 @@ class AuthController {
                     maxAge: 10 * 60 * 1000 // 10 minutes
                 })
 
-                res.status(200).json({accessToken})
+                res.status(200).json({accessToken, optVerified: user.otpVerified})
             } else {
                 res.status(401).json({error: 'Invalid email or password'})
             }
@@ -94,38 +98,38 @@ class AuthController {
             address,
             city,
             postalCode,
-        } = req.body;
+        } = req.body
 
         try {
-            const hasGeolocation = typeof latitude === 'number' && typeof longitude === 'number';
+            const hasGeolocation = typeof latitude === 'number' && typeof longitude === 'number'
 
             if (!hasGeolocation) {
                 if (!address || !city || !postalCode) {
                     res.status(400).json({
                         error: 'Adresse, ville et code postal sont requis si la géolocalisation est absente.',
-                    });
-                    return;
+                    })
+                    return
                 }
             }
 
-            const existingUser = await postgresClient.user.findUnique({where: {email}});
+            const existingUser = await postgresClient.user.findUnique({where: {email}})
             if (existingUser) {
-                res.status(409).json({error: 'User already exists'});
-                return;
+                res.status(409).json({error: 'User already exists'})
+                return
             }
 
-            const hashedPassword = await argon2.hash(password);
+            const hashedPassword = await argon2.hash(password)
 
-            const otp = crypto.randomInt(100000, 999999).toString();
+            const otp = crypto.randomInt(100000, 999999).toString()
 
             const mailOptions = {
                 from: process.env.EMAIL_USER,
                 to: email,
                 subject: 'Votre code OTP pour vérification',
                 text: `Bonjour ${firstName},\n\nVoici votre code de vérification OTP : ${otp}\n\nCe code est valide pendant 10 minutes.\n\nMerci.`,
-            };
+            }
 
-            await transporter.sendMail(mailOptions);
+            await transporter.sendMail(mailOptions)
 
             await postgresClient.user.create({
                 data: {
@@ -143,62 +147,66 @@ class AuthController {
                     otpCreatedAt: new Date(),
                     otpVerified: false,
                 },
-            });
+            })
 
-            res.status(201).json({message: 'User registered successfully. OTP sent by email.'});
+            res.status(201).json({message: 'User registered successfully. OTP sent by email.'})
         } catch (error) {
-            next(error);
+            next(error)
             transporter.verify((error, success) => {
                 if (error) {
-                    console.error('Erreur de configuration mail:', error);
+                    console.error('Erreur de configuration mail:', error)
                 } else {
-                    console.log('Serveur mail prêt à envoyer');
+                    console.log('Serveur mail prêt à envoyer')
                 }
-            });
+            })
         }
-    };
+    }
 
     verifyOtp: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-        const { email, otp } = req.body;
+        const { email, otp } = req.body
 
         try {
             const user = await postgresClient.user.findUnique({
                 where: { email },
-            });
+            })
 
             if (!user) {
-                res.status(404).json({ error: 'Utilisateur non trouvé' });
-                return;
+                res.status(404).json({ error: 'Utilisateur non trouvé' })
+                return
             }
 
             if (user.otpVerified) {
-                res.status(400).json({ error: 'OTP déjà vérifié' });
-                return;
+                res.status(400).json({ error: 'OTP déjà vérifié' })
+                return
             }
 
-            const now = new Date();
+            const now = new Date()
             if (!user.otpCreatedAt) {
-                res.status(400).json({ error: 'OTP expiré' });
-                return;
+                res.status(400).json({ error: 'OTP expiré' })
+                return
             }
-            const otpAgeMinutes = (now.getTime() - new Date(user.otpCreatedAt).getTime()) / 1000 / 60;
+            const otpAgeMinutes = (now.getTime() - new Date(user.otpCreatedAt).getTime()) / 1000 / 60
 
             if (otpAgeMinutes > 10) {
-                res.status(400).json({ error: 'OTP expiré' });
-                return;
+                res.status(400).json({ error: 'OTP expiré' })
+                return
             }
 
             if (user.otpCode !== otp) {
-                res.status(400).json({ error: 'OTP invalide' });
-                return;
+                res.status(400).json({ error: 'OTP invalide' })
+                return
             }
 
-            const controller = new MapBoxController();
-            const response = await controller['fetchNeighborhoodFromAddress'](user.address);
+            const controller = new MapBoxController()
+            if (!user.address) {
+                res.status(400).json({ error: "Adresse de l'utilisateur manquante" })
+                return
+            }
+            const response = await controller.fetchNeighborhoodFromAddress(user.address)
 
-            let neighborhood = await postgresClient.neighborhood.findUnique({
+            let neighborhood = await postgresClient.neighborhood.findFirst({
                 where: { name: response.district },
-            });
+            })
 
             if (!neighborhood) {
                 neighborhood = await postgresClient.neighborhood.create({
@@ -212,7 +220,7 @@ class AuthController {
                         updatedAt: new Date(),
                         image: null,
                     },
-                });
+                })
             }else {
                 await postgresClient.neighborhood.update({
                     where: { id: neighborhood.id },
@@ -220,10 +228,10 @@ class AuthController {
                         members: { increment: 1 },
                         updatedAt: new Date(),
                     },
-                });
+                })
             }
 
-            const isFirstMember = neighborhood.members === 1;
+            const isFirstMember = neighborhood.members === 1
 
             await postgresClient.userNeighborhood.create({
                 data: {
@@ -232,7 +240,7 @@ class AuthController {
                     joinedAt: new Date(),
                     roleInArea: isFirstMember ? "admin" : "member",
                 },
-            });
+            })
 
             await postgresClient.user.update({
                 where: { email },
@@ -241,43 +249,43 @@ class AuthController {
                     otpCode: null,
                     otpCreatedAt: null,
                 },
-            });
+            })
 
 
-            res.status(200).json({ message: 'OTP vérifié avec succès' });
+            res.status(200).json({ message: 'OTP vérifié avec succès' })
         } catch (error) {
-            next(error);
+            next(error)
         }
-    };
+    }
 
     resendOtp: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-        const { email } = req.body;
+        const { email } = req.body
 
         try {
             const user = await postgresClient.user.findUnique({
                 where: { email },
-            });
+            })
 
             if (!user) {
-                res.status(404).json({ error: 'Utilisateur non trouvé' });
-                return;
+                res.status(404).json({ error: 'Utilisateur non trouvé' })
+                return
             }
 
             if (user.otpVerified) {
-                res.status(400).json({ error: 'OTP déjà vérifié. Aucun besoin de renvoyer le code.' });
-                return;
+                res.status(400).json({ error: 'OTP déjà vérifié. Aucun besoin de renvoyer le code.' })
+                return
             }
 
-            const newOtp = crypto.randomInt(100000, 999999).toString();
+            const newOtp = crypto.randomInt(100000, 999999).toString()
 
             const mailOptions = {
                 from: process.env.EMAIL_USER,
                 to: email,
                 subject: 'Nouveau code OTP de vérification',
                 text: `Bonjour ${user.firstName},\n\nVoici votre nouveau code de vérification OTP : ${newOtp}\n\nCe code est valide pendant 10 minutes.\n\nMerci.`,
-            };
+            }
 
-            await transporter.sendMail(mailOptions);
+            await transporter.sendMail(mailOptions)
 
             await postgresClient.user.update({
                 where: { email },
@@ -285,13 +293,13 @@ class AuthController {
                     otpCode: newOtp,
                     otpCreatedAt: new Date(),
                 },
-            });
+            })
 
-            res.status(200).json({ message: 'Nouveau code OTP envoyé par email.' });
+            res.status(200).json({ message: 'Nouveau code OTP envoyé par email.' })
         } catch (error) {
-            next(error);
+            next(error)
         }
-    };
+    }
 
 
 
