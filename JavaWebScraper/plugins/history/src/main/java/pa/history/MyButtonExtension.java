@@ -15,7 +15,7 @@ import java.io.IOException;
 public class MyButtonExtension implements HistoryExtension {
     @Override
     public void injectInto(Menu pluginMenu, Context context, TabPane tabPane) {
-        MenuItem item = new MenuItem("Plugin - Action");
+        MenuItem item = new MenuItem("Historique des requêtes");
         item.setOnAction(evt ->
                 {
                     // Ouvre une boîte de dialogue avec une ListView de tous les éléments dans context.getRequests()

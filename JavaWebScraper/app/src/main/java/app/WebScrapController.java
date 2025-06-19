@@ -93,8 +93,7 @@ public class WebScrapController extends Thread {
     void initialize() {
         changeThemeItem.setOnAction(evt -> showThemeDialog());
         baseVBOX.setOnDragOver(event -> {
-            if (event.getGestureSource() != baseVBOX
-                    && event.getDragboard().hasFiles()) {
+            if (event.getGestureSource() != baseVBOX && event.getDragboard().hasFiles()) {
                 /* allow for both copying and moving, whatever user chooses */
                 event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
             }
@@ -111,6 +110,8 @@ public class WebScrapController extends Thread {
                 if (file.getName().endsWith(".jar")) {
                     if (file.getName().contains("history")) {
                         pluginService.loadPlugin(file.toPath(), options, currentContext, tabPane);
+                    } else if (file.getName().contains("mastermind")) {
+                        pluginService.loadPlugin(file.toPath(), options);
                     } else {
                         pluginService.loadPlugin(file.toPath());
                     }
@@ -142,16 +143,13 @@ public class WebScrapController extends Thread {
         assert btn != null;
         btn.sceneProperty().addListener((obs, scene, newScene) -> {
             if (newScene != null) {
-                newScene.getAccelerators().put(
-                        KeyCodeCombination.keyCombination("Ctrl+Enter"),
-                        new Runnable() {
-                            @FXML
-                            public void run() {
-                                System.out.println("Enter KeyCodeCombination Ctrl+Enter");
-                                btn.fire();
-                            }
-                        }
-                );
+                newScene.getAccelerators().put(KeyCodeCombination.keyCombination("Ctrl+Enter"), new Runnable() {
+                    @FXML
+                    public void run() {
+                        System.out.println("Enter KeyCodeCombination Ctrl+Enter");
+                        btn.fire();
+                    }
+                });
             }
         });
     }
@@ -181,7 +179,7 @@ public class WebScrapController extends Thread {
                 try {
                     String url = "https://www.google.com/search?q=" + URLEncoder.encode(keyword.getText(), StandardCharsets.UTF_8);
                     scrappedValues[0] = webScrapper.scrap(driver, url, keyword.getText(), this::updateProgress);
-                    currentContext.addRequest(keyword.getText(),scrappedValues[0]);
+                    currentContext.addRequest(keyword.getText(), scrappedValues[0]);
                     System.out.println("added. len : " + currentContext.getRequests().size());
                     sleep(3000);
                     updateProgress(100, 100);
@@ -196,7 +194,7 @@ public class WebScrapController extends Thread {
                 return null;
             }
         };
-        Stage loading = createLoadingPopup(task,keyword.getText());
+        Stage loading = createLoadingPopup(task, keyword.getText());
 
         task.setOnRunning(evt -> loading.show());
         task.setOnSucceeded(evt -> {
@@ -277,16 +275,7 @@ public class WebScrapController extends Thread {
         content.setPadding(new Insets(10));
 
         // Liste des thèmes
-        Map<String, String> themeMap = Map.of(
-                "Clair", "/app/utils/theme-light.css",
-                "Sombre", "/app/utils/theme-dark.css",
-                "Bleu", "/app/utils/theme-blue.css",
-                "Vert", "/app/utils/theme-green.css",
-                "Sepia", "/app/utils/theme-sepia.css",
-                "Rose", "/app/utils/theme-pink.css",
-                "Contrasté", "/app/utils/theme-high-contrast.css",
-                "Terminal", "/app/utils/theme-terminal.css"
-        );
+        Map<String, String> themeMap = Map.of("Clair", "/app/utils/theme-light.css", "Sombre", "/app/utils/theme-dark.css", "Bleu", "/app/utils/theme-blue.css", "Vert", "/app/utils/theme-green.css", "Sepia", "/app/utils/theme-sepia.css", "Rose", "/app/utils/theme-pink.css", "Contrasté", "/app/utils/theme-high-contrast.css", "Terminal", "/app/utils/theme-terminal.css");
 
         for (String label : themeMap.keySet()) {
             RadioButton rb = new RadioButton(label);
@@ -320,6 +309,7 @@ public class WebScrapController extends Thread {
         scene.getStylesheets().clear();
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(theme)).toExternalForm());
     }
+
     @FXML
     private void showPlugins() {
         try {
@@ -333,6 +323,7 @@ public class WebScrapController extends Thread {
             e.printStackTrace();
         }
     }
+
     private void showError(Throwable e) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error alert");
@@ -414,8 +405,7 @@ public class WebScrapController extends Thread {
         ringProgressIndicator.setRingWidth(200);
         ringProgressIndicator.makeIndeterminate();
 
-        task.progressProperty().addListener(
-                (obs, progress, newProgress) -> ringProgressIndicator.setProgress((int) (newProgress.doubleValue() * 100)));
+        task.progressProperty().addListener((obs, progress, newProgress) -> ringProgressIndicator.setProgress((int) (newProgress.doubleValue() * 100)));
 
 
         VBox box = new VBox(ringProgressIndicator, new Label("Chargement en cours..."));

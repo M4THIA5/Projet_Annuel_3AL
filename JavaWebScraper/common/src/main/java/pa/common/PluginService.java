@@ -41,6 +41,24 @@ public class PluginService {
             }
         }
     }
+    public void loadPlugin(Path pluginJar, Menu pluginMenu) {
+        String wrapper = pluginManager.loadPlugin(pluginJar);
+        if (wrapper != null) {
+            pluginManager.startPlugin(wrapper);
+            System.out.println("Plugin loaded and started: " + wrapper);
+            if (wrapper.contains("mastermind")) {
+                List<MastermindExtension> extensions = pluginManager.getExtensions(MastermindExtension.class);
+                if (!extensions.isEmpty()) {
+                    System.out.println("Mastermind found: " + extensions.getFirst().toString());
+                    extensions.getFirst().injectInto(pluginMenu);
+                } else {
+                    System.out.println("No Mastermind found in the plugin.");
+                }
+            }
+        }
+    }
+
+
 
     public void unloadPlugin(String pluginId) {
         pluginManager.stopPlugin(pluginId);
