@@ -50,6 +50,7 @@ jobs:
             JavaWebScraper/create-release.sh
             JavaWebScraper/plugins/gif/target/*.jar
             JavaWebScraper/plugins/history/target/*.jar
+            JavaWebScraper/plugins/mastermind/target/*.jar
             JavaWebScraper/app/target/*.jar
             JavaWebScraper/cli/target/*.jar
             JavaWebScraper/common/target/*.jar
@@ -89,6 +90,7 @@ jobs:
           files: |
             jars/plugins/gif/target/gif-${{ needs.build.outputs.version }}.jar
             jars/plugins/history/target/history-${{ needs.build.outputs.version }}.jar
+            jars/plugins/mastermind/target/mastermind-${{ needs.build.outputs.version }}.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
