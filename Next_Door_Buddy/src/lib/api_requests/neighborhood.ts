@@ -32,7 +32,7 @@ export const getNeighborhoodsOfUser = async (userId: string): Promise<Neighborho
     const neighborhoods = data.map(link => link.neighborhood)
 
     if (!neighborhoods || neighborhoods.length === 0) {
-      throw new Error('No neighborhoods found for this user')
+      return []
     }
 
     return neighborhoods
