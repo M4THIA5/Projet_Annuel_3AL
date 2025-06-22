@@ -16,6 +16,8 @@ async function main() {
       email: 'mathias@admin.io',
       password: await hash('Azerty1234!'),
       roles: [ userRole.admin, userRole.classic ],
+      otpVerified: true,
+      otpCode: '123456',
     }
   })
 
@@ -28,6 +30,8 @@ async function main() {
       email: 'admin@admin.io',
       password: await hash('admin'),
       roles: [ userRole.admin, userRole.classic ],
+      otpVerified: true,
+      otpCode: '123456'
     }
   })
 
@@ -44,6 +48,8 @@ async function main() {
         email: user.email,
         password: await hash(user.password),
         roles: user.roles,
+        otpVerified: true,
+        otpCode: '123456',
       }
     })
   }
