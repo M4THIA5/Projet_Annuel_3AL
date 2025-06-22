@@ -39,6 +39,7 @@ import { deleteUserById, getAllUsers } from "#/lib/api_requests/user"
 import { toast } from "react-toastify"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "#/components/ui/dialog"
 import { DialogTrigger } from "@radix-ui/react-dialog"
+import { Details } from "./details"
 
 function DeleteUserDialog({ onConfirm }: { onConfirm: () => void }) {
   const [open, setOpen] = useState(false)
@@ -79,7 +80,10 @@ function DeleteUserDialog({ onConfirm }: { onConfirm: () => void }) {
   )
 }
 
-export function getAllColumns(deleteUser: (id: string) => void): ColumnDef<UserProfile>[] {
+function getAllColumns(
+  deleteUser: (id: string) => void,
+  setUserDetails: (id: string) => void
+): ColumnDef<UserProfile>[] {
   return [
   {
     accessorKey: "image",
@@ -174,7 +178,7 @@ export function getAllColumns(deleteUser: (id: string) => void): ColumnDef<UserP
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem>Voir le détail</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setUserDetails(row.original.id)}>Voir le détail</DropdownMenuItem>
           <DeleteUserDialog onConfirm={() => deleteUser(row.original.id)} />
         </DropdownMenuContent>
       </DropdownMenu>
@@ -191,6 +195,7 @@ export default function DashboardAdminPage() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [totalPages, setTotalPages] = useState(1)
+  const [userDetails, setUserDetails] = useState<string | null>(null)
 
   async function deleteUser(userId: string) {
   const response = await deleteUserById(userId)
@@ -215,10 +220,9 @@ export default function DashboardAdminPage() {
     fetchUsers()
   }, [fetchUsers])
 
-  // TODO: gestion de la pagination | suppression des utilisateurs | affichage des détails d'un utilisateur
   const table = useReactTable({
     data: users,
-    columns: getAllColumns(deleteUser),
+    columns: getAllColumns(deleteUser, setUserDetails),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -241,7 +245,6 @@ export default function DashboardAdminPage() {
       const newState = typeof updater === 'function' ? updater({ pageIndex: page - 1, pageSize }) : updater
       setPage(newState.pageIndex + 1)
       setPageSize(newState.pageSize)
-      
     },
   })
 
@@ -357,6 +360,9 @@ export default function DashboardAdminPage() {
           </Button>
         </div>
       </div>
+      {userDetails && (
+        <Details userId={userDetails} setUserDetails={setUserDetails} />
+      )}
     </div>
   )
 }
