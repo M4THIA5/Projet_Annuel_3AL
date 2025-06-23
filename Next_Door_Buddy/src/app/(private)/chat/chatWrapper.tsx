@@ -1,13 +1,13 @@
 "use client"
 import {useEffect, useRef, useState} from "react"
 import {MySocket, useSocket} from "./socketProvider"
+import { ChatUser } from "#/types/user"
 
 export function ChatWrapper({firstName, lastName}: { firstName: string, lastName: string }) {
     const [messages, setMessages] = useState<Message[]>([])
     const socket = useSocket()
     const [typingStatus, setTypingStatus] = useState('')
-    const lastMessageRef = useRef(null)
-    const userName: string = firstName + " " + lastName
+    const lastMessageRef = useRef<HTMLDivElement>(null)
     useEffect(() => {
         if (!socket) return
 
@@ -16,7 +16,7 @@ export function ChatWrapper({firstName, lastName}: { firstName: string, lastName
         }
         socket.on('connected', (data: Message[]) => {
             console.log("Connected messages:", data)
-            setMessages(() => data.messageData)
+            setMessages(() => data)
         })
         socket.on('message_sent', handleMessage)
         socket.on('typingResponse', (data) => setTypingStatus(data))
@@ -32,7 +32,7 @@ export function ChatWrapper({firstName, lastName}: { firstName: string, lastName
 
     return (
         <div className="chat">
-            <ChatBar socket={socket}/>
+            {socket && <ChatBar socket={socket} />}
             <div className="chat__main">
                 <ChatBody
                     messages={messages}
@@ -40,7 +40,7 @@ export function ChatWrapper({firstName, lastName}: { firstName: string, lastName
                     lastMessageRef={lastMessageRef}
                     typingStatus={typingStatus}
                 />
-                <ChatFooter socket={socket} user={userName}/>
+                {socket && <ChatFooter socket={socket} user={{ firstName, lastName }} />}
             </div>
         </div>
     )
@@ -61,7 +61,7 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
         firstName: string
         lastName: string
     }
-    lastMessageRef: React.RefObject<HTMLDivElement>
+    lastMessageRef: React.RefObject<HTMLDivElement | null>
     typingStatus: string
 }) {
 
@@ -82,7 +82,7 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
             {/*This shows messages sent from you*/}
             <div className="message__container">
                 {messages.map((message) =>
-                    message.name === username ? (
+                    `${message.name.firstName} ${message.name.lastName}` === username ? (
                         <div className="message__chats" key={message.id}>
                             <p className="sender__name">You</p>
                             <div className="message__sender">
@@ -91,7 +91,7 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
                         </div>
                     ) : (
                         <div className="message__chats" key={message.id}>
-                            <p>{`${message.name}`}</p>
+                            <p>{`${message.name.firstName} ${message.name.lastName}`}</p>
                             <div className="message__recipient">
                                 <p>{message.text}</p>
                             </div>
@@ -155,14 +155,14 @@ function ChatFooter({socket, user}: {
 }
 
 function ChatBar({socket}: { socket: MySocket }) {
-    const [users, setUsers] = useState([])
+    const [users, setUsers] = useState<ChatUser[]>([])
     useEffect(() => {
         if (!socket) {
             console.log("Socket not ready yet")
             return
         }
-        socket.on('newUser', (data) => setUsers(data))
-    }, [socket, users])
+        socket.on('newUser', (data: ChatUser[]) => setUsers(data))
+    }, [socket])
     return (
         <div className="chat__sidebar">
             <h2>Open Chat</h2>
