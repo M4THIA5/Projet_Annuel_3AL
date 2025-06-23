@@ -16,7 +16,7 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
     const router = useRouter()
     const NeighborhoodId = decodeURIComponent(React.use(params).id)
     const [neighborhood, setNeighborhood] = useState<Neighborhood | null>(null)
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<FormData>({
         name: '',
         city: '',
         postalCode: '',
@@ -108,7 +108,7 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
         if (Object.keys(errors).length === 0) {
             updateNeighborhood(Number(NeighborhoodId), formData)
                 .then(() => {
-                    handleCancel()
+
                 }).catch(() => {
                 alert('Une erreur est survenue lors de la mise à jour. Veuillez réessayer.')
             })
@@ -122,7 +122,7 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
         </div>
         <Card className="max-w mx-auto m-10 p-6">
             <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+                <form encType={"multipart/form-data"} method={"post"} onSubmit={handleSubmit} className="space-y-6" noValidate>
                     {/* Image + Champs */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Image */}

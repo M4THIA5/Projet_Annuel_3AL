@@ -1,5 +1,8 @@
 import { NextFunction, Request, Response } from "express"
 import { PrismaClient as PostgresClient } from "../../prisma/client/postgresClient"
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 
 const postgresClient = new PostgresClient()
 
@@ -43,15 +46,52 @@ class NeighborhoodController {
     }
 
     // Update a neighborhood
-    updateNeighborhood = async (req:Request, res: Response, next: NextFunction) => {
+    updateNeighborhood = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            const storage = multer.diskStorage({
+                destination: (_req, _file, cb) => {
+                    const uploadDir = path.join(__dirname, '..', '..','..','Next_Door_Buddy','public', 'uploads')
+                    if (!fs.existsSync(uploadDir)) {
+                        fs.mkdirSync(uploadDir, { recursive: true })
+                    }
+                    cb(null, uploadDir)
+                },
+                filename: (_req, file, cb) => {
+                    const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`
+                    cb(null, uniqueName)
+                }
+            })
+
+            const upload = multer({ storage:storage , limits: { fieldSize: 10 * 1024 * 1024 } }).single('image')
+            upload(req,res, function (err){
+                if (err instanceof multer.MulterError) {
+                    console.error(err)
+                } else if (err) {
+                    // An unknown error occurred when uploading.
+                }
+                console.log(req.files)
+            })
+            const body = req.body;
+            const file = req.files
+
+            const data: any = {
+                ...body,
+            };
+
+
+
+            if (file) {
+                data.image = `/uploads/${file.filename}`;
+            }
+
             const updated = await postgresClient.neighborhood.update({
                 where: { id: Number(req.params.id) },
-                data: req.body,
-            })
-            res.status(200).json(updated)
+                data,
+            });
+
+            res.status(200).json(updated);
         } catch (error) {
-            next(error)
+            next(error);
         }
     }
 

@@ -22,8 +22,9 @@ const mongoClient = new MongoClient()
 const app = express()
 app.use(express.json())
 app.use(cookieParser())
+
 app.use(cors({ credentials: true, origin: config.NODE_ENV === "production" ? `https://${config.HOST}:3000` : "http://localhost:3000" }))
-app.use(urlencoded({ extended: false }))
+app.use(urlencoded({ extended: true }))
 
 app.get("/", async (req: Request, res: Response): Promise<void> => {
   res.status(200).json({ message: "Hello World !" })
