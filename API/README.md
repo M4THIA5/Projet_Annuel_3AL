@@ -53,7 +53,7 @@ npx prisma db push
 
 Pour créer une nouvelle migration :
 ```bash
-npx prisma migrate dev --create-only --name "nom_de_la_migration"
+npx prisma migrate dev --setting-only --name "nom_de_la_migration"
 ```
 
 ## Auteurs

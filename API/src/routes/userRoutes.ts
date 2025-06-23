@@ -13,4 +13,5 @@ userRoutes.get('/:id', userController.getUser)
 userRoutes.put('/:id', userController.updateUser)
 userRoutes.delete('/:id', userController.deleteUser)
 
+
 export default userRoutes
