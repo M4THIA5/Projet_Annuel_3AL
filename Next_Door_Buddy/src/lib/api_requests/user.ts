@@ -2,7 +2,7 @@ import {API} from '#/lib/api_requests/fetchRequest'
 import {UserProfile, UserRole, VerifyOtpData, ResendOtpData} from '#/types/user'
 import {getAccessToken} from '../authentification'
 import {RegisterUserData} from "#/types/mapbox"
-import { buildUrl } from '../utils'
+import {buildUrl} from '../utils'
 
 export const getProfile = async (): Promise<UserProfile> => {
     try {
@@ -35,14 +35,37 @@ export const getRoles = async (): Promise<UserRole[]> => {
         throw error
     }
 }
+
+export const getRoleInArea = async ( userId: number,neighborhoodId: number): Promise<string> => {
+    try {
+
+        const response = await API.get(`/user-neighborhoods/roleinarea/${userId}/${neighborhoodId}`, {accessToken: await getAccessToken()})
+
+        if (!response.ok) {
+            throw new Error('Failed to get role')
+        }
+
+        const data = await response.json()
+
+        if (!data || typeof data.role !== 'string') {
+            throw new Error('Invalid or missing role in response')
+        }
+
+        return data.role
+    } catch (error) {
+        throw new Error(`getRoleInArea failed: ${error instanceof Error ? error.message : String(error)}`)
+    }
+}
+
+
 export const getAllUsers = async (
-    params?:Record<string, string | number | undefined>): 
+    params?: Record<string, string | number | undefined>):
     Promise<{
-    users: UserProfile[],
-    total: number,
-    page: number,
-    pageSize: number,
-    totalPages: number
+        users: UserProfile[],
+        total: number,
+        page: number,
+        pageSize: number,
+        totalPages: number
     }> => {
     try {
         const url = buildUrl('/users', params)
@@ -51,16 +74,16 @@ export const getAllUsers = async (
             throw new Error('Failed to get users')
         }
 
-        const { users, total, page, pageSize, totalPages } = await response.json()
+        const {users, total, page, pageSize, totalPages} = await response.json()
 
         return {
             users: users.map((user: UserProfile) => ({
-            id: user.id,
-            firstName: user.firstName || '',
-            lastName: user.lastName || '',
-            email: user.email,
-            image: user.image || '',
-            roles: user.roles || []
+                id: user.id,
+                firstName: user.firstName || '',
+                lastName: user.lastName || '',
+                email: user.email,
+                image: user.image || '',
+                roles: user.roles || []
             })),
             total,
             page,
@@ -141,7 +164,7 @@ export const isValidEmail = async (email: string): Promise<boolean> => {
         if (!response.ok) {
             return false
         }
-        const { isValid } = await response.json()
+        const {isValid} = await response.json()
         if (isValid) {
             return true
         }
@@ -154,17 +177,17 @@ export const isValidEmail = async (email: string): Promise<boolean> => {
 
 export const resetPassWord = async (email: string, resetUrl: string): Promise<Response> => {
     try {
-        const resetPasswordResponse = await API.put('/reset-password-code', { data: { email } })
+        const resetPasswordResponse = await API.put('/reset-password-code', {data: {email}})
         if (!resetPasswordResponse.ok) {
             const errorData = await resetPasswordResponse.json()
             throw new Error(errorData.error || 'Failed to generate reset password code')
         }
-        const { resetPasswordCode } = await resetPasswordResponse.json()
+        const {resetPasswordCode} = await resetPasswordResponse.json()
 
         const response = await fetch('/api/reset-password', {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, resetUrl: `${resetUrl}?code=${resetPasswordCode}` }),
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({email, resetUrl: `${resetUrl}?code=${resetPasswordCode}`}),
         })
 
         if (!response.ok) {

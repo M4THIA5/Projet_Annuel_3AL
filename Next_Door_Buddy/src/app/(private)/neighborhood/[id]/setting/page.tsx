@@ -1,43 +1,74 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
-import { Input } from "#/components/ui/input"
-import { Textarea } from "#/components/ui/textarea"
-import { Button } from "#/components/ui/button"
+import React, {useEffect, useState} from "react"
+import {Card, CardContent, CardHeader, CardTitle} from "#/components/ui/card"
+import {Input} from "#/components/ui/input"
+import {Textarea} from "#/components/ui/textarea"
+import {Button} from "#/components/ui/button"
 import Image from "next/image"
 import logo from "@/logo.png"
-import { useRouter } from "next/navigation"
-import MapNeighborhood from "#/components/personal/MapNeighborhood"
+import {useRouter} from "next/navigation"
+import {getProfile, getRoleInArea} from "#/lib/api_requests/user"
+import {getNeighborhood, updateNeighborhood} from "#/lib/api_requests/neighborhood"
+import {Neighborhood} from "#/types/neighborghood"
 
-export default function NeighborhoodForm() {
+export default function NeighborhoodForm({params}: { params: Promise<{ id: string }> }) {
     const router = useRouter()
+    const NeighborhoodId = decodeURIComponent(React.use(params).id)
+    const [neighborhood, setNeighborhood] = useState<Neighborhood | null>(null)
     const [formData, setFormData] = useState({
-        name: "",
-        city: "",
-        country: "",
-        address: "",
-        postalCode: "",
-        description: "",
+        name: '',
+        city: '',
+        postalCode: '',
+        description: '',
         image: null as File | null,
     })
 
     const [imagePreview, setImagePreview] = useState<string | null>(null)
     const [formErrors, setFormErrors] = useState<Record<string, string>>({})
-    const [coordinates, setCoordinates] = useState<{ latitude: number; longitude: number } | null>(null)
-    const [mapVisible, setMapVisible] = useState(false)
+
+
+    useEffect(() => {
+        async function fetchNeighborhood() {
+            try {
+                const user = await getProfile()
+                const role = await getRoleInArea(Number(user.id), Number(NeighborhoodId))
+                if (role !== 'admin') {
+                    router.back()
+                }
+
+                const neighborhoodData = await getNeighborhood(NeighborhoodId)
+                setNeighborhood(neighborhoodData)
+
+                if (neighborhoodData) {
+                    setFormData({
+                        name: neighborhoodData.name || '',
+                        city: neighborhoodData.city || '',
+                        postalCode: neighborhoodData.postalCode || '',
+                        description: neighborhoodData.description || '',
+                        image: null,
+                    })
+                }
+
+            } catch (error) {
+                console.error("Erreur lors du chargement du quartier ou des utilisateurs :", error)
+            }
+        }
+
+        fetchNeighborhood()
+    }, [NeighborhoodId])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target
-        setFormData((prev) => ({ ...prev, [name]: value }))
-        setFormErrors((prev) => ({ ...prev, [name]: "" }))
+        const {name, value} = e.target
+        setFormData((prev) => ({...prev, [name]: value}))
+        setFormErrors((prev) => ({...prev, [name]: ""}))
     }
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const file = e.target.files[0]
-            setFormData((prev) => ({ ...prev, image: file }))
-            setFormErrors((prev) => ({ ...prev, image: "" }))
+            setFormData((prev) => ({...prev, image: file}))
+            setFormErrors((prev) => ({...prev, image: ""}))
 
             const reader = new FileReader()
             reader.onload = () => {
@@ -64,14 +95,6 @@ export default function NeighborhoodForm() {
             errors.city = "La ville doit contenir uniquement des lettres et au moins 2 caractères."
         }
 
-        if (!formData.country || !/^[A-Za-zÀ-ÿ\s\-']{2,}$/.test(formData.country.trim())) {
-            errors.country = "Le pays doit contenir uniquement des lettres et au moins 2 caractères."
-        }
-
-        if (!formData.address || formData.address.trim().length < 5) {
-            errors.address = "L'adresse doit contenir au moins 5 caractères."
-        }
-
         if (!formData.postalCode || !/^\d{4,10}$/.test(formData.postalCode.trim())) {
             errors.postalCode = "Le code postal doit contenir entre 4 et 10 chiffres."
         }
@@ -83,37 +106,21 @@ export default function NeighborhoodForm() {
         setFormErrors(errors)
 
         if (Object.keys(errors).length === 0) {
-            console.log("Formulaire valide:", formData)
+            updateNeighborhood(Number(NeighborhoodId), formData)
+                .then(() => {
+                    handleCancel()
+                }).catch(() => {
+                alert('Une erreur est survenue lors de la mise à jour. Veuillez réessayer.')
+            })
         }
     }
 
-    const handleGenerateMap = async () => {
-        const fullAddress = `${formData.address}, ${formData.postalCode} ${formData.city}, ${formData.country}`
 
-        try {
-            const res = await fetch(
-                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}`
-            )
-            const data = await res.json()
-
-            if (data.length > 0) {
-                const { lat, lon } = data[0]
-                setCoordinates({ latitude: parseFloat(lat), longitude: parseFloat(lon) })
-                setMapVisible(true)
-            } else {
-                alert("Adresse introuvable.")
-            }
-        } catch (err) {
-            console.error("Erreur de géocodage:", err)
-            alert("Échec lors de la génération de la carte.")
-        }
-    }
-
-    return (
+    return (<>
+        <div className="flex justify-between items-center  p-6 pb-1 space-y-6">
+            <h2 className="text-xl font-bold">Setting</h2>
+        </div>
         <Card className="max-w mx-auto m-10 p-6">
-            <CardHeader>
-                <CardTitle>Créer un Quartier</CardTitle>
-            </CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                     {/* Image + Champs */}
@@ -152,6 +159,7 @@ export default function NeighborhoodForm() {
                                 value={formData.name}
                                 onChange={handleChange}
                                 required
+                                disabled
                                 minLength={2}
                                 maxLength={100}
                                 className={formErrors.name ? "border-red-500" : ""}
@@ -166,28 +174,8 @@ export default function NeighborhoodForm() {
                                     value={formData.city}
                                     onChange={handleChange}
                                     required
+                                    disabled
                                     className={formErrors.city ? "border-red-500" : ""}
-                                />
-                                <Input
-                                    id="country"
-                                    name="country"
-                                    placeholder="Pays"
-                                    value={formData.country}
-                                    onChange={handleChange}
-                                    required
-                                    className={formErrors.country ? "border-red-500" : ""}
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <Input
-                                    id="address"
-                                    name="address"
-                                    placeholder="Adresse"
-                                    value={formData.address}
-                                    onChange={handleChange}
-                                    required
-                                    className={formErrors.address ? "border-red-500" : ""}
                                 />
                                 <Input
                                     id="postalCode"
@@ -196,6 +184,7 @@ export default function NeighborhoodForm() {
                                     value={formData.postalCode}
                                     onChange={handleChange}
                                     required
+                                    disabled
                                     className={formErrors.postalCode ? "border-red-500" : ""}
                                 />
                             </div>
@@ -212,23 +201,6 @@ export default function NeighborhoodForm() {
                         </div>
                     </div>
 
-                    {/* Génération de la carte */}
-                    <div className="mt-6 space-y-4">
-                        <Button type="button" onClick={handleGenerateMap}>
-                            Régénérer la carte
-                        </Button>
-
-                        {mapVisible && coordinates && (
-                            <div className="h-[500px] w-full rounded-lg border overflow-hidden">
-                                <MapNeighborhood
-                                    latitude={coordinates.latitude}
-                                    longitude={coordinates.longitude}
-                                    districtName={formData.name || "Quartier"}
-                                />
-                            </div>
-                        )}
-                    </div>
-
                     {/* Boutons */}
                     <div className="flex justify-end gap-4 mt-4">
                         <Button type="button" variant="outline" onClick={handleCancel}>
@@ -239,5 +211,5 @@ export default function NeighborhoodForm() {
                 </form>
             </CardContent>
         </Card>
-    )
+    </>)
 }

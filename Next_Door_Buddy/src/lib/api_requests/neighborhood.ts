@@ -1,6 +1,7 @@
-import { API } from '#/lib/api_requests/fetchRequest'
-import { Neighborhood } from '#/types/neighborghood'
-import { getAccessToken } from '../authentification'
+import {API} from '#/lib/api_requests/fetchRequest'
+import {Neighborhood} from '#/types/neighborghood'
+import {getAccessToken} from '../authentification'
+import {UserNeighborhood} from "#/types/user";
 
 export const getAllNeighborhoods = async (): Promise<Neighborhood[]> => {
   try {
@@ -18,6 +19,28 @@ export const getAllNeighborhoods = async (): Promise<Neighborhood[]> => {
     throw error
   }
 }
+
+
+export const getNeighborhood = async (neighborhoodId: string): Promise<Neighborhood> => {
+  try {
+    const response = await API.get(`/neighborhoods/${neighborhoodId}`, { accessToken: await getAccessToken()})
+
+    if (!response.ok) {
+      throw new Error(`Failed to get neighborhoods ${neighborhoodId}`)
+    }
+
+    const neighborhood = (await response.json()) as Neighborhood
+
+    if (!neighborhood ) {
+      throw new Error('No neighborhoods found for this user')
+    }
+
+    return neighborhood
+  } catch (error) {
+    throw error
+  }
+}
+
 
 export const getNeighborhoodsOfUser = async (userId: string): Promise<Neighborhood[]> => {
   try {
@@ -52,6 +75,46 @@ export const getNeighborhoodsAroundMe = async (userId: string): Promise<Neighbor
 
 
     return data
+  } catch (error) {
+    throw error
+  }
+}
+
+
+export const getUsersOfNeighborhood = async (userId: string): Promise<UserNeighborhood[]> => {
+  try {
+    const response = await API.get(`/user-neighborhoods/neighborhood/${userId}`, { accessToken: await getAccessToken()})
+
+    if (!response.ok) {
+      throw new Error(`Failed to get neighborhoods for user ${userId}`)
+    }
+
+    const data = await response.json()
+
+
+    return data
+  } catch (error) {
+    throw error
+  }
+}
+
+export const updateNeighborhood = async (id: number, data: {
+  name: string;
+  city: string;
+  postalCode: string;
+  description: string;
+  image: File | null
+}): Promise<Neighborhood> => {
+  try {
+
+    data.image = null
+    const response = await API.put(`/neighborhoods/${id}`, { data : data,accessToken: await getAccessToken()})
+
+    if (!response.ok) {
+      throw new Error(`Failed to update neighborhood with ID ${id}`)
+    }
+
+    return await response.json()
   } catch (error) {
     throw error
   }

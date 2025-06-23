@@ -1,4 +1,4 @@
-import {NextFunction, Request, Response} from "express"
+import {NextFunction, Request, RequestHandler, Response} from "express"
 import {PrismaClient as PostgresClient} from "../../prisma/client/postgresClient"
 
 const postgresClient = new PostgresClient()
@@ -118,7 +118,20 @@ class UserNeighborhoodController {
 
             const uniqueNeighborhoods = Array.from(neighborhoodsMap.values())
 
-            res.status(200).json(uniqueNeighborhoods)
+            const currentNeighborhoodLinks = await postgresClient.userNeighborhood.findMany({
+                where: { userId },
+                select: { neighborhoodId: true }
+            })
+
+            const alreadyJoinedNeighborhoodIds = new Set(
+                currentNeighborhoodLinks.map(link => link.neighborhoodId)
+            )
+
+            const filteredNeighborhoods = uniqueNeighborhoods.filter(
+                neighborhood => !alreadyJoinedNeighborhoodIds.has(neighborhood.id)
+            )
+
+            res.status(200).json(filteredNeighborhoods)
         } catch (error) {
             next(error)
         }
@@ -132,7 +145,17 @@ class UserNeighborhoodController {
                 where: {neighborhoodId: Number(req.params.neighborhoodId)},
                 include: {user: true},
             })
-            res.status(200).json(links)
+
+            const sanitizedLinks = links.map(link => ({
+                ...link,
+                user: {
+                    ...link.user,
+                    password: undefined,
+                },
+            }))
+
+
+            res.status(200).json(sanitizedLinks)
         } catch (error) {
             next(error)
         }
@@ -155,6 +178,36 @@ class UserNeighborhoodController {
         }
     }
 
+    getRoleInArea: RequestHandler = async (req, res, next): Promise<void> => {
+        try {
+            const userId = Number(req.params.userId)
+            const neighborhoodId = Number(req.params.neighborhoodId)
+
+            if (!userId || !neighborhoodId) {
+                res.status(400).json({ error: 'userId and neighborhoodId are required' })
+                return
+            }
+
+            const userNeighborhood = await postgresClient.userNeighborhood.findFirst({
+                where: {
+                    userId: Number(userId),
+                    neighborhoodId: Number(neighborhoodId),
+                },
+                select: {
+                    roleInArea: true,
+                },
+            })
+
+            if (!userNeighborhood) {
+                res.status(404).json({ error: 'Relation not found' })
+                return
+            }
+
+            res.json({ role: userNeighborhood.roleInArea })
+        } catch (error) {
+            next(error)
+        }
+    }
 
 }
 
