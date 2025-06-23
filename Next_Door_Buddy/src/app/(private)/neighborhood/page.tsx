@@ -7,7 +7,7 @@ import Image from "next/image"
 import {Neighborhood} from "#/types/neighborghood"
 import { useRouter } from 'next/navigation'
 import {UserProfile} from "#/types/user"
-import {getprofile} from "#/lib/api_requests/user"
+import {getProfile} from "#/lib/api_requests/user"
 
 export default function NeighborhoodsPage() {
     const router = useRouter()
@@ -21,7 +21,7 @@ export default function NeighborhoodsPage() {
 
     useEffect(() => {
         async function fetchNeighborhoods() {
-            const user = await getprofile()
+            const user = await getProfile()
             setProfile(user)
             const data = await getNeighborhoodsOfUser(user.id)
             setNeighborhoodUser(data)
