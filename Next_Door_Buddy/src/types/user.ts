@@ -64,3 +64,7 @@ export type UserNeighborhood = {
 export type UserRole = keyof typeof userRole
 
 
+export type ChatUser = {
+    userID: string
+    username: string
+}
