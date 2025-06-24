@@ -100,6 +100,7 @@ export const getUsersOfNeighborhood = async (userId: string): Promise<UserNeighb
 
 export const updateNeighborhood = async (id: number, dat:FormData): Promise<Neighborhood> => {
   try {
+    console.log(dat)
     const response = await API.put(
         `/neighborhoods/${id}`,
         dat,

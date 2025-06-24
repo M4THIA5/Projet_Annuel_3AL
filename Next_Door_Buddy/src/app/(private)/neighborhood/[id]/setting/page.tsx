@@ -16,7 +16,7 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
     const router = useRouter()
     const NeighborhoodId = decodeURIComponent(React.use(params).id)
     const [neighborhood, setNeighborhood] = useState<Neighborhood | null>(null)
-    const [formData, setFormData] = useState<FormData>({
+    const [formData, setFormData] = useState({
         name: '',
         city: '',
         postalCode: '',
@@ -106,9 +106,17 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
         setFormErrors(errors)
 
         if (Object.keys(errors).length === 0) {
-            updateNeighborhood(Number(NeighborhoodId), formData)
+            const finalFormData = new FormData()
+            finalFormData.append("name", formData.name)
+            finalFormData.append("city", formData.city)
+            finalFormData.append("postalCode", formData.postalCode)
+            finalFormData.append("description", formData.description ?? "")
+            if (formData.image) {
+                finalFormData.append("image", formData.image)
+            }
+            updateNeighborhood(Number(NeighborhoodId), finalFormData)
                 .then(() => {
-
+                    handleCancel()
                 }).catch(() => {
                 alert('Une erreur est survenue lors de la mise à jour. Veuillez réessayer.')
             })

@@ -21,7 +21,7 @@ model User {
   firstName    String?
   lastName     String?
   color        String   @default("212529")
-  image        String?
+  image        Bytes?
 
   latitude   Float?
   longitude  Float?

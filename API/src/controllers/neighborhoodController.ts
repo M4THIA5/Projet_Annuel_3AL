@@ -48,40 +48,19 @@ class NeighborhoodController {
     // Update a neighborhood
     updateNeighborhood = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const storage = multer.diskStorage({
-                destination: (_req, _file, cb) => {
-                    const uploadDir = path.join(__dirname, '..', '..','..','Next_Door_Buddy','public', 'uploads')
-                    if (!fs.existsSync(uploadDir)) {
-                        fs.mkdirSync(uploadDir, { recursive: true })
-                    }
-                    cb(null, uploadDir)
-                },
-                filename: (_req, file, cb) => {
-                    const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`
-                    cb(null, uniqueName)
-                }
-            })
 
-            const upload = multer({ storage:storage , limits: { fieldSize: 10 * 1024 * 1024 } }).single('image')
-            upload(req,res, function (err){
-                if (err instanceof multer.MulterError) {
-                    console.error(err)
-                } else if (err) {
-                    // An unknown error occurred when uploading.
-                }
-                console.log(req.files)
-            })
             const body = req.body;
-            const file = req.files
+            const file = req.file
 
             const data: any = {
                 ...body,
             };
 
-
-
             if (file) {
-                data.image = `/uploads/${file.filename}`;
+                const fileBuffer = fs.readFileSync(file.path);
+                const base64 = fileBuffer.toString('base64');
+                const mimeType = file.mimetype; // exemple: 'image/jpeg'
+                data.image = `data:${mimeType};base64,${base64}`;
             }
 
             const updated = await postgresClient.neighborhood.update({

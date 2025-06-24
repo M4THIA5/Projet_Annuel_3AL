@@ -59,7 +59,7 @@ class Api {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         },
-        body: JSON.stringify(formData),
+        body: formData,
       })
     } catch (error) {
       console.error('Erreur lors de la requête PUT:', error)
