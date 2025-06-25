@@ -4,7 +4,7 @@ import { getProfile } from "#/lib/api_requests/user"
 import { useEffect, useState } from "react"
 import { ChatWrapper } from "./chatWrapper"
 import { UserProfile } from "#/types/user"
-import {SocketProvider} from "#/app/(private)/chat/socketProvider";
+import {SocketProvider} from "#/app/(private)/chat/socketProvider"
 
 export default function Chat() {
   const [profile, setProfile] = useState<UserProfile | undefined>(undefined)

@@ -23,7 +23,6 @@ model JournalEntry {
   districtId Int
 }
 
-
 model Message {
   m_id      String   @id @default(auto()) @map("_id") @db.ObjectId
   id        String
