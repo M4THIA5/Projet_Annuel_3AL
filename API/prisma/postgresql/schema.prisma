@@ -40,6 +40,8 @@ model User {
 
   Score             Score[]
   userNeighborhoods UserNeighborhood[]
+
+  rooms Rooms[]
 }
 
 model Game {
@@ -87,4 +89,10 @@ model UserNeighborhood {
 
   user         User         @relation(fields: [userId], references: [id])
   neighborhood Neighborhood @relation(fields: [neighborhoodId], references: [id])
+}
+
+model Rooms {
+  id    String @id @default(cuid())
+  nom   String
+  users User[]
 }
