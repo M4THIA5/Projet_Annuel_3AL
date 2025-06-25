@@ -14,9 +14,9 @@ export function ChatWrapper({firstName, lastName}: { firstName: string, lastName
         const handleMessage = (data: Message) => {
             setMessages((prev: Message[]) => [...prev, data])
         }
-        socket.on('connected', (data: Message[]) => {
-            console.log("Connected messages:", data)
-            setMessages(() => data)
+        socket.on('connected', (data:{ messageData: Message[]}) => {
+            console.log("Connected messages:", data.messageData)
+            setMessages(() => data.messageData)
         })
         socket.on('message_sent', handleMessage)
         socket.on('typingResponse', (data) => setTypingStatus(data))
@@ -82,7 +82,7 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
             {/*This shows messages sent from you*/}
             <div className="message__container">
                 {messages.map((message) =>
-                    `${message.name.firstName} ${message.name.lastName}` === username ? (
+                    `${message.name}` === username ? (
                         <div className="message__chats" key={message.id}>
                             <p className="sender__name">You</p>
                             <div className="message__sender">
@@ -91,7 +91,7 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
                         </div>
                     ) : (
                         <div className="message__chats" key={message.id}>
-                            <p>{`${message.name.firstName} ${message.name.lastName}`}</p>
+                            <p>`${message.name}`</p>
                             <div className="message__recipient">
                                 <p>{message.text}</p>
                             </div>
@@ -127,10 +127,11 @@ function ChatFooter({socket, user}: {
                 console.log("socket is not ready")
                 return
             }
+            const uan = user.firstName +' '+ user.lastName
             socket.emit('send_message', {
                 text: message,
-                name: user,
-                id: `${user}${Math.random()}`,
+                name: uan,
+                id: `${uan}${Math.random()}`,
                 socketID: socket.id,
             })
         }
