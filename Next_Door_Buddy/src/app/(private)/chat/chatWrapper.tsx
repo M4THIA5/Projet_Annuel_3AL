@@ -1,5 +1,5 @@
 "use client"
-import {useEffect, useRef, useState} from "react"
+import {useEffect, useMemo, useRef, useState} from "react"
 import {MySocket, useSocket} from "./socketProvider"
 import {
     Dialog, DialogClose,
@@ -17,11 +17,12 @@ import {createGroupChat, getAllChatUsers, getUserGroups} from "#/lib/api_request
 import MultiSelect from "#/components/ui/MultiSelect"
 import {Group, GroupUser} from "#/types/chat"
 
-export function ChatWrapper({firstName, lastName}: { firstName: string, lastName: string }) {
+export function ChatWrapper({firstName, lastName, id}: { firstName: string, lastName: string, id: number }) {
     const [messages, setMessages] = useState<Message[]>([])
     const socket = useSocket()
     const [typingStatus, setTypingStatus] = useState('')
     const lastMessageRef = useRef<HTMLDivElement>(null)
+    const [currentRoom, setCurrentRoom] = useState<string>("")
     useEffect(() => {
         if (!socket) return
 
@@ -34,13 +35,15 @@ export function ChatWrapper({firstName, lastName}: { firstName: string, lastName
         })
         socket.on('message_sent', handleMessage)
         socket.on('typingResponse', (data) => setTypingStatus(data))
-
+        if (socket && currentRoom !== null) {
+            socket.emit("join_room", currentRoom.toString())
+        }
         return () => {
             socket.off('message_sent', handleMessage)
             socket.off('connected')
             socket.off('typingResponse')
         }
-    }, [socket])
+    }, [currentRoom, socket])
     useEffect(() => {
         // 👇️ scroll to bottom every time messages change
         lastMessageRef.current?.scrollIntoView({behavior: 'smooth'})
@@ -48,15 +51,15 @@ export function ChatWrapper({firstName, lastName}: { firstName: string, lastName
 
     return (
         <div className="chat">
-            <ChatBar/>
+            <ChatBar setCurrentRoom={setCurrentRoom}/>
             <div className="chat__main">
                 <ChatBody
                     messages={messages}
-                    user={{firstName, lastName}}
+                    user={{firstName, lastName, id}}
                     lastMessageRef={lastMessageRef}
                     typingStatus={typingStatus}
                 />
-                {socket && <ChatFooter socket={socket} user={{firstName, lastName}}/>}
+                {socket && <ChatFooter socket={socket} user={{firstName, lastName}} currentRoom={currentRoom}/>}
             </div>
         </div>
     )
@@ -76,6 +79,7 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
     user: {
         firstName: string
         lastName: string
+        id: number
     }
     lastMessageRef: React.RefObject<HTMLDivElement | null>
     typingStatus: string
@@ -99,7 +103,7 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
     }
     const username = user.firstName + " " + user.lastName
     const [users, setUsers] = useState<GroupUser[]>([])
-    const [selectedUsers, setSelectedUsers] = useState<string[]>([])
+    const [selectedUsers, setSelectedUsers] = useState<number[]>([])
     useEffect(() => {
         const getUsers = async () => {
             const d = await getAllChatUsers()
@@ -108,6 +112,16 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
         getUsers()
 
     }, [])
+    const lockedUsers = useMemo(() => [{name: username, id: user.id}], [])
+    const lockedUsersStr = useMemo(() => lockedUsers.map(user => user.id), [lockedUsers])
+
+    useEffect(() => {
+        setSelectedUsers(lockedUsersStr)
+        setUsers((prevUsers) =>
+            prevUsers.filter((user) => !lockedUsers.includes(user))
+        )
+    }, [lockedUsers, lockedUsersStr])
+    console.log(users)
 
     const array = [...new Set([...users])]
     const options = []
@@ -142,6 +156,7 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
                                         selectedValues={selectedUsers}
                                         setSelectedValues={setSelectedUsers}
                                         placeholder="Select people..."
+                                        lockedValues={lockedUsersStr}
                                         name={"users"}
                                     />
                                 </div>
@@ -186,12 +201,13 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
     )
 }
 
-function ChatFooter({socket, user}: {
+function ChatFooter({socket, user, currentRoom}: {
     user: {
         firstName: string
         lastName: string
     }
-    socket: MySocket
+    socket: MySocket,
+    currentRoom:string
 }) {
 
     const [message, setMessage] = useState('')
@@ -210,6 +226,7 @@ function ChatFooter({socket, user}: {
                 name: uan,
                 id: `${uan}${Math.random()}`,
                 socketID: socket.id,
+                room: currentRoom?.toString() ?? "",
             })
         }
         setMessage('')
@@ -232,18 +249,23 @@ function ChatFooter({socket, user}: {
     )
 }
 
-function ChatBar() {
+interface ChatBarProps {
+    setCurrentRoom: (value: (((prevState: (string)) => (string)) | string)) => void
+}
+
+function ChatBar({setCurrentRoom}: ChatBarProps) {
     const [groups, setGroups] = useState<Group[]>([])
     useEffect(() => {
 
         const getgrps = async () => {
             const d = await getUserGroups()
-            setGroups(d)
+            const globalGroup = { id: "", nom: "Global Chat" }
+
+            setGroups([globalGroup, ...d])
 
         }
         getgrps()
     }, [])
-    console.log(groups)
     return (
         <div className="chat__sidebar">
             <h2>Open Chat</h2>
@@ -251,11 +273,11 @@ function ChatBar() {
             <div>
                 <h4 className="chat__header">Select Group</h4>
                 <div className="chat__users">
-                    {groups.map(group=>
-                       <div key={group.id}>
-                           {group.nom}
-                       </div>
-                    )}
+                    {groups.map(group => (
+                        <div key={group.id} onClick={() => setCurrentRoom(group.id)}>
+                            {group.nom}
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>
