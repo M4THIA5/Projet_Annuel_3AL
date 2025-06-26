@@ -22,7 +22,7 @@ export default function Chat() {
   }
   return (
       <SocketProvider>
-        <ChatWrapper firstName={profile.firstName} lastName={profile.lastName}/>
+        <ChatWrapper firstName={profile.firstName} lastName={profile.lastName} id={Number(profile.id)}/>
       </SocketProvider>
   )
 }
