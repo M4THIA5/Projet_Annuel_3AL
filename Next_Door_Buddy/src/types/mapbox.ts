@@ -1,3 +1,5 @@
+import {UserNeighborhood} from "#/types/user"
+
 export type MapboxNeighborhood = {
     status: number;
     district: string | null;
@@ -7,6 +9,10 @@ export type MapboxNeighborhood = {
     longitude: number | null;
     address: string | null
 };
+
+export type MapNeighborhoodProps = {
+    users: UserNeighborhood[]
+}
 
 export type RegisterUserData = {
     email: string | null;

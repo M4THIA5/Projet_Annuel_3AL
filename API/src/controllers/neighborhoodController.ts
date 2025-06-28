@@ -1,5 +1,8 @@
 import { NextFunction, Request, Response } from "express"
 import { PrismaClient as PostgresClient } from "../../prisma/client/postgresClient"
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 
 const postgresClient = new PostgresClient()
 
@@ -43,15 +46,31 @@ class NeighborhoodController {
     }
 
     // Update a neighborhood
-    updateNeighborhood = async (req:Request, res: Response, next: NextFunction) => {
+    updateNeighborhood = async (req: Request, res: Response, next: NextFunction) => {
         try {
+
+            const body = req.body;
+            const file = req.file
+
+            const data: any = {
+                ...body,
+            };
+
+            if (file) {
+                const fileBuffer = fs.readFileSync(file.path);
+                const base64 = fileBuffer.toString('base64');
+                const mimeType = file.mimetype; // exemple: 'image/jpeg'
+                data.image = `data:${mimeType};base64,${base64}`;
+            }
+
             const updated = await postgresClient.neighborhood.update({
                 where: { id: Number(req.params.id) },
-                data: req.body,
-            })
-            res.status(200).json(updated)
+                data,
+            });
+
+            res.status(200).json(updated);
         } catch (error) {
-            next(error)
+            next(error);
         }
     }
 

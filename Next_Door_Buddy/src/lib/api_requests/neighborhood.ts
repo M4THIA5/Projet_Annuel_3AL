@@ -98,17 +98,14 @@ export const getUsersOfNeighborhood = async (userId: string): Promise<UserNeighb
   }
 }
 
-export const updateNeighborhood = async (id: number, data: {
-  name: string;
-  city: string;
-  postalCode: string;
-  description: string;
-  image: File | null
-}): Promise<Neighborhood> => {
+export const updateNeighborhood = async (id: number, dat:FormData): Promise<Neighborhood> => {
   try {
-
-    data.image = null
-    const response = await API.put(`/neighborhoods/${id}`, { data : data,accessToken: await getAccessToken()})
+    console.log(dat)
+    const response = await API.put(
+        `/neighborhoods/${id}`,
+        dat,
+        { accessToken: await getAccessToken()}
+    )
 
     if (!response.ok) {
       throw new Error(`Failed to update neighborhood with ID ${id}`)
