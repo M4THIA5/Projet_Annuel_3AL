@@ -18,7 +18,7 @@ import Icon from "@mdi/react"
 import {useRouter} from "next/navigation"
 import {UserNeighborhood} from "#/types/user"
 import {getProfile} from "#/lib/api_requests/user"
-import { Skeleton } from '#/components/ui/skeleton'  // <-- import Skeleton
+import {Skeleton} from '#/components/ui/skeleton'  // <-- import Skeleton
 
 const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }) => {
     const router = useRouter()
@@ -139,14 +139,15 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
                     {loadingButtons ? (
                         <>
                             {[...Array(5)].map((_, idx) => (
-                                <Skeleton key={idx} className="w-full h-10 rounded-md" />
+                                <Skeleton key={idx} className="w-full h-10 rounded-md"/>
                             ))}
                         </>
                     ) : (
                         <>
-                            <Button variant="secondary" className="w-full justify-start bg-secondary  hover:bg-gray-200">
+                            <Button variant="secondary"
+                                    className="w-full justify-start bg-secondary  hover:bg-gray-200">
                                 <Icon path={mdiBookOpenPageVariant} size={0.9} className="mr-2"/>
-                                Local newsletter
+                                Newsletter locale
                             </Button>
                             <Button variant="secondary" className="w-full justify-start bg-secondary  hover:bg-gray-200"
                                     onClick={() => handleClickChat()}>
@@ -158,7 +159,7 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
                                     onClick={() => handleClickInformation()}>
                                 <Icon
                                     path={mdiMapMarker} size={0.9} className="mr-2"/>
-                                Information
+                                Informations
                             </Button>
                             {profile?.roleInArea === 'admin' && (
                                 <Button
@@ -166,19 +167,20 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
                                     variant="secondary"
                                     className="w-full justify-start bg-secondary hover:bg-gray-200"
                                 >
-                                    <Icon path={mdiCog} size={0.9} className="mr-2" />
-                                    Settings
+                                    <Icon path={mdiCog} size={0.9} className="mr-2"/>
+                                    Paramètres
                                 </Button>
                             )}
                             <Button variant="secondary" className="w-full justify-start bg-secondary  hover:bg-gray-200"
                                     onClick={() => handleClickBack()}>
                                 <Icon
                                     path={mdiLogout} size={0.9} className="mr-2"/>
-                                Leave
+                                Quitter
                             </Button>
                         </>
                     )}
                 </div>
+
             </div>
 
             {/* Main Content */}
@@ -244,20 +246,20 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
             </div>
 
             {/* Community Member List */}
-            <div className="w-1/5 bg-secondary p-6 rounded-2xl shadow-lg">
-                <h2 className="font-semibold text-xl text-center  mb-4">Community member</h2>
+            <div className="w-1/5 bg-secondary p-6 rounded-2xl shadow-lg h-[800px]">
+                <h2 className="font-semibold text-xl text-center  mb-4">Membre</h2>
                 <hr className="w-full border-t-4 border-white mb-6"/>
 
-                <ScrollArea className="h-[calc(100vh-160px)] pr-2">
+                <ScrollArea className="h-[700px] pr-2">
                     {loadingMembers ? (
                         <>
                             {[...Array(6)].map((_, idx) => (
                                 <div key={idx} className="flex items-center gap-3 p-2 rounded-lg">
-                                    <Skeleton className="w-10 h-10 rounded-full" />
+                                    <Skeleton className="w-10 h-10 rounded-full"/>
                                     <div className="flex flex-col flex-1 space-y-1">
-                                        <Skeleton className="h-4 w-24 rounded-md" />
-                                        <Skeleton className="h-3 w-32 rounded-md" />
-                                        <Skeleton className="h-3 w-16 rounded-md" />
+                                        <Skeleton className="h-4 w-24 rounded-md"/>
+                                        <Skeleton className="h-3 w-32 rounded-md"/>
+                                        <Skeleton className="h-3 w-16 rounded-md"/>
                                     </div>
                                 </div>
                             ))}
