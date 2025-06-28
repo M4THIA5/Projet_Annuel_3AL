@@ -9,13 +9,15 @@ import Image from "next/image"
 import logo from "@/logo.png"
 import {useRouter} from "next/navigation"
 import {getProfile, getRoleInArea} from "#/lib/api_requests/user"
-import {getNeighborhood, updateNeighborhood} from "#/lib/api_requests/neighborhood"
+import {getNeighborhood, getUsersOfNeighborhood, updateNeighborhood} from "#/lib/api_requests/neighborhood"
 import {Neighborhood} from "#/types/neighborghood"
+import MapNeighborhood from "#/components/personal/MapNeighborhood";
+import {UserNeighborhood} from "#/types/user";
 
 export default function NeighborhoodForm({params}: { params: Promise<{ id: string }> }) {
     const router = useRouter()
     const NeighborhoodId = decodeURIComponent(React.use(params).id)
-    const [neighborhood, setNeighborhood] = useState<Neighborhood | null>(null)
+    const [userNeighborhoods, setUserNeighborhoods] = useState<UserNeighborhood[]>([])
 
     const [formData, setFormData] = useState({
         name: '',
@@ -38,7 +40,6 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
                 }
 
                 const neighborhoodData = await getNeighborhood(NeighborhoodId)
-                setNeighborhood(neighborhoodData)
 
                 if (neighborhoodData) {
                     let image: string | null = null
@@ -57,6 +58,9 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
 
                     setImagePreview(image)
                 }
+
+                const userNeighborhoodsData: UserNeighborhood[] = await getUsersOfNeighborhood(NeighborhoodId)
+                setUserNeighborhoods(userNeighborhoodsData)
 
             } catch (error) {
                 console.error("Erreur lors du chargement du quartier ou des utilisateurs :", error)
@@ -135,15 +139,20 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
 
     return (
         <>
-            <div className="flex justify-between items-center pb-1 space-y-6">
-                <h2 className="text-xl font-bold">Setting</h2>
+            <div className="flex ml-10">
+                <h2 className="text-2xl font-bold">Paramètres du quartier</h2>
             </div>
             <Card className="max-w mx-auto m-10 p-6">
                 <CardContent>
-                    <form encType="multipart/form-data" method="post" onSubmit={handleSubmit} className="space-y-6"
-                          noValidate>
+                    <form
+                        encType="multipart/form-data"
+                        method="post"
+                        onSubmit={handleSubmit}
+                        className="space-y-6"
+                        noValidate
+                    >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Image */}
+                            {/* Colonne gauche : Image + Description */}
                             <div className="flex flex-col gap-1 justify-center">
                                 <Image
                                     src={imagePreview || logo}
@@ -166,9 +175,25 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
                                 {formErrors.image && (
                                     <p className="text-red-500 text-sm mt-1">{formErrors.image}</p>
                                 )}
+
+                                <label
+                                    htmlFor="description"
+                                    className="block text-sm font-medium text-gray-700 mb-1 mt-6"
+                                >
+                                    Description
+                                </label>
+                                <Textarea
+                                    id="description"
+                                    name="description"
+                                    placeholder="Description"
+                                    value={formData.description}
+                                    onChange={handleChange}
+                                    maxLength={1000}
+                                    rows={4}
+                                />
                             </div>
 
-                            {/* Champs texte */}
+                            {/* Colonne droite : Champs texte + Carte */}
                             <div className="flex flex-col gap-4">
                                 <Input
                                     id="name"
@@ -182,7 +207,9 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
                                     maxLength={100}
                                     className={formErrors.name ? "border-red-500" : ""}
                                 />
-                                {formErrors.name && <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>}
+                                {formErrors.name && (
+                                    <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
+                                )}
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <Input
@@ -207,15 +234,9 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
                                     />
                                 </div>
 
-                                <Textarea
-                                    id="description"
-                                    name="description"
-                                    placeholder="Description"
-                                    value={formData.description}
-                                    onChange={handleChange}
-                                    maxLength={1000}
-                                    rows={4}
-                                />
+                                <div className="w-full">
+                                    <MapNeighborhood users={userNeighborhoods} />
+                                </div>
                             </div>
                         </div>
 
@@ -230,4 +251,5 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
             </Card>
         </>
     )
+
 }
