@@ -1,7 +1,7 @@
 "use client"
 
 import React, {useEffect, useState} from "react"
-import {Card, CardContent, CardHeader, CardTitle} from "#/components/ui/card"
+import {Card, CardContent} from "#/components/ui/card"
 import {Input} from "#/components/ui/input"
 import {Textarea} from "#/components/ui/textarea"
 import {Button} from "#/components/ui/button"
@@ -16,17 +16,17 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
     const router = useRouter()
     const NeighborhoodId = decodeURIComponent(React.use(params).id)
     const [neighborhood, setNeighborhood] = useState<Neighborhood | null>(null)
+
     const [formData, setFormData] = useState({
         name: '',
         city: '',
         postalCode: '',
         description: '',
-        image: null as File | null,
+        image: null as File | string | null,
     })
 
     const [imagePreview, setImagePreview] = useState<string | null>(null)
     const [formErrors, setFormErrors] = useState<Record<string, string>>({})
-
 
     useEffect(() => {
         async function fetchNeighborhood() {
@@ -41,13 +41,21 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
                 setNeighborhood(neighborhoodData)
 
                 if (neighborhoodData) {
+                    let image: string | null = null
+
+                    if (typeof neighborhoodData.image === 'string') {
+                        image = neighborhoodData.image
+                    }
+
                     setFormData({
                         name: neighborhoodData.name || '',
                         city: neighborhoodData.city || '',
                         postalCode: neighborhoodData.postalCode || '',
                         description: neighborhoodData.description || '',
-                        image: null,
+                        image: image,
                     })
+
+                    setImagePreview(image)
                 }
 
             } catch (error) {
@@ -111,9 +119,11 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
             finalFormData.append("city", formData.city)
             finalFormData.append("postalCode", formData.postalCode)
             finalFormData.append("description", formData.description ?? "")
-            if (formData.image) {
+
+            if (formData.image instanceof File) {
                 finalFormData.append("image", formData.image)
             }
+
             updateNeighborhood(Number(NeighborhoodId), finalFormData)
                 .then(() => {
                     handleCancel()
@@ -123,101 +133,101 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
         }
     }
 
-
-    return (<>
-        <div className="flex justify-between items-center  p-6 pb-1 space-y-6">
-            <h2 className="text-xl font-bold">Setting</h2>
-        </div>
-        <Card className="max-w mx-auto m-10 p-6">
-            <CardContent>
-                <form encType={"multipart/form-data"} method={"post"} onSubmit={handleSubmit} className="space-y-6" noValidate>
-                    {/* Image + Champs */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Image */}
-                        <div className="flex flex-col gap-1 justify-center">
-                            <Image
-                                src={imagePreview || logo}
-                                alt="Aperçu"
-                                width={300}
-                                height={200}
-                                className={`w-[300px] h-[200px] object-cover rounded-lg border mx-auto ${
-                                    formErrors.image ? "border-red-500" : ""
-                                }`}
-                            />
-                            <Input
-                                id="image"
-                                name="image"
-                                type="file"
-                                accept="image/*"
-                                onChange={handleFileChange}
-                                required
-                                className={formErrors.image ? "border-red-500" : ""}
-                            />
-                            {formErrors.image && (
-                                <p className="text-red-500 text-sm mt-1">{formErrors.image}</p>
-                            )}
-                        </div>
-
-                        {/* Champs texte */}
-                        <div className="flex flex-col gap-4">
-                            <Input
-                                id="name"
-                                name="name"
-                                placeholder="Nom"
-                                value={formData.name}
-                                onChange={handleChange}
-                                required
-                                disabled
-                                minLength={2}
-                                maxLength={100}
-                                className={formErrors.name ? "border-red-500" : ""}
-                            />
-                            {formErrors.name && <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>}
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <Input
-                                    id="city"
-                                    name="city"
-                                    placeholder="Ville"
-                                    value={formData.city}
-                                    onChange={handleChange}
-                                    required
-                                    disabled
-                                    className={formErrors.city ? "border-red-500" : ""}
+    return (
+        <>
+            <div className="flex justify-between items-center pb-1 space-y-6">
+                <h2 className="text-xl font-bold">Setting</h2>
+            </div>
+            <Card className="max-w mx-auto m-10 p-6">
+                <CardContent>
+                    <form encType="multipart/form-data" method="post" onSubmit={handleSubmit} className="space-y-6"
+                          noValidate>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Image */}
+                            <div className="flex flex-col gap-1 justify-center">
+                                <Image
+                                    src={imagePreview || logo}
+                                    alt="Aperçu"
+                                    width={600}
+                                    height={400}
+                                    className={`w-[600px] h-[400px] object-cover rounded-lg border mx-auto ${
+                                        formErrors.image ? "border-red-500" : ""
+                                    }`}
                                 />
                                 <Input
-                                    id="postalCode"
-                                    name="postalCode"
-                                    placeholder="Code Postal"
-                                    value={formData.postalCode}
-                                    onChange={handleChange}
+                                    id="image"
+                                    name="image"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleFileChange}
                                     required
-                                    disabled
-                                    className={formErrors.postalCode ? "border-red-500" : ""}
+                                    className={formErrors.image ? "border-red-500" : ""}
                                 />
+                                {formErrors.image && (
+                                    <p className="text-red-500 text-sm mt-1">{formErrors.image}</p>
+                                )}
                             </div>
 
-                            <Textarea
-                                id="description"
-                                name="description"
-                                placeholder="Description"
-                                value={formData.description}
-                                onChange={handleChange}
-                                maxLength={1000}
-                                rows={4}
-                            />
-                        </div>
-                    </div>
+                            {/* Champs texte */}
+                            <div className="flex flex-col gap-4">
+                                <Input
+                                    id="name"
+                                    name="name"
+                                    placeholder="Nom"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    required
+                                    disabled
+                                    minLength={2}
+                                    maxLength={100}
+                                    className={formErrors.name ? "border-red-500" : ""}
+                                />
+                                {formErrors.name && <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>}
 
-                    {/* Boutons */}
-                    <div className="flex justify-end gap-4 mt-4">
-                        <Button type="button" variant="outline" onClick={handleCancel}>
-                            Annuler
-                        </Button>
-                        <Button type="submit">Enregistrer</Button>
-                    </div>
-                </form>
-            </CardContent>
-        </Card>
-    </>)
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Input
+                                        id="city"
+                                        name="city"
+                                        placeholder="Ville"
+                                        value={formData.city}
+                                        onChange={handleChange}
+                                        required
+                                        disabled
+                                        className={formErrors.city ? "border-red-500" : ""}
+                                    />
+                                    <Input
+                                        id="postalCode"
+                                        name="postalCode"
+                                        placeholder="Code Postal"
+                                        value={formData.postalCode}
+                                        onChange={handleChange}
+                                        required
+                                        disabled
+                                        className={formErrors.postalCode ? "border-red-500" : ""}
+                                    />
+                                </div>
+
+                                <Textarea
+                                    id="description"
+                                    name="description"
+                                    placeholder="Description"
+                                    value={formData.description}
+                                    onChange={handleChange}
+                                    maxLength={1000}
+                                    rows={4}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-4 mt-4">
+                            <Button type="button" variant="outline" onClick={handleCancel}>
+                                Annuler
+                            </Button>
+                            <Button type="submit">Enregistrer</Button>
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
+        </>
+    )
 }
