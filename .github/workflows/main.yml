@@ -14,19 +14,15 @@ on:
 
 jobs:
   test:
-    name: Test on node ${{ matrix.node_version }} and ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        node_version: ['18.x', '20.x']
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+    name: Test on node ubuntu-latest
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node_version }}
+    - name: Use Node.js 20
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ matrix.node_version }}
+        node-version: 20
 
     - name: npm install
       run: |
@@ -36,9 +32,9 @@ jobs:
         npm install
     - name: Deploy to VPS
       env:
-        SSH_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-        REMOTE_HOST: ${{ secrets.HOST }}
-        REMOTE_USER: ${{ secrets.USERNAME }}
+        SSH_PRIVATE_KEY: ${{ secrets.VPS_PRIVATE_KEY }}
+        REMOTE_HOST: ${{ secrets.VPS_HOST }}
+        REMOTE_USER: ${{ secrets.VPS_USERNAME }}
         SOURCE: "/"
         TARGET: "~"
       run: |
@@ -46,8 +42,11 @@ jobs:
          chmod 600 private_key.pem # Set the appropriate permissions for the key file
         
          # Establish an SSH connection and execute commands on the remote server
-         ssh -o StrictHostKeyChecking=no -i private_key.pem "$REMOTE_USER"@"$REMOTE_HOST" <<EOF
-          cd ~/Projet_Annuel_3AL
+         ssh -o StrictHostKeyChecking=no -i private_key.pem "$REMOTE_USER"@"$REMOTE_HOST" << EOF
+            # Navigate to the project directory and pull the latest changes
+          cd ~
+          git clone git@github.com:M4THIA5/Projet_Annuel_3AL.git
+          cd Projet_Annuel_3AL
           cd API
           docker compose up -d 
           cd ../Next_Door_Buddy 
