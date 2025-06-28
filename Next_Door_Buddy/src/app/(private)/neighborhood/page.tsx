@@ -32,7 +32,6 @@ export default function NeighborhoodsPage() {
         fetchNeighborhoods()
     }, [])
 
-    // Chargement...
     if (!neighborhooduser) {
         return (
             <div className="p-6 space-y-6">

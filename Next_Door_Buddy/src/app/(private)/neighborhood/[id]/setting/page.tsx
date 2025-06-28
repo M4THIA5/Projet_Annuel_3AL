@@ -11,8 +11,9 @@ import {useRouter} from "next/navigation"
 import {getProfile, getRoleInArea} from "#/lib/api_requests/user"
 import {getNeighborhood, getUsersOfNeighborhood, updateNeighborhood} from "#/lib/api_requests/neighborhood"
 import {Neighborhood} from "#/types/neighborghood"
-import MapNeighborhood from "#/components/personal/MapNeighborhood";
-import {UserNeighborhood} from "#/types/user";
+import MapNeighborhood from "#/components/personal/MapNeighborhood"
+import {UserNeighborhood} from "#/types/user"
+import { Skeleton } from "#/components/ui/skeleton"
 
 export default function NeighborhoodForm({params}: { params: Promise<{ id: string }> }) {
     const router = useRouter()
@@ -29,6 +30,8 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
 
     const [imagePreview, setImagePreview] = useState<string | null>(null)
     const [formErrors, setFormErrors] = useState<Record<string, string>>({})
+
+    const isLoading = formData.name === ''
 
     useEffect(() => {
         async function fetchNeighborhood() {
@@ -154,15 +157,19 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Colonne gauche : Image + Description */}
                             <div className="flex flex-col gap-1 justify-center">
-                                <Image
-                                    src={imagePreview || logo}
-                                    alt="Aperçu"
-                                    width={600}
-                                    height={400}
-                                    className={`w-[600px] h-[400px] object-cover rounded-lg border mx-auto ${
-                                        formErrors.image ? "border-red-500" : ""
-                                    }`}
-                                />
+                                {isLoading ? (
+                                    <Skeleton className="w-[600px] h-[400px] rounded-lg mx-auto" />
+                                ) : (
+                                    <Image
+                                        src={imagePreview || logo}
+                                        alt="Aperçu"
+                                        width={600}
+                                        height={400}
+                                        className={`w-[600px] h-[400px] object-cover rounded-lg border mx-auto ${
+                                            formErrors.image ? "border-red-500" : ""
+                                        }`}
+                                    />
+                                )}
                                 <Input
                                     id="image"
                                     name="image"
@@ -171,6 +178,7 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
                                     onChange={handleFileChange}
                                     required
                                     className={formErrors.image ? "border-red-500" : ""}
+                                    disabled={isLoading}
                                 />
                                 {formErrors.image && (
                                     <p className="text-red-500 text-sm mt-1">{formErrors.image}</p>
@@ -182,74 +190,96 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
                                 >
                                     Description
                                 </label>
-                                <Textarea
-                                    id="description"
-                                    name="description"
-                                    placeholder="Description"
-                                    value={formData.description}
-                                    onChange={handleChange}
-                                    maxLength={1000}
-                                    rows={4}
-                                />
+                                {isLoading ? (
+                                    <Skeleton className="h-20 rounded-md" />
+                                ) : (
+                                    <Textarea
+                                        id="description"
+                                        name="description"
+                                        placeholder="Description"
+                                        value={formData.description}
+                                        onChange={handleChange}
+                                        maxLength={1000}
+                                        rows={4}
+                                    />
+                                )}
                             </div>
 
                             {/* Colonne droite : Champs texte + Carte */}
                             <div className="flex flex-col gap-4">
-                                <Input
-                                    id="name"
-                                    name="name"
-                                    placeholder="Nom"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    required
-                                    disabled
-                                    minLength={2}
-                                    maxLength={100}
-                                    className={formErrors.name ? "border-red-500" : ""}
-                                />
-                                {formErrors.name && (
-                                    <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
+                                {isLoading ? (
+                                    <Skeleton className="h-10 rounded-md" />
+                                ) : (
+                                    <>
+                                        <Input
+                                            id="name"
+                                            name="name"
+                                            placeholder="Nom"
+                                            value={formData.name}
+                                            onChange={handleChange}
+                                            required
+                                            disabled
+                                            minLength={2}
+                                            maxLength={100}
+                                            className={formErrors.name ? "border-red-500" : ""}
+                                        />
+                                        {formErrors.name && (
+                                            <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
+                                        )}
+                                    </>
                                 )}
 
                                 <div className="grid grid-cols-2 gap-4">
-                                    <Input
-                                        id="city"
-                                        name="city"
-                                        placeholder="Ville"
-                                        value={formData.city}
-                                        onChange={handleChange}
-                                        required
-                                        disabled
-                                        className={formErrors.city ? "border-red-500" : ""}
-                                    />
-                                    <Input
-                                        id="postalCode"
-                                        name="postalCode"
-                                        placeholder="Code Postal"
-                                        value={formData.postalCode}
-                                        onChange={handleChange}
-                                        required
-                                        disabled
-                                        className={formErrors.postalCode ? "border-red-500" : ""}
-                                    />
+                                    {isLoading ? (
+                                        <>
+                                            <Skeleton className="h-10 rounded-md" />
+                                            <Skeleton className="h-10 rounded-md" />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Input
+                                                id="city"
+                                                name="city"
+                                                placeholder="Ville"
+                                                value={formData.city}
+                                                onChange={handleChange}
+                                                required
+                                                disabled
+                                                className={formErrors.city ? "border-red-500" : ""}
+                                            />
+                                            <Input
+                                                id="postalCode"
+                                                name="postalCode"
+                                                placeholder="Code Postal"
+                                                value={formData.postalCode}
+                                                onChange={handleChange}
+                                                required
+                                                disabled
+                                                className={formErrors.postalCode ? "border-red-500" : ""}
+                                            />
+                                        </>
+                                    )}
                                 </div>
 
                                 <div className="w-full">
-                                    <MapNeighborhood users={userNeighborhoods} />
+                                    {isLoading ? (
+                                        <Skeleton className="w-full h-60 rounded-md" />
+                                    ) : (
+                                        <MapNeighborhood users={userNeighborhoods} />
+                                    )}
                                 </div>
                             </div>
                         </div>
 
                         <div className="flex justify-end gap-4 mt-4">
-                            <Button type="button" variant="outline" onClick={handleCancel}>
+                            <Button type="button" variant="outline" onClick={handleCancel} disabled={isLoading}>
                                 Annuler
                             </Button>
-                            <Button type="submit">Enregistrer</Button>
+                            <Button type="submit" disabled={isLoading}>Enregistrer</Button>
                         </div>
                     </form>
                 </CardContent>
             </Card>
         </>
     )
-
 }
