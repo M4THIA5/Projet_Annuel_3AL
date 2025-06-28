@@ -42,10 +42,10 @@ jobs:
          chmod 600 private_key.pem # Set the appropriate permissions for the key file
         
          # Establish an SSH connection and execute commands on the remote server
-         ssh -o StrictHostKeyChecking=no -i private_key.pem "$REMOTE_USER"@"$REMOTE_HOST" << EOF
+         ssh -o StrictHostKeyChecking=no -i private_key.pem "$REMOTE_USER"@"$REMOTE_HOST" '
             # Navigate to the project directory and pull the latest changes
           cd ~
-          git clone git@github.com:M4THIA5/Projet_Annuel_3AL.git
+          git clone https://github.com/M4THIA5/Projet_Annuel_3AL.git
           cd Projet_Annuel_3AL
           cd API
           docker compose up -d 
@@ -53,7 +53,7 @@ jobs:
           npm run dev &
           cd ../API
           npm run dev &
-          EOF
+         '
           rm -f private_key.pem
     permissions:
       contents: read
