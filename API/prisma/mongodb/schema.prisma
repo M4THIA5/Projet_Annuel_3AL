@@ -32,3 +32,13 @@ model Message {
   createdAt DateTime @default(now())
   room      String
 }
+
+model Post {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String
+  neighborhoodId String
+  content        String
+  type           String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime? @updatedAt
+}
