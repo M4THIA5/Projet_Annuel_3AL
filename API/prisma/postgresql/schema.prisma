@@ -88,3 +88,12 @@ model UserNeighborhood {
   user         User         @relation(fields: [userId], references: [id])
   neighborhood Neighborhood @relation(fields: [neighborhoodId], references: [id])
 }
+
+model Objet {
+  id          String    @id @unique @default(cuid())
+  nom         String
+  description String?
+  image       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+}
