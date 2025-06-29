@@ -51,7 +51,7 @@ export const createObjet = async (formdata:FormData): Promise<Objet[]> => {
     }
 }
 
-export const deleteObjet = async (id: string): Promise<void> => {
+export const deleteObjet = async (id: number): Promise<void> => {
     try {
         const response = await API.delete('/objets/' + id, {accessToken: await getAccessToken()})
         if (!response.ok) {

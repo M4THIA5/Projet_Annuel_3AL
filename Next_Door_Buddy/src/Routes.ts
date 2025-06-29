@@ -36,6 +36,15 @@ export const Routes = {
     },
     troc: {
         toString: () => "/troc" as const,
+        objet: {
+            toString: (id: string) => `/troc/objet/${id}` as const,
+            modify: {
+                toString: (id: string) => `/troc/objet/${id}/modify` as const,
+            },
+            create: {
+                toString: () => "/troc/objet/create" as const,
+            },
+        },
     },
 
     undefined: {
