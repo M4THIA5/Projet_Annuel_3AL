@@ -20,4 +20,8 @@ export const config = {
   EMAIL_PASSWORD: process.env.EMAIL_PASSWORD || "",
   EMAIL_HOST: process.env.EMAIL_HOST || "",
   EMAIL_PORT: process.env.EMAIL_PORT || 465,
+
+  NEO4J_URL: process.env.NEO4J_URL || "bolt://localhost:7687",
+  NEO4J_USER: process.env.NEO4J_USER || "neo4j",
+  NEO4J_PASSWORD: process.env.NEO4J_PASSWORD || "password",
 }

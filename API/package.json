@@ -14,7 +14,8 @@
     "prisma:reset:postgresql": "prisma migrate reset --force --schema prisma/postgresql/schema.prisma",
     "prisma:reset:mongodb": "prisma migrate reset --force --schema prisma/mongodb/schema.prisma",
     "prisma:show:postgresql": "prisma studio --schema prisma/postgresql/schema.prisma",
-    "prisma:show:mongodb": "prisma studio --schema prisma/mongodb/schema.prisma"
+    "prisma:show:mongodb": "prisma studio --schema prisma/mongodb/schema.prisma",
+    "neo4j:reset": "ts-node src/scripts/reset-neodb.ts"
   },
   "prisma": {
     "seed": "ts-node src/scripts/seed.ts"
@@ -33,6 +34,8 @@
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.1",
+    "neo4j-driver": "^5.28.1",
+    "neogma": "^1.14.1",
     "nodemailer": "^7.0.3",
     "pg": "^8.13.3",
     "socket.io": "^4.8.1"

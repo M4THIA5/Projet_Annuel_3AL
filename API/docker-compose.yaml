@@ -12,8 +12,33 @@ services:
     networks:
       - app_network
 
+  neo4j:
+    image: neo4j:5
+    container_name: neo4j
+    ports:
+      - "7474:7474"  # UI
+      - "7687:7687"  # Bolt (driver)
+    environment:
+      NEO4J_AUTH: ${NEO4J_AUTH}
+    volumes:
+      - neo4j_data:/data
+
+  # api:
+  #   build: .
+  #   container_name: express_api
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - postgres
+  #     - neo4j
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - app_network
+
 volumes:
   postgres_data:
+  neo4j_data:
 
 networks:
   app_network:

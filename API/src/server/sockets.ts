@@ -16,7 +16,7 @@ async function saveMessage(data: {
     text: string,
     room?: string
 }) {
-    console.log('Saving message:', data)
+
     await db.message.create({
         data: {
             id: data.id,
@@ -122,7 +122,7 @@ const socketHandler = async (socket: Socket, io: Server): Promise<void> => {
     socket.on("disconnect", () => {
         socket.broadcast.emit("user disconnected", socket.id)
         users = users.filter(user => user.userID !== socket.id)
-        // console.log(users)
+
         //Sends the list of users to the client
         io.emit('newUser', users)
     })

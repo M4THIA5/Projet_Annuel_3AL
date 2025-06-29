@@ -28,7 +28,6 @@ export default class JournalController {
     create: RequestHandler = async (req: Request, res: Response) => {
         const validator = createValidator.validate(req.body)
         if (validator.error != undefined) {
-            console.log(validator.error.message)
             res.status(400).send(validator.error.message)
             return
         }

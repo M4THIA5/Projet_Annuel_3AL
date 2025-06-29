@@ -1,8 +1,6 @@
 import { isAuthenticated } from "#/lib/authentification"
 import { Routes } from "#/Routes"
 import { NextRequest, NextResponse } from "next/server"
-import { getRoles } from "./lib/api_requests/user"
-import { userRole } from "./types/user"
 import { isAdmin } from "./lib/config"
 
 const PUBLIC_ROUTES = [
