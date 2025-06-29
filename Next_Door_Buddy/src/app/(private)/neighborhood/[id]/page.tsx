@@ -12,11 +12,11 @@ import {
     mdiBookOpenPageVariant,
     mdiChatOutline,
     mdiMapMarker,
-    mdiLogout, mdiCog
+    mdiLogout, mdiCog, mdiHandshake, mdiCompass, mdiPlusBox, mdiSwapHorizontal
 } from "@mdi/js"
 import Icon from "@mdi/react"
 import {useRouter} from "next/navigation"
-import {UserNeighborhood} from "#/types/user"
+import {User, UserNeighborhood} from "#/types/user"
 import {getProfile} from "#/lib/api_requests/user"
 import {Skeleton} from '#/components/ui/skeleton'  // <-- import Skeleton
 
@@ -42,13 +42,11 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
                 const userNeighborhoodsData: UserNeighborhood[] = await getUsersOfNeighborhood(NeighborhoodId)
                 setUserNeighborhoods(userNeighborhoodsData)
 
-                const neighborhood = userNeighborhoodsData.find(n => n.userId === Number(user.id))
-
+                const neighborhood = userNeighborhoodsData.find(n => n.user.id === Number(user.id))
+                console.log(neighborhood)
                 if (neighborhood) {
-                    const updatedUserNeighborhood: UserNeighborhood = {...neighborhood}
-                    setProfile(updatedUserNeighborhood)
-                } else {
-                    setProfile(undefined)
+                    const UserNeighborhood: UserNeighborhood = {...neighborhood}
+                    setProfile(UserNeighborhood)
                 }
 
                 setLoadingMembers(false)  // données membres chargées
@@ -63,7 +61,7 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
         fetchNeighborhood()
     }, [NeighborhoodId])
 
-    function getInitials(value: string): string {
+    function getInitials(value: string | undefined): string {
         if (!value) return ''
 
         const initials = value
@@ -184,21 +182,46 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 p-6 bg-white">
+            <div className="flex-1 p-6 bg-white ">
                 {/* Top Bar */}
-                <div className="flex items-center gap-4 mb-6">
-                    <Avatar>
-                        <AvatarImage src="https://via.placeholder.com/40"/>
-                    </Avatar>
-                    <Input
-                        placeholder="What do you want to share ?"
-                        className="flex-1"
-                    />
-                    <Button variant="outline">Offer a service</Button>
-                    <Button variant="outline">Trade</Button>
-                    <Button variant="outline">Propose an excursion</Button>
-                    <Button>Post</Button>
+                <div className="flex flex-col items-center gap-4 bg-gray-100 rounded-xl px-4 py-3 mb-6 shadow-sm">
+                    <div className="flex w-full">
+                        {/* Avatar rond */}
+                        <Avatar className="mr-2">
+                            <AvatarImage src={profile?.user.image?.toString()} alt={profile?.user.firstName}/>
+                            <AvatarFallback>{getInitials(profile?.user.firstName)}</AvatarFallback>
+                        </Avatar>
+                        {/* Champ de saisie */}
+                        <Input
+                            placeholder="What do you want to share?"
+                            className="flex-1 rounded-full bg-white text-black placeholder-gray-400 px-4 py-2"
+                        />
+                    </div>
+                    {/* Actions avec séparateurs */}
+                    <div className="flex justify-around text-sm text-black space-x-4 select-none w-full">
+                        <div className="flex justify-center  gap-1 cursor-pointer hover:text-gray-400">
+                            <Icon path={mdiHandshake} size={0.9} className="mr-2"/>
+                            <span>Offer a service</span>
+                        </div>
+                        <div className="border-l h-5 border-gray-400"></div>
+                        <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400">
+                            <Icon path={mdiSwapHorizontal} size={0.9} className="mr-2"/>
+                            <span>Trade</span>
+                        </div>
+                        <div className="border-l h-5 border-gray-400"></div>
+                        <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400">
+                            <Icon path={mdiCompass} size={0.9} className="mr-2"/>
+                            <span>Propose an excursion</span>
+                        </div>
+                        <div className="border-l h-5 border-gray-400"></div>
+                        <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400 font-semibold">
+                            <Icon path={mdiPlusBox} size={0.9} className="mr-2"/>
+                            <span>Post</span>
+                        </div>
+                    </div>
+
                 </div>
+
 
                 {/* Navigation */}
                 <div className="flex items-center justify-between border-b pb-2 mb-4">

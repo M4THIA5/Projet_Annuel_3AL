@@ -29,6 +29,7 @@ export const createJournal = async (content: object): Promise<object> => {
         }
         return data
     } catch (error) {
+
         throw error
     }
 }
