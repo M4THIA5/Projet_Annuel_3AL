@@ -1,5 +1,6 @@
 import {API} from "#/lib/api_requests/fetchRequest"
 import {getAccessToken} from "#/lib/authentification"
+import { JournalEntry } from "#/types/journal"
 
 export const getJournalPageById = async (id: string): Promise<object> => {
     try {
@@ -33,7 +34,7 @@ export const createJournal = async (content: object): Promise<object> => {
         throw error
     }
 }
-export const getJournals = async (): Promise<object> => {
+export const getJournals = async (): Promise<JournalEntry[]> => {
     try {
         const response = await API.get('/journal/', {accessToken: await getAccessToken()})
         if (!response.ok) {
@@ -43,7 +44,7 @@ export const getJournals = async (): Promise<object> => {
         if (!data) {
             throw new Error('No data found')
         }
-        return data
+        return data as JournalEntry[]
     } catch (error) {
         throw error
     }

@@ -1,6 +1,8 @@
 import {PrismaClient as PostgresClient} from '../../prisma/client/postgresClient'
 import {RequestHandler, Request, Response} from "express"
 import {User} from '../types'
+import { getUserFriends } from '../neo4j/neo-driver'
+import { User as NeoUser } from '../neo4j/neogma'
 
 const postgresClient = new PostgresClient()
 
@@ -101,6 +103,85 @@ class UserController {
                 email: user.email,
                 roles: user.roles,
             })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    getFriends: RequestHandler = async (req: Request, res: Response, next) => {
+        try {
+            const userId = (req as any).user.id
+            const friendsNodes = await getUserFriends(userId)
+
+            const friends = await postgresClient.user.findMany({
+                where: {
+                    id: {
+                        in: friendsNodes.friends.map(friendNode => friendNode.userId)
+                    }
+                },
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true
+                }
+            })
+
+            const pending = await postgresClient.user.findMany({
+                where: {
+                    id: {
+                        in: friendsNodes.pending.map(friendNode => friendNode.userId)
+                    }
+                },
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true
+                }
+            })
+
+            const friendRequests = await postgresClient.user.findMany({
+                where: {
+                    id: {
+                        in: friendsNodes.friend_requests.map(friendNode => friendNode.userId)
+                    }
+                },
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true
+                }
+            })
+
+            res.status(200).json({
+                friends,
+                pending,
+                friend_requests: friendRequests
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    addFriend: RequestHandler = async (req: Request, res: Response, next) => {
+        try {
+            const userId = (req as any).user.id
+            const friendId = Number(req.params.friendId)
+
+            const node = await NeoUser.findOne({where: {userId: userId}})
+            const friendNode = await NeoUser.findOne({where: {userId: friendId}})
+
+            if (!node || !friendNode) {
+                res.status(404).json({error: 'User or friend not found'})
+                return
+            }
+
+            node.relateTo({
+                alias: "friends",
+                properties: undefined,
+                where: {userId: friendId}
+            })
+
+            res.status(200).json({message: 'Friend added successfully'})
         } catch (error) {
             next(error)
         }

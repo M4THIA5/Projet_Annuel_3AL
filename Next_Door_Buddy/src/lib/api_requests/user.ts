@@ -1,5 +1,5 @@
 import {API} from '#/lib/api_requests/fetchRequest'
-import {UserProfile, UserRole, VerifyOtpData, ResendOtpData} from '#/types/user'
+import {UserProfile, UserRole, VerifyOtpData, ResendOtpData, MultiFriendTypes} from '#/types/user'
 import {getAccessToken} from '../authentification'
 import {RegisterUserData} from "#/types/mapbox"
 import {buildUrl} from '../utils'
@@ -11,6 +11,22 @@ export const getProfile = async (): Promise<UserProfile> => {
             throw new Error('Failed to get profile')
         }
         const data = await response.json() as UserProfile
+        if (!data) {
+            throw new Error('No data found')
+        }
+        return data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const getMultiFriendTypes = async (userId: number): Promise<MultiFriendTypes> => {
+    try {
+        const response = await API.get(`/users/${userId}/friends`, {accessToken: await getAccessToken()})
+        if (!response.ok) {
+            throw new Error('Failed to get friends')
+        }
+        const data = await response.json() as MultiFriendTypes
         if (!data) {
             throw new Error('No data found')
         }
