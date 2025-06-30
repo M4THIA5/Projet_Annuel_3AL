@@ -89,11 +89,11 @@ const ActionItems: Array<{
   tooltip: string
   isLink?: boolean
 }> = [
-  {
-    key: "onView",
-    icon: <SizeIcon className="size-4" />,
-    tooltip: "View image",
-  },
+  // {
+  //   key: "onView",
+  //   icon: <SizeIcon className="size-4" />,
+  //   tooltip: "View image",
+  // },
   {
     key: "onDownload",
     icon: <DownloadIcon className="size-4" />,
