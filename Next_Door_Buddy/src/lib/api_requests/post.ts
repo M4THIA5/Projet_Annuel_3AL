@@ -55,7 +55,8 @@ export const getPostsByNeighborhoodId = async (neighborhoodId: string): Promise<
 // Créer un nouveau post
 export const createPost = async (content: object): Promise<object> => {
     try {
-        const response = await API.post('/posts', { accessToken: await getAccessToken(), data: content })
+        const response = await API.post('/post/create', { accessToken: await getAccessToken(), data: content })
+        console.log(response)
         if (!response.ok) {
             throw new Error('Failed to create post')
         }

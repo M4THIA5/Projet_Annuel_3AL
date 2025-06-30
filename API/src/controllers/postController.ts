@@ -52,6 +52,7 @@ export default class PostController {
             res.status(400).send(validator.error.message);
             return;
         }
+        console.log(validator)
         await db.post.create({
             data: validator.value
         });

@@ -7,7 +7,7 @@ const postRoutes = Router();
 postRoutes.get('/', postController.getAll);
 postRoutes.get('/:id', postController.getOne);
 postRoutes.get('/neighborhood/:neighborhoodId', postController.getByNeighborhood);
-postRoutes.post('/', postController.create);
+postRoutes.post('/create', postController.create);
 postRoutes.put('/:id', postController.modify);
 postRoutes.delete('/:id', postController.delete);
 

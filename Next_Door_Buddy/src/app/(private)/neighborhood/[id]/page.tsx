@@ -8,6 +8,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "#/components/ui/avatar"
 import {ScrollArea} from "#/components/ui/scroll-area"
 import {Skeleton} from "#/components/ui/skeleton"
 import {TooltipProvider} from "#/components/ui/tooltip"
+import { ToastContainer, toast } from "react-toastify"
 import {
     Dialog,
     DialogTrigger,
@@ -34,6 +35,7 @@ import {Neighborhood} from "#/types/neighborghood"
 import {getProfile} from "#/lib/api_requests/user"
 import {UserNeighborhood} from "#/types/user"
 import {MinimalTiptapEditor} from "#/components/minimal-tiptap";
+import {createPost} from "#/lib/api_requests/post";
 
 
 const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }) => {
@@ -109,8 +111,30 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
     const handleClickInformation = () => router.push(`${NeighborhoodId}/information`)
     const handleClickSetting = () => router.push(`${NeighborhoodId}/setting`)
 
+    const handleSubmitPost = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!profile || !neighborhood) return
+
+        try {
+            const postData = {
+                userId: profile.user.id.toString(),
+                neighborhoodId: neighborhood.id.toString(),
+                content: value,
+                type: 'text',
+            }
+
+            await createPost(postData)
+            toast.success("✅ Votre post a bien été ajouté au quartier.")
+            setValue("")
+        } catch (error) {
+            toast.error("❌ Impossible de publier le post. Veuillez réessayer.")
+            console.error('Erreur lors de la création du post:', error)
+        }
+    }
+
     return (
         <div className="flex">
+            <ToastContainer />
             {/* Sidebar */}
             <div className="w-1/5 p-6 flex flex-col items-center gap-6">
                 <div className="w-full flex flex-col items-center space-y-4 py-6">
@@ -189,7 +213,7 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
                                 </DialogHeader>
 
                                 <TooltipProvider delayDuration={200}>
-                                    <form className="flex flex-col max-w-[95vw] max-h-[95vh] mx-auto">
+                                    <form className="flex flex-col max-w-[95vw] max-h-[95vh] mx-auto" >
                                         <MinimalTiptapEditor
                                             value={value}
                                             onChange={setValue}
@@ -200,8 +224,17 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
                                             editable={true}
                                             editorClassName="focus:outline-hidden"
                                         />
+                                        {/*<Input*/}
+                                        {/*    id="image"*/}
+                                        {/*    name="image"*/}
+                                        {/*    type="file"*/}
+                                        {/*    accept="image/*"*/}
+                                        {/*    onChange={handleFileChange}*/}
+                                        {/*    required*/}
+                                        {/*    className={formErrors.image ? "border-red-500" : ""}*/}
+                                        {/*/>*/}
                                         <div className="flex justify-end">
-                                            <Button type="submit" className="px-6">
+                                            <Button type="button" onClick={handleSubmitPost} className="px-6">
                                                 Publier
                                             </Button>
                                         </div>
