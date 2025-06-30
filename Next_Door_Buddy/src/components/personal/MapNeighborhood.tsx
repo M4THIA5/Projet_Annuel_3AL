@@ -20,12 +20,14 @@ const MapNeighborhood: React.FC<MapNeighborhoodProps> = ({ users }) => {
 
         mapboxgl.accessToken = NEXT_PUBLIC_MAPBOX_API_KEY || ''
 
-        map.current = new mapboxgl.Map({
-            container: mapContainer.current,
-            style: 'mapbox://styles/mapbox/streets-v11',
-            center: [validUsers[0].user.longitude, validUsers[0].user.latitude],
-            zoom: 13,
-        })
+        if (!map.current) {
+            map.current = new mapboxgl.Map({
+                container: mapContainer.current,
+                style: 'mapbox://styles/mapbox/streets-v11',
+                center: [validUsers[0].user.longitude, validUsers[0].user.latitude],
+                zoom: 13,
+            })
+        }
 
         validUsers.forEach(({ user }) => {
             new mapboxgl.Marker()
@@ -56,25 +58,24 @@ const MapNeighborhood: React.FC<MapNeighborhoodProps> = ({ users }) => {
                 new mapboxgl.LngLatBounds(coordinates[0] as [number, number], coordinates[0] as [number, number])
             )
 
-            map.current.fitBounds(bounds, {
+            map.current?.fitBounds(bounds, {
                 padding: 50,
                 maxZoom: 15,
                 duration: 1000,
             })
 
-            // Ajouter source et layers une fois la map chargée
-            map.current.on('load', () => {
+            map.current?.on('load', () => {
                 if (!map.current) return
 
-                if (map.current.getSource('hull')) {
-                    map.current.getSource('hull').setData(hull)
+                if (map.current?.getSource('hull')) {
+                    (map.current.getSource('hull') as mapboxgl.GeoJSONSource).setData(hull)
                 } else {
-                    map.current.addSource('hull', {
+                    map.current?.addSource('hull', {
                         type: 'geojson',
                         data: hull,
                     })
 
-                    map.current.addLayer({
+                    map.current?.addLayer({
                         id: 'hull-fill',
                         type: 'fill',
                         source: 'hull',
@@ -85,7 +86,7 @@ const MapNeighborhood: React.FC<MapNeighborhoodProps> = ({ users }) => {
                         },
                     })
 
-                    map.current.addLayer({
+                    map.current?.addLayer({
                         id: 'hull-line',
                         type: 'line',
                         source: 'hull',
