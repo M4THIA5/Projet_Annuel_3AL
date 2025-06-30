@@ -46,7 +46,7 @@ class Api {
   }
 
   // Méthode pour effectuer une requête PUT
-  async put(endpoint: string, formData: FormData, options?: {
+  async put(endpoint: string, formData?: FormData, options?: {
       accessToken?: string;
       data?: unknown
   }): Promise<Response> {
@@ -59,7 +59,7 @@ class Api {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         },
-        body: formData,
+        body: formData ? formData : JSON.stringify(data),
       })
     } catch (error) {
       console.error('Erreur lors de la requête PUT:', error)

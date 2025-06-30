@@ -111,7 +111,7 @@ export const getAllUsers = async (
     }
 }
 
-export const deleteUserById = async (userId: string): Promise<Response> => {
+export const deleteUserById = async (userId: number): Promise<Response> => {
     try {
         const response = await API.delete(`/users/${userId}`, {accessToken: await getAccessToken()})
         if (!response.ok) {
@@ -193,7 +193,7 @@ export const isValidEmail = async (email: string): Promise<boolean> => {
 
 export const resetPassWord = async (email: string, resetUrl: string): Promise<Response> => {
     try {
-        const resetPasswordResponse = await API.put('/reset-password-code', {data: {email}})
+        const resetPasswordResponse = await API.put('/reset-password-code', undefined,{ data: { email } })
         if (!resetPasswordResponse.ok) {
             const errorData = await resetPasswordResponse.json()
             throw new Error(errorData.error || 'Failed to generate reset password code')
