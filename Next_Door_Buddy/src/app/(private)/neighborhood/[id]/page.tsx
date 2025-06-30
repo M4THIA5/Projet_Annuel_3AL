@@ -308,7 +308,7 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
                                         {user.user.firstName} {user.user.lastName}
                                     </p>
                                     <p className="text-xs text-muted-foreground italic">
-                                        {getReadableRole(user.roleInArea)} - {true ? (
+                                        {getReadableRole(user.roleInArea)} - {false ? (
                                         <span className="text-green-500">En ligne</span>
                                     ) : (
                                         <span className="text-gray-400">Hors ligne</span>
