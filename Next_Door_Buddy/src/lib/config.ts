@@ -7,7 +7,7 @@ export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001
 export const NODE_ENV = process.env.NODE_ENV || "development"
 export const NEXT_PUBLIC_URL = process.env.NEXT_PUBLIC_URL || "http://localhost:3000"
 
-export const MAPBOX_API_KEY = process.env.NEXT_PUBLIC_API_URL
+export const NEXT_PUBLIC_MAPBOX_API_KEY = process.env.NEXT_PUBLIC_MAPBOX_API_KEY || "pk.eyJ1Ijoid2F5a29lIiwiYSI6ImNtYmUwbnR2ajIxZzgybnM2cTdudDYwaGgifQ.caKqkcYVeiWLtpuf3VLoVA"
 export const SMTP = {
   HOST: process.env.SMTP_HOST || "smtp.ionos.fr",
   PORT: Number(process.env.SMTP_PORT) || 465,

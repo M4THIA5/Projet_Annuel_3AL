@@ -33,6 +33,7 @@ model Message {
   room      String
 }
 
+
 model Troc {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   asker      String
@@ -41,4 +42,13 @@ model Troc {
   isAccepted Boolean  @default(false)
   isOpen     Boolean  @default(true)
   isDone     Boolean  @default(false)
+
+model Post {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String
+  neighborhoodId String
+  content        String
+  type           String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime? @updatedAt
 }

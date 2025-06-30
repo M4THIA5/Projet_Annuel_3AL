@@ -16,7 +16,7 @@ async function saveMessage(data: {
     text: string,
     room?: string
 }) {
-    console.log('Saving message:', data)
+
     await db.message.create({
         data: {
             id: data.id,
@@ -57,7 +57,9 @@ const socketHandler = async (socket: Socket, io: Server): Promise<void> => {
 
     socket.on('send_message', async (data) => {
         await saveMessage(data)
-        io.emit('message_sent', data)
+        if (data.room) {
+            io.to(data.room).emit('message_sent', data)
+        }
     })
     socket.on('newUser', (data) => {
         users.push(data)  // Ajoute le nouvel utilisateur
@@ -82,7 +84,7 @@ const socketHandler = async (socket: Socket, io: Server): Promise<void> => {
         const message = peopleTyping.length > 1 ?
             "" + peopleTyping.join(", ") + " are typing..." :
             (peopleTyping.length === 0 ? "" : peopleTyping[0] + " is typing...")
-        socket.broadcast.emit('typingResponse', message)
+        socket.to(data.room).emit('typingResponse', message)
     })
     socket.on('ntyping', (data) => {
         peopleTyping = peopleTyping.filter((name) => name !== data)
@@ -90,7 +92,7 @@ const socketHandler = async (socket: Socket, io: Server): Promise<void> => {
             "" + peopleTyping.join(", ") + " are typing..." :
             (peopleTyping.length === 0 ? "" : peopleTyping[0] + " is typing...")
 
-        socket.broadcast.emit('typingResponse', message)
+        socket.to(data.room).emit('typingResponse', message)
     })
 
     // notify existing users
@@ -107,11 +109,20 @@ const socketHandler = async (socket: Socket, io: Server): Promise<void> => {
         })
     })
 
+    socket.on("join_room", async (roomId: string) => {
+        await socket.join(roomId)
+        console.log(`Socket ${socket.id} joined room ${roomId}`)
+
+        // Envoie les messages de cette room uniquement
+        const roomMessages = await getMessages({ room: roomId })
+        socket.emit("connected", { messageData: roomMessages })
+    })
+
     // notify users upon disconnection
     socket.on("disconnect", () => {
         socket.broadcast.emit("user disconnected", socket.id)
         users = users.filter(user => user.userID !== socket.id)
-        // console.log(users)
+
         //Sends the list of users to the client
         io.emit('newUser', users)
     })

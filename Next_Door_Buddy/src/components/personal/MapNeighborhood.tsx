@@ -1,51 +1,102 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import mapboxgl from 'mapbox-gl'
-import MapboxDraw from '@mapbox/mapbox-gl-draw'
-import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
-import {MAPBOX_API_KEY} from "#/lib/config"
+import { NEXT_PUBLIC_MAPBOX_API_KEY } from '#/lib/config'
+import { MapNeighborhoodProps } from '#/types/mapbox'
 
-type MapNeighborhoodProps = {
-    latitude: number
-    longitude: number
-    districtName: string
-}
+// Import de Turf convex et helpers
+import convex from '@turf/convex'
+import { featureCollection, point } from '@turf/helpers'
 
-const MapNeighborhood: React.FC<MapNeighborhoodProps> = ({ latitude, longitude, districtName }) => {
+const MapNeighborhood: React.FC<MapNeighborhoodProps> = ({ users }) => {
     const mapContainer = useRef<HTMLDivElement | null>(null)
     const map = useRef<mapboxgl.Map | null>(null)
-    const draw = useRef<MapboxDraw | null>(null)
-    const [drawnPolygon, setDrawnPolygon] = useState<any>(null)
 
     useEffect(() => {
-        if (!map.current && mapContainer.current && latitude && longitude) {
-            mapboxgl.accessToken = MAPBOX_API_KEY || 'pk.eyJ1Ijoid2F5a29lIiwiYSI6ImNtYmUwbnR2ajIxZzgybnM2cTdudDYwaGgifQ.caKqkcYVeiWLtpuf3VLoVA'
+        if (!mapContainer.current || users.length === 0) return
 
-            map.current = new mapboxgl.Map({
-                container: mapContainer.current,
-                style: 'mapbox://styles/mapbox/streets-v11',
-                center: [longitude, latitude],
-                zoom: 14,
-            })
-            
-            draw.current = new MapboxDraw({
-                displayControlsDefault: false,
-                controls: {
-                    polygon: true,
-                    trash: true
-                },
-                defaultMode: 'draw_polygon'
-            })
-            map.current.addControl(draw.current)
-            
+        const validUsers = users.filter(u => u.user.latitude != null && u.user.longitude != null)
+        if (validUsers.length === 0) return
+
+        mapboxgl.accessToken = NEXT_PUBLIC_MAPBOX_API_KEY || ''
+
+        map.current = new mapboxgl.Map({
+            container: mapContainer.current,
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [validUsers[0].user.longitude, validUsers[0].user.latitude],
+            zoom: 13,
+        })
+
+        validUsers.forEach(({ user }) => {
             new mapboxgl.Marker()
-                .setLngLat([longitude, latitude])
-                .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(districtName))
-                .addTo(map.current)
-            
-            map.current.on('draw.create', updateArea)
-            map.current.on('draw.update', updateArea)
-            map.current.on('draw.delete', () => setDrawnPolygon(null))
+                .setLngLat([user.longitude!, user.latitude!])
+                .setPopup(
+                    new mapboxgl.Popup({ offset: 25 }).setText(
+                        `${user.firstName} ${user.lastName}`.trim()
+                    )
+                )
+                .addTo(map.current!)
+        })
+
+        if (validUsers.length >= 3) {
+            // Construire un FeatureCollection de points turf
+            const points = featureCollection(
+                validUsers.map(({ user }) => point([user.longitude!, user.latitude!]))
+            )
+
+            // Calculer l'enveloppe convexe
+            const hull = convex(points)
+
+            if (!hull) return // pas assez de points ou erreur
+
+            // Zoomer sur le polygone
+            const coordinates = hull.geometry.coordinates[0]
+            const bounds = coordinates.reduce(
+                (bounds, coord) => bounds.extend(coord as [number, number]),
+                new mapboxgl.LngLatBounds(coordinates[0] as [number, number], coordinates[0] as [number, number])
+            )
+
+            map.current.fitBounds(bounds, {
+                padding: 50,
+                maxZoom: 15,
+                duration: 1000,
+            })
+
+            // Ajouter source et layers une fois la map chargée
+            map.current.on('load', () => {
+                if (!map.current) return
+
+                if (map.current.getSource('hull')) {
+                    map.current.getSource('hull').setData(hull)
+                } else {
+                    map.current.addSource('hull', {
+                        type: 'geojson',
+                        data: hull,
+                    })
+
+                    map.current.addLayer({
+                        id: 'hull-fill',
+                        type: 'fill',
+                        source: 'hull',
+                        layout: {},
+                        paint: {
+                            'fill-color': '#088',
+                            'fill-opacity': 0.2,
+                        },
+                    })
+
+                    map.current.addLayer({
+                        id: 'hull-line',
+                        type: 'line',
+                        source: 'hull',
+                        layout: {},
+                        paint: {
+                            'line-color': '#088',
+                            'line-width': 2,
+                        },
+                    })
+                }
+            })
         }
 
         return () => {
@@ -54,28 +105,11 @@ const MapNeighborhood: React.FC<MapNeighborhoodProps> = ({ latitude, longitude, 
                 map.current = null
             }
         }
-    }, [latitude, longitude, districtName])
-    
-    const updateArea = () => {
-        if (!draw.current) return
-
-        const data = draw.current.getAll()
-        if (data.features.length > 0) {
-            setDrawnPolygon(data.features[0])
-            console.log("Zone dessinée:", data.features[0])
-        } else {
-            setDrawnPolygon(null)
-        }
-    }
+    }, [users])
 
     return (
         <div className="w-full h-full">
             <div ref={mapContainer} className="w-full h-[500px]" />
-            {drawnPolygon && (
-                <pre className="mt-4 p-2 bg-gray-100 text-sm overflow-auto" style={{maxHeight: '150px'}}>
-                    {JSON.stringify(drawnPolygon.geometry.coordinates, null, 2)}
-                </pre>
-            )}
         </div>
     )
 }

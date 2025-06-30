@@ -32,7 +32,6 @@ export default function NeighborhoodsPage() {
         fetchNeighborhoods()
     }, [])
 
-    // Chargement...
     if (!neighborhooduser) {
         return (
             <div className="p-6 space-y-6">
@@ -97,9 +96,9 @@ export default function NeighborhoodsPage() {
                         <Card key={n.name} className="flex" onClick={() => handleClick(n)} >
                             <div className="flex">
                                 <div className="flex flex-1/3 align-middle justify-center">
-                                    {n.image ? (
-                                        <Image
-                                            src={n.image}
+                                    {n.image  ? (
+                                        <img
+                                            src={n.image.toString()}
                                             alt={n.name}
                                             width={150}
                                             height={100}
@@ -108,10 +107,10 @@ export default function NeighborhoodsPage() {
                                     ) : (
                                         <Image
                                             src={logo}
-                                            alt=""
+                                            alt={n.name}
                                             width={150}
                                             height={100}
-                                            className="rounded-md object-cover "
+                                            className="rounded-md object-cover"
                                         />
                                     )}
                                 </div>
@@ -140,7 +139,7 @@ export default function NeighborhoodsPage() {
                                 <div className="flex flex-1/3 align-middle justify-center">
                                     {n.image ? (
                                         <Image
-                                            src={n.image}
+                                            src={n.image.toString()}
                                             alt={n.name}
                                             width={100}
                                             height={100}

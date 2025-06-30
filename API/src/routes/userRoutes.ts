@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import UserController from '../controllers/userController'
-import { verifyJwt, verifyAdmin } from '../middleware/verifyJwt'
+import { verifyAdmin } from '../middleware/verifyJwt'
 
 const userController = new UserController()
 
@@ -12,6 +12,7 @@ userRoutes.get('/', verifyAdmin, userController.getAllUsers)
 userRoutes.get('/:id', userController.getUser)
 userRoutes.put('/:id', userController.updateUser)
 userRoutes.delete('/:id', userController.deleteUser)
+userRoutes.get('/:id/friends', userController.getFriends)
 
 
 export default userRoutes

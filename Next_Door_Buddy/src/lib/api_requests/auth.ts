@@ -29,7 +29,6 @@ export const logout = async (accessToken: string): Promise<void> => {
     await API.post('/logout', { accessToken })
   } catch (error) {
     console.error('Error during logout:', error)
-    throw error
   }
 }
 
@@ -39,7 +38,6 @@ export const refreshToken = async (refreshToken: string | undefined): Promise<{ 
     const data = await response.json()
     return data
   } catch (error) {
-    console.error('Error during token refresh:', error)
     throw error
   }
 }

@@ -1,7 +1,7 @@
 import {API} from '#/lib/api_requests/fetchRequest'
 import {Neighborhood} from '#/types/neighborghood'
 import {getAccessToken} from '../authentification'
-import {UserNeighborhood} from "#/types/user";
+import {UserNeighborhood} from "#/types/user"
 
 export const getAllNeighborhoods = async (): Promise<Neighborhood[]> => {
   try {
@@ -42,7 +42,7 @@ export const getNeighborhood = async (neighborhoodId: string): Promise<Neighborh
 }
 
 
-export const getNeighborhoodsOfUser = async (userId: string): Promise<Neighborhood[]> => {
+export const getNeighborhoodsOfUser = async (userId: number): Promise<Neighborhood[]> => {
   try {
     const response = await API.get(`/user-neighborhoods/user/${userId}`, { accessToken: await getAccessToken()})
 
@@ -98,17 +98,14 @@ export const getUsersOfNeighborhood = async (userId: string): Promise<UserNeighb
   }
 }
 
-export const updateNeighborhood = async (id: number, data: {
-  name: string;
-  city: string;
-  postalCode: string;
-  description: string;
-  image: File | null
-}): Promise<Neighborhood> => {
+export const updateNeighborhood = async (id: number, dat:FormData): Promise<Neighborhood> => {
   try {
-
-    data.image = null
-    const response = await API.put(`/neighborhoods/${id}`, { data : data,accessToken: await getAccessToken()})
+    console.log(dat)
+    const response = await API.put(
+        `/neighborhoods/${id}`,
+        dat,
+        { accessToken: await getAccessToken()}
+    )
 
     if (!response.ok) {
       throw new Error(`Failed to update neighborhood with ID ${id}`)
