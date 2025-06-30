@@ -34,8 +34,8 @@ import {getNeighborhood, getUsersOfNeighborhood} from "#/lib/api_requests/neighb
 import {Neighborhood} from "#/types/neighborghood"
 import {getProfile} from "#/lib/api_requests/user"
 import {UserNeighborhood} from "#/types/user"
-import {MinimalTiptapEditor} from "#/components/minimal-tiptap";
-import {createPost} from "#/lib/api_requests/post";
+import {MinimalTiptapEditor} from "#/components/minimal-tiptap"
+import {createPost} from "#/lib/api_requests/post"
 
 
 const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }) => {
@@ -216,7 +216,7 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
                                     <form className="flex flex-col max-w-[95vw] max-h-[95vh] mx-auto" >
                                         <MinimalTiptapEditor
                                             value={value}
-                                            onChange={setValue}
+                                            onChange={(newValue)=>setValue(newValue)}
                                             className="w-full"
                                             editorContentClassName="p-5"
                                             output="html"
