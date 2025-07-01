@@ -64,13 +64,13 @@ export default function TrocPage() {
                                 : objet.description}
                         </p>
                         <div className="flex gap-2 justify-center">
-                            <Button size="sm" onClick={() => redirect(Routes.troc.objet.create.toString())}>
+                            <Button size="sm" onClick={(id) => redirect(Routes.troc.objet.toString(id))}>
                                 Voir
                             </Button>
                             <Button
                                 size="sm"
                                 variant="secondary"
-                                onClick={() => () => redirect(Routes.troc.objet.create.toString())}
+                                onClick={(id) => redirect(Routes.troc.objet.modify.toString(id))}
                             >
                                 Modifier
                             </Button>
@@ -98,7 +98,7 @@ export default function TrocPage() {
             <div className="flex-1 bg-white rounded-xl shadow-md p-6 space-y-6">
             <div className="flex justify-between items-center mb-2">
                 <h2 className="text-2xl font-bold text-gray-800">Demandes de troc</h2>
-                <Button onClick={() => {}} className="font-medium">
+                <Button onClick={() => redirect(Routes.troc.create.toString())}  className="font-medium">
                     Créer une demande
                 </Button>
             </div>

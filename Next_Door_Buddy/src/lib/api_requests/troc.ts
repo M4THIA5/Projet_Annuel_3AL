@@ -78,9 +78,25 @@ export const getDemandesTroc= async (): Promise<DemandeTroc[]> => {
     }
 }
 
-export const createDemandeTroc = async (): Promise<void> => {
+export const createDemandeTroc = async (form:FormData): Promise<void> => {
     try {
-        const response = await API.post('/troc/', {accessToken: await getAccessToken()})
+        const response = await API.postf('/troc/', {accessToken: await getAccessToken(), data:form})
+        if (!response.ok) {
+            throw new Error('Failed to get page')
+        }
+        const data = await response.json()
+        if (!data) {
+            throw new Error('No data found')
+        }
+        return data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const modifyObjet = async (id:string, form:FormData): Promise<void> => {
+    try {
+        const response = await API.put('/objet/'+id, form, {accessToken: await getAccessToken()})
         if (!response.ok) {
             throw new Error('Failed to get page')
         }
