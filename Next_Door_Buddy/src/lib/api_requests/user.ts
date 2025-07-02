@@ -1,5 +1,5 @@
 import {API} from '#/lib/api_requests/fetchRequest'
-import {UserProfile, UserRole, VerifyOtpData, ResendOtpData, MultiFriendTypes} from '#/types/user'
+import {UserProfile, UserRole, VerifyOtpData, ResendOtpData, MultiFriendTypes, Friend} from '#/types/user'
 import {getAccessToken} from '../authentification'
 import {RegisterUserData} from "#/types/mapbox"
 import {buildUrl} from '../utils'
@@ -31,6 +31,100 @@ export const getMultiFriendTypes = async (userId: number): Promise<MultiFriendTy
             throw new Error('No data found')
         }
         return data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const getNewFriendByEmail = async (email: string): Promise<Friend | null> => {
+    try {
+        const response = await API.get(`/users/${email}/friend`, {accessToken: await getAccessToken()})
+        if (!response.ok) {
+            if (response.status === 404) {
+                return null
+            }
+            throw new Error('Failed to get user by email')
+        }
+        const data = await response.json() as Friend
+        if (!data) {
+            throw new Error('No data found')
+        }
+        return data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const sendFriendRequest = async (friendId: number): Promise<Response> => {
+    try {
+        const response = await API.post(`/users/${friendId}/friend-request`, {
+            accessToken: await getAccessToken(),
+        })
+        if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Failed to send friend request')
+        }
+        return response
+    } catch (error) {
+        throw error
+    }
+}
+
+export const acceptFriendRequest = async (friendId: number): Promise<Response> => {
+    try {
+        const response = await API.post(`/users/${friendId}/accept-friend`, {
+            accessToken: await getAccessToken(),
+        })
+        if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Failed to accept friend request')
+        }
+        return response
+    } catch (error) {
+        throw error
+    }
+}
+
+export const refuseFriendRequest = async (friendId: number): Promise<Response> => {
+    try {
+        const response = await API.delete(`/users/${friendId}/refuse-friend`, {
+            accessToken: await getAccessToken(),
+        })
+        if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Failed to refuse friend request')
+        }
+        return response
+    } catch (error) {
+        throw error
+    }
+}
+
+export const cancelFriendRequest = async (friendId: number): Promise<Response> => {
+    try {
+        const response = await API.delete(`/users/${friendId}/cancel-friend-request`, {
+            accessToken: await getAccessToken(),
+        })
+        if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Failed to cancel friend request')
+        }
+        return response
+    } catch (error) {
+        throw error
+    }
+}
+
+export const removeFriend = async (friendId: number): Promise<Response> => {
+    try {
+        const response = await API.delete(`/users/${friendId}/remove-friend`, {
+            accessToken: await getAccessToken(),
+        })
+        if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Failed to remove friend')
+        }
+        return response
     } catch (error) {
         throw error
     }
@@ -124,6 +218,22 @@ export const deleteUserById = async (userId: number): Promise<Response> => {
     }
 }
 
+export const updateUser = async (userId: number, data: Partial<UserProfile>): Promise<Response> => {
+    try {
+        const response = await API.put(
+            `/users/${userId}`, 
+            {accessToken: await getAccessToken(), data}
+        )
+        if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Failed to update user')
+        }
+        return response
+    } catch (error) {
+        throw error
+    }
+}
+
 export const registerUser = async (data: RegisterUserData): Promise<Response> => {
     try {
         const response = await API.post('/register', {accessToken: await getAccessToken(), data: data})
@@ -193,7 +303,7 @@ export const isValidEmail = async (email: string): Promise<boolean> => {
 
 export const resetPassWord = async (email: string, resetUrl: string): Promise<Response> => {
     try {
-        const resetPasswordResponse = await API.put('/reset-password-code', undefined,{ data: { email } })
+        const resetPasswordResponse = await API.put('/reset-password-code',{ data: { email } })
         if (!resetPasswordResponse.ok) {
             const errorData = await resetPasswordResponse.json()
             throw new Error(errorData.error || 'Failed to generate reset password code')
