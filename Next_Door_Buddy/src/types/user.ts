@@ -5,12 +5,19 @@ export type UserProfile = {
   email: string
   image: string
   roles: UserRole[]
+  latitude?: number
+  longitude?: number
+  address?: string
+  city?: string
+  postalCode?: string
 }
 
 export type Friend = {
   id: number
   firstName: string
   lastName: string
+  image?: string
+  status: 'accepted' | 'pending' | 'requested' | 'none'
 }
 
 export type MultiFriendTypes = {

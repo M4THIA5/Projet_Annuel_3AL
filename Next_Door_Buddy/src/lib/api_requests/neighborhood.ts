@@ -98,13 +98,11 @@ export const getUsersOfNeighborhood = async (userId: string): Promise<UserNeighb
   }
 }
 
-export const updateNeighborhood = async (id: number, dat:FormData): Promise<Neighborhood> => {
+export const updateNeighborhood = async (id: number, formData:FormData): Promise<Neighborhood> => {
   try {
-    console.log(dat)
     const response = await API.put(
         `/neighborhoods/${id}`,
-        dat,
-        { accessToken: await getAccessToken()}
+        { formData, accessToken: await getAccessToken()}
     )
 
     if (!response.ok) {
