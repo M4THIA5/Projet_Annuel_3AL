@@ -53,50 +53,70 @@ export const getPostsByNeighborhoodId = async (neighborhoodId: string): Promise<
 }
 
 // Créer un nouveau post
-export const createPost = async (content: object): Promise<object> => {
+export const createPost = async (content: {
+    userId: string
+    neighborhoodId: string
+    content: string
+    type: string
+    images: File[]
+}): Promise<object> => {
     try {
-        const response = await API.post('/post/create', { accessToken: await getAccessToken(), data: content })
-        console.log(response)
+        console.log(content)
+        const formData = new FormData()
+
+        formData.append('userId', content.userId)
+        formData.append('neighborhoodId', content.neighborhoodId)
+        formData.append('content', content.content)
+        formData.append('type', content.type)
+
+        content.images.forEach((image) => {
+            formData.append('images', image)
+        })
+
+        const response = await API.postF('/post/create', formData, {
+            accessToken: await getAccessToken(),
+        })
+
         if (!response.ok) {
             throw new Error('Failed to create post')
         }
-        const data = await response.json()
-        if (!data) {
-            throw new Error('No data found')
-        }
-        return data
+        console.log(await response.text())
+        return response
     } catch (error) {
+        console.error('createPost error:', error)
         throw error
     }
 }
 
+
+
 // Mettre à jour un post
 export const updatePost = async (id: string, content: Record<string, never>): Promise<object> => {
     try {
-        const formData = new FormData();
+        const formData = new FormData()
         Object.keys(content).forEach(key => {
-            formData.append(key, content[key]);
-        });
+            formData.append(key, content[key])
+        })
 
         const response = await API.put(`/posts/${id}`,formData, {
             accessToken: await getAccessToken(),
-        });
+        })
 
         if (!response.ok) {
-            throw new Error('Failed to update post');
+            throw new Error('Failed to update post')
         }
 
-        const data = await response.json();
+        const data = await response.json()
         if (!data) {
-            throw new Error('No data found');
+            throw new Error('No data found')
         }
 
-        return data;
+        return data
     } catch (error) {
-        console.error('Error updating post:', error);
-        throw error;
+        console.error('Error updating post:', error)
+        throw error
     }
-};
+}
 
 
 // Supprimer un post

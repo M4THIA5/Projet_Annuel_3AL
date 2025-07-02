@@ -7,15 +7,7 @@ import {Input} from "#/components/ui/input"
 import {Avatar, AvatarFallback, AvatarImage} from "#/components/ui/avatar"
 import {ScrollArea} from "#/components/ui/scroll-area"
 import {Skeleton} from "#/components/ui/skeleton"
-import {TooltipProvider} from "#/components/ui/tooltip"
 import { ToastContainer, toast } from "react-toastify"
-import {
-    Dialog,
-    DialogTrigger,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "#/components/ui/dialog"
 import {
     mdiBookOpenPageVariant,
     mdiChatOutline,
@@ -34,8 +26,7 @@ import {getNeighborhood, getUsersOfNeighborhood} from "#/lib/api_requests/neighb
 import {Neighborhood} from "#/types/neighborghood"
 import {getProfile} from "#/lib/api_requests/user"
 import {UserNeighborhood} from "#/types/user"
-import {MinimalTiptapEditor} from "#/components/minimal-tiptap"
-import {createPost} from "#/lib/api_requests/post"
+import AddPost from "#/components/personal/AddPost";
 
 
 const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }) => {
@@ -47,7 +38,7 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
     const [userNeighborhoods, setUserNeighborhoods] = useState<UserNeighborhood[]>([])
     const [loadingMembers, setLoadingMembers] = useState<boolean>(true)
     const [loadingButtons, setLoadingButtons] = useState<boolean>(true)
-    const [value, setValue] = useState<string>("")
+
     useEffect(() => {
         const fetchNeighborhood = async () => {
             try {
@@ -110,27 +101,6 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
     const handleClickChat = () => router.push(`/chat`)
     const handleClickInformation = () => router.push(`${NeighborhoodId}/information`)
     const handleClickSetting = () => router.push(`${NeighborhoodId}/setting`)
-
-    const handleSubmitPost = async (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!profile || !neighborhood) return
-
-        try {
-            const postData = {
-                userId: profile.user.id.toString(),
-                neighborhoodId: neighborhood.id.toString(),
-                content: value,
-                type: 'text',
-            }
-
-            await createPost(postData)
-            toast.success("✅ Votre post a bien été ajouté au quartier.")
-            setValue("")
-        } catch (error) {
-            toast.error("❌ Impossible de publier le post. Veuillez réessayer.")
-            console.error('Erreur lors de la création du post:', error)
-        }
-    }
 
     return (
         <div className="flex">
@@ -195,53 +165,9 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
                             <AvatarFallback>{getInitials(profile?.user.firstName)}</AvatarFallback>
                         </Avatar>
 
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <div
-                                    className="flex-1 w-full rounded-full bg-white px-4 py-2 cursor-pointer hover:bg-gray-100 transition"
-                                >
-                                    <span className="text-gray-400">Qu&apos;aimeriez-vous partager ?</span>
-                                </div>
-                            </DialogTrigger>
-
-                            <DialogContent
-                                className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-auto sm:max-w-8xl bg-white p-4 rounded-lg shadow-lg overflow-auto z-50"
-                            >
-
-                                <DialogHeader className="flex flex-row justify-between items-center">
-                                    <DialogTitle>Ajouter un post</DialogTitle>
-                                </DialogHeader>
-
-                                <TooltipProvider delayDuration={200}>
-                                    <form className="flex flex-col max-w-[95vw] max-h-[95vh] mx-auto" >
-                                        <MinimalTiptapEditor
-                                            value={value}
-                                            onChange={(newValue)=>setValue(newValue)}
-                                            className="w-full"
-                                            editorContentClassName="p-5"
-                                            output="html"
-                                            autofocus={true}
-                                            editable={true}
-                                            editorClassName="focus:outline-hidden"
-                                        />
-                                        {/*<Input*/}
-                                        {/*    id="image"*/}
-                                        {/*    name="image"*/}
-                                        {/*    type="file"*/}
-                                        {/*    accept="image/*"*/}
-                                        {/*    onChange={handleFileChange}*/}
-                                        {/*    required*/}
-                                        {/*    className={formErrors.image ? "border-red-500" : ""}*/}
-                                        {/*/>*/}
-                                        <div className="flex justify-end">
-                                            <Button type="button" onClick={handleSubmitPost} className="px-6">
-                                                Publier
-                                            </Button>
-                                        </div>
-                                    </form>
-                                </TooltipProvider>
-                            </DialogContent>
-                        </Dialog>
+                        {profile && neighborhood && (
+                            <AddPost profileId={profile.user.id.toString()} neighborhoodId={NeighborhoodId} />
+                        )}
 
 
                     </div>

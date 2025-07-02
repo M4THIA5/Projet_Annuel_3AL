@@ -45,6 +45,25 @@ class Api {
     }
   }
 
+  async postF(endpoint: string,formData: FormData, options?: { accessToken?: string}): Promise<Response> {
+    const accessToken = options?.accessToken
+    console.log(formData)
+    try {
+      return await fetch(`${this.baseUrl}${endpoint}`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: formData,
+      })
+    } catch (error) {
+      console.error('Erreur lors de la requête POST:', error)
+      throw error
+    }
+  }
+
+
   // Méthode pour effectuer une requête PUT
   async put(endpoint: string, formData: FormData, options?: {
       accessToken?: string;
