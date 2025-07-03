@@ -64,6 +64,7 @@ export default function AddPost({ profileId, neighborhoodId }: PostDialogProps) 
                 neighborhoodId,
                 content: value,
                 type: 'post',
+                images: images,
             })
             toast.success("✅ Votre post a bien été ajouté au quartier.")
             setValue("")

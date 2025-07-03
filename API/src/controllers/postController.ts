@@ -7,8 +7,10 @@ import {
     updateValidator,
 } from "../validators/post";
 import fs from "fs";
+import {PrismaClient as PostgresClient} from "../../prisma/client/postgresClient";
 
 const db = new MongoClient();
+const postgresClient = new PostgresClient()
 
 export default class PostController {
     getAll: RequestHandler = async (_: Request, res: Response) => {
@@ -32,25 +34,46 @@ export default class PostController {
     };
 
     getByNeighborhood: RequestHandler = async (req: Request, res: Response) => {
-        const validator = neighborhoodIdValidator.validate(req.query);
-        if (validator.error != undefined) {
-            res.status(400).send({ error: validator.error.message });
-            return;
-        }
-        const neighborhoodId = validator.value.neighborhoodId;
+        const neighborhoodId = req.params.neighborhoodId;
         try {
             const posts = await db.post.findMany({
-                where: {
-                    neighborhoodId: neighborhoodId,
+                where: { neighborhoodId },
+            });
+            const userIds = [...new Set(posts.map(p => Number(p.userId)))];
+
+            const users = await postgresClient.user.findMany({
+                where: { id: { in: userIds } },
+                select: {
+                    id: true,
+                    email: true,
+                    color: true,
+                    image: true,
+                    firstName: true,
+                    lastName: true,
                 },
             });
-            res.status(200).send({ data: posts });
+
+            const userMap = new Map(users.map(user => [user.id, user]));
+
+            const formattedPosts = posts.map(post => ({
+                _id: post.id,
+                content: post.content,
+                createdAt: post.createdAt,
+                updatedAt: post.updatedAt,
+                neighborhoodId: post.neighborhoodId,
+                userId: post.userId,
+                type: post.type,
+                images: post.images || [],
+                user: userMap.get(Number(post.userId)) || null,
+            }));
+
+            res.status(200).send(formattedPosts);
         } catch (error) {
-            res
-                .status(500)
-                .send({ error: "An error occurred while fetching posts." });
+            console.error(error);
+            res.status(500).send({ error: "An error occurred while fetching posts." });
         }
     };
+
 
     create: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         const { error, value } = createValidator.validate(req.body);
@@ -62,32 +85,37 @@ export default class PostController {
         }
 
         const files = (req.files as Express.Multer.File[]) || [];
-        console.log(files);
+        // console.log(files);
         try {
-            const imageBase64Array = await Promise.all(
-                files.map(async (file) => {
-                    const fileBuffer = fs.readFileSync(file.path);
-                    const base64 = fileBuffer.toString("base64");
-                    const mimeType = file.mimetype;
-                    return `data:${mimeType};base64,${base64}`;
-                })
-            );
+            // const imageBase64Array = await Promise.all(
+            //     files.map(async (file) => {
+            //         const fileBuffer = fs.readFileSync(file.path);
+            //         const base64 = fileBuffer.toString("base64");
+            //         const mimeType = file.mimetype;
+            //         return `data:${mimeType};base64,${base64}`;
+            //     })
+            // );
+            //
+            // // Nettoyage des fichiers après conversion
+            // for (const file of files) {
+            //     fs.unlink(file.path, (err) => {
+            //         if (err) console.error(`Erreur suppression ${file.path} :`, err);
+            //     });
+            // }
 
-            // Nettoyage des fichiers après conversion
-            for (const file of files) {
-                fs.unlink(file.path, (err) => {
-                    if (err) console.error(`Erreur suppression ${file.path} :`, err);
-                });
-            }
+            const imageUrls = files.map((file) => {
+                return `@/uploads/${file.filename}`;
+            });
 
             const postData = {
                 ...value,
-                images: imageBase64Array,
+                images: imageUrls,
             };
-            console.log(postData);
+            // console.log(postData);
 
             await db.post.create({ data: postData });
 
+            console.log("Resource created")
             res.status(201).send({ message: "Resource created" });
         } catch (err) {
             console.error("Erreur lors du traitement des images :", err);

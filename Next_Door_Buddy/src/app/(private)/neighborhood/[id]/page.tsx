@@ -26,7 +26,8 @@ import {getNeighborhood, getUsersOfNeighborhood} from "#/lib/api_requests/neighb
 import {Neighborhood} from "#/types/neighborghood"
 import {getProfile} from "#/lib/api_requests/user"
 import {UserNeighborhood} from "#/types/user"
-import AddPost from "#/components/personal/AddPost";
+import AddPost from "#/components/personal/AddPost"
+import FiedGeneralNeighborhood from "#/components/personal/FiedGeneralNeighborhood"
 
 
 const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }) => {
@@ -210,32 +211,7 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
                 </div>
 
                 {/* Post Example */}
-                <Card className="mb-6">
-                    <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                            <div className="text-sm font-medium">Jean-Marie Valheur · Dec 17</div>
-                            <Button variant="outline" size="sm">Excursion</Button>
-                        </div>
-                        <h2 className="mt-2 font-semibold text-lg">
-                            What are some of the most interesting scientific facts known to you?
-                        </h2>
-                        <p className="mt-2 text-sm text-gray-600">
-                            Sixteen years ago, a man named Fimme Bootsma was struck with a brain aneurysm...
-                            <span className="text-blue-500">(more)</span>
-                        </p>
-                        <img
-                            src="https://images.unsplash.com/photo-1570129477492-45c003edd2be"
-                            alt="Excursion"
-                            className="w-full rounded-lg mt-4"
-                        />
-                        <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
-                            <span>👍 Upvote · 7.3K</span>
-                            <span>💬 279</span>
-                            <span>👀 270</span>
-                            <Button size="sm">Join the outing</Button>
-                        </div>
-                    </CardContent>
-                </Card>
+                <FiedGeneralNeighborhood neighborhoodId={NeighborhoodId}></FiedGeneralNeighborhood>
             </div>
 
             {/* Community Member List */}

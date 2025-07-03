@@ -1,5 +1,6 @@
 import { API } from "#/lib/api_requests/fetchRequest"
 import { getAccessToken } from "#/lib/authentification"
+import {Post} from "#/types/post"
 
 // Récupérer tous les posts
 export const getPosts = async (): Promise<object> => {
@@ -36,9 +37,10 @@ export const getPostById = async (id: string): Promise<object> => {
 }
 
 // Récupérer tous les posts d'un quartier par son neighborhoodId
-export const getPostsByNeighborhoodId = async (neighborhoodId: string): Promise<object> => {
+export const getPostsByNeighborhoodId = async (neighborhoodId: string): Promise<Post[]> => {
     try {
-        const response = await API.get(`/posts/neighborhood/${neighborhoodId}`, { accessToken: await getAccessToken() })
+        const response = await API.get(`/post/neighborhood/${neighborhoodId}`, { accessToken: await getAccessToken() })
+        console.log(response)
         if (!response.ok) {
             throw new Error('Failed to fetch posts by neighborhood')
         }
