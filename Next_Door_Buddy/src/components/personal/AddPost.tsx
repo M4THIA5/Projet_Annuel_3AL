@@ -42,10 +42,10 @@ export default function AddPost({ profileId, neighborhoodId, profile, neighborho
         const files = e.target.files
         if (!files || files.length === 0) return
 
-        if (files.length > 6) {
+        if (files.length > 4) {
             setFormErrors((prev) => ({
                 ...prev,
-                image: "Vous pouvez sélectionner jusqu'à 6 fichiers maximum.",
+                image: "Vous pouvez sélectionner jusqu'à 4 fichiers maximum.",
             }))
             setImages([])
             return
