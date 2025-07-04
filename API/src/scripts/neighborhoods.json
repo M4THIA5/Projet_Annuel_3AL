@@ -1,0 +1,146 @@
+[
+  {
+    "name": "Centre Ville",
+    "city": "Herblay",
+    "postalCode": "95220",
+    "description": "Le cœur d'Herblay, proche de la mairie et des commerces."
+  },
+  {
+    "name": "Les Copistes",
+    "city": "Herblay",
+    "postalCode": "95220",
+    "description": "Quartier résidentiel calme d'Herblay."
+  },
+  {
+    "name": "Les Bayonnes",
+    "city": "Herblay",
+    "postalCode": "95220",
+    "description": "Quartier pavillonnaire situé à l'ouest d'Herblay."
+  },
+  {
+    "name": "Les Courlains",
+    "city": "Herblay",
+    "postalCode": "95220",
+    "description": "Quartier résidentiel proche de la nature."
+  },
+  {
+    "name": "Montmartre",
+    "city": "Paris",
+    "postalCode": "75018",
+    "description": "Quartier artistique et touristique de Paris."
+  },
+  {
+    "name": "Le Marais",
+    "city": "Paris",
+    "postalCode": "75003",
+    "description": "Quartier historique et branché de Paris."
+  },
+  {
+    "name": "Saint-Germain-des-Prés",
+    "city": "Paris",
+    "postalCode": "75006",
+    "description": "Quartier littéraire et chic de la rive gauche."
+  },
+  {
+    "name": "Quartier Latin",
+    "city": "Paris",
+    "postalCode": "75005",
+    "description": "Quartier étudiant et historique autour de la Sorbonne."
+  },
+  {
+    "name": "Bastille",
+    "city": "Paris",
+    "postalCode": "75011",
+    "description": "Quartier dynamique connu pour sa vie nocturne."
+  },
+  {
+    "name": "Champs-Élysées",
+    "city": "Paris",
+    "postalCode": "75008",
+    "description": "Quartier prestigieux autour de l'avenue des Champs-Élysées."
+  },
+  {
+    "name": "Batignolles",
+    "city": "Paris",
+    "postalCode": "75017",
+    "description": "Quartier familial et villageois du nord-ouest parisien."
+  },
+  {
+    "name": "La Villette",
+    "city": "Paris",
+    "postalCode": "75019",
+    "description": "Quartier culturel autour du parc de la Villette."
+  },
+  {
+    "name": "Passy",
+    "city": "Paris",
+    "postalCode": "75016",
+    "description": "Quartier résidentiel chic de l'ouest parisien."
+  },
+  {
+    "name": "Bercy",
+    "city": "Paris",
+    "postalCode": "75012",
+    "description": "Quartier moderne et animé de l'est parisien."
+  },
+  {
+    "name": "Montparnasse",
+    "city": "Paris",
+    "postalCode": "75014",
+    "description": "Quartier artistique et animé de la rive gauche."
+  },
+  {
+    "name": "Les Halles",
+    "city": "Paris",
+    "postalCode": "75001",
+    "description": "Quartier central autour du forum des Halles."
+  },
+  {
+    "name": "République",
+    "city": "Paris",
+    "postalCode": "75010",
+    "description": "Quartier vivant autour de la place de la République."
+  },
+  {
+    "name": "Gobelins",
+    "city": "Paris",
+    "postalCode": "75013",
+    "description": "Quartier historique et populaire du sud-est parisien."
+  },
+  {
+    "name": "Grenelle",
+    "city": "Paris",
+    "postalCode": "75015",
+    "description": "Quartier résidentiel et commerçant du sud-ouest parisien."
+  },
+  {
+    "name": "Auteuil",
+    "city": "Paris",
+    "postalCode": "75016",
+    "description": "Quartier résidentiel et verdoyant de l'ouest parisien."
+  },
+  {
+    "name": "Belleville",
+    "city": "Paris",
+    "postalCode": "75020",
+    "description": "Quartier multiculturel et animé de Paris."
+  },
+  {
+    "name": "Montmartre",
+    "city": "Paris",
+    "postalCode": "75018",
+    "description": "Quartier artistique et touristique de Paris."
+  },
+  {
+    "name": "La Défense",
+    "city": "Courbevoie",
+    "postalCode": "92400",
+    "description": "Quartier d'affaires moderne de la métropole parisienne."
+  },
+  {
+    "name": "Belleville",
+    "city": "Paris",
+    "postalCode": "75020",
+    "description": "Quartier multiculturel et animé de Paris."
+  }
+]
