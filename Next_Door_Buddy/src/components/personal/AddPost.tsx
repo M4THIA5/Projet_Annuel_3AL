@@ -15,22 +15,41 @@ import { MinimalTiptapEditor } from "#/components/minimal-tiptap"
 import { toast } from "react-toastify"
 import { createPost } from "#/lib/api_requests/post"
 import { Skeleton } from "#/components/ui/skeleton"
+import { Avatar, AvatarImage, AvatarFallback } from "#/components/ui/avatar"
+import { mdiHandshake, mdiSwapHorizontal, mdiCompass, mdiPlusBox } from "@mdi/js"
+import Icon from "@mdi/react"
+import {Neighborhood} from "#/types/neighborghood";
+import {UserNeighborhood} from "#/types/user";
 
 interface PostDialogProps {
     profileId: string
     neighborhoodId: string
+    profile: UserNeighborhood
+    neighborhood: Neighborhood
 }
 
-export default function AddPost({ profileId, neighborhoodId }: PostDialogProps) {
+export default function AddPost({ profileId, neighborhoodId, profile, neighborhood }: PostDialogProps) {
     const [value, setValue] = useState<string>("")
     const [formErrors, setFormErrors] = useState<Record<string, string>>({})
     const [images, setImages] = useState<File[]>([])
     const [isLoading, setIsLoading] = useState(false)
     const dialogRef = useRef<HTMLButtonElement | null>(null)
 
+    const getInitials = (value: string | undefined) =>
+        value ? value.split(" ").map(word => word[0]?.toUpperCase()).join("").slice(0, 2) : ""
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files
         if (!files || files.length === 0) return
+
+        if (files.length > 6) {
+            setFormErrors((prev) => ({
+                ...prev,
+                image: "Vous pouvez sélectionner jusqu'à 6 fichiers maximum.",
+            }))
+            setImages([])
+            return
+        }
 
         const validImages: File[] = []
         const errors: string[] = []
@@ -52,9 +71,10 @@ export default function AddPost({ profileId, neighborhoodId }: PostDialogProps) 
             return
         }
 
-        setFormErrors((prev) => ({ ...prev, images: "" }))
+        setFormErrors((prev) => ({ ...prev, image: "" }))  // Corrigé: "image" et non "images"
         setImages(validImages)
     }
+
 
     const handleSubmitPost = async () => {
         setIsLoading(true)
@@ -80,22 +100,53 @@ export default function AddPost({ profileId, neighborhoodId }: PostDialogProps) 
 
     return (
         <Dialog>
-            <DialogTrigger asChild>
-                <button
-                    ref={dialogRef}
-                    className="flex-1 w-full h-full rounded-full bg-white px-4 py-2 cursor-pointer hover:bg-gray-100 transition"
-                >
-                    <span className="text-gray-400">Qu&apos;aimeriez-vous partager ?</span>
-                </button>
-            </DialogTrigger>
+            <div className="flex flex-col items-center gap-4 bg-gray-100 rounded-xl px-4 py-3 mb-6 shadow-sm">
+                <div className="flex w-full items-center">
+                    <Avatar className="mr-2">
+                        <AvatarImage src={profile?.user.image?.toString()} alt={profile?.user.firstName} />
+                        <AvatarFallback>{getInitials(profile?.user.firstName)}</AvatarFallback>
+                    </Avatar>
 
-            <DialogContent className="p-6"  style={{ width: '600px', maxWidth: '700px', height: '500px',maxHeight: '500px', }}>
+                    <DialogTrigger asChild>
+                        <button
+                            ref={dialogRef}
+                            className="flex-1 w-full h-full rounded-full bg-white px-4 py-2 cursor-pointer hover:bg-gray-100 transition"
+                        >
+                            <span className="text-gray-400">Qu&apos;aimeriez-vous partager ?</span>
+                        </button>
+                    </DialogTrigger>
+                </div>
+
+                <div className="flex justify-around text-sm text-black space-x-4 select-none w-full">
+                    <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400">
+                        <Icon path={mdiHandshake} size={0.9} className="mr-2" />
+                        <span>Proposer un service</span>
+                    </div>
+                    <div className="border-l h-5 border-gray-400" />
+                    <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400">
+                        <Icon path={mdiSwapHorizontal} size={0.9} className="mr-2" />
+                        <span>Échanger</span>
+                    </div>
+                    <div className="border-l h-5 border-gray-400" />
+                    <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400">
+                        <Icon path={mdiCompass} size={0.9} className="mr-2" />
+                        <span>Proposer une excursion</span>
+                    </div>
+                    <div className="border-l h-5 border-gray-400" />
+                    <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400 font-semibold">
+                        <Icon path={mdiPlusBox} size={0.9} className="mr-2" />
+                        <span>Publier</span>
+                    </div>
+                </div>
+            </div>
+
+            <DialogContent className="p-6" style={{ width: '600px', maxWidth: '700px', height: '500px', maxHeight: '500px' }}>
                 <DialogHeader>
                     <DialogTitle>Ajouter un post</DialogTitle>
                 </DialogHeader>
 
                 <TooltipProvider>
-                    <form className="flex flex-col w-full  h-full" onSubmit={(e) => e.preventDefault()}>
+                    <form className="flex flex-col w-full h-full" onSubmit={(e) => e.preventDefault()}>
                         {isLoading ? (
                             <Skeleton className="w-full h-full rounded-md" />
                         ) : (
@@ -104,7 +155,7 @@ export default function AddPost({ profileId, neighborhoodId }: PostDialogProps) 
                                     value={value}
                                     onChange={setValue}
                                     className="w-full"
-                                    editorContentClassName="p-5 max-h-[300px] max-w-[600px] overflow-y-auto"
+                                    editorContentClassName="p-5 max-h-[30vh] max-w-[35vw] overflow-y-auto"
                                     output="html"
                                     autofocus
                                     editable

@@ -159,42 +159,29 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
             {/* Main Content */}
             <div className="flex-1 p-6 bg-white relative">
                 {/* Top Bar */}
-                <div className="flex flex-col items-center gap-4 bg-gray-100 rounded-xl px-4 py-3 mb-6 shadow-sm">
-                    <div className="flex w-full">
-                        <Avatar className="mr-2">
-                            <AvatarImage src={profile?.user.image?.toString()} alt={profile?.user.firstName}/>
-                            <AvatarFallback>{getInitials(profile?.user.firstName)}</AvatarFallback>
-                        </Avatar>
-
-                        {profile && neighborhood && (
-                            <AddPost profileId={profile.user.id.toString()} neighborhoodId={NeighborhoodId} />
-                        )}
-
-
-                    </div>
-
-                    <div className="flex justify-around text-sm text-black space-x-4 select-none w-full">
-                        <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400">
-                            <Icon path={mdiHandshake} size={0.9} className="mr-2"/>
-                            <span>Proposer un service</span>
+                {profile && neighborhood ? (
+                    <AddPost
+                        profileId={profile.user.id.toString()}
+                        neighborhoodId={NeighborhoodId}
+                        profile={profile}
+                        neighborhood={neighborhood}
+                    />
+                ) : (
+                    <div className="flex flex-col gap-4 mb-6 px-4 py-3">
+                        <div className="flex items-center gap-2">
+                            <Skeleton className="h-10 w-10 rounded-full" />
+                            <Skeleton className="h-10 flex-1 rounded-full" />
                         </div>
-                        <div className="border-l h-5 border-gray-400"/>
-                        <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400">
-                            <Icon path={mdiSwapHorizontal} size={0.9} className="mr-2"/>
-                            <span>Échanger</span>
-                        </div>
-                        <div className="border-l h-5 border-gray-400"/>
-                        <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400">
-                            <Icon path={mdiCompass} size={0.9} className="mr-2"/>
-                            <span>Proposer une excursion</span>
-                        </div>
-                        <div className="border-l h-5 border-gray-400"/>
-                        <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400 font-semibold">
-                            <Icon path={mdiPlusBox} size={0.9} className="mr-2"/>
-                            <span>Publier</span>
+                        <div className="flex justify-around text-sm space-x-4 w-full">
+                            <Skeleton className="h-5 w-32" />
+                            <Skeleton className="h-5 w-32" />
+                            <Skeleton className="h-5 w-32" />
+                            <Skeleton className="h-5 w-32" />
                         </div>
                     </div>
-                </div>
+                )}
+
+
 
                 {/* Navigation */}
                 <div className="flex items-center justify-between border-b pb-2 mb-4">
@@ -215,10 +202,10 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
             </div>
 
             {/* Community Member List */}
-            <div className="w-1/5 bg-secondary p-6 rounded-2xl shadow-lg h-[800px]">
+            <div className="w-1/5 bg-secondary p-6 rounded-2xl shadow-lg h-[80vh]">
                 <h2 className="font-semibold text-xl text-center mb-4">Membre</h2>
                 <hr className="w-full border-t-4 border-white mb-6"/>
-                <ScrollArea className="h-[700px] pr-2">
+                <ScrollArea className="h-[70vh] pr-2">
                     {loadingMembers ? (
                         [...Array(6)].map((_, idx) => (
                             <div key={idx} className="flex items-center gap-3 p-2 rounded-lg">

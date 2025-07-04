@@ -104,7 +104,7 @@ export default class PostController {
             // }
 
             const imageUrls = files.map((file) => {
-                return `@/uploads/${file.filename}`;
+                return `/uploads/${file.filename}`;
             });
 
             const postData = {

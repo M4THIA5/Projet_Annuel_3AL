@@ -7,6 +7,7 @@ import Lightbox from "react-image-lightbox"
 import "react-image-lightbox/style.css"
 import {Avatar, AvatarFallback, AvatarImage} from "#/components/ui/avatar"
 import {Badge} from "#/components/ui/badge"
+import {Skeleton} from "../ui/skeleton"
 
 interface PostFieldDialogProps {
     neighborhoodId: string
@@ -24,7 +25,8 @@ export default function AddPost({neighborhoodId}: PostFieldDialogProps) {
         const fetchNeighborhood = async () => {
             try {
                 const postData = await getPostsByNeighborhoodId(neighborhoodId)
-                setPosts(postData)
+                const sortedPosts = postData.toSorted((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                setPosts(sortedPosts)
             } catch (error) {
                 console.error("Erreur lors du chargement des posts", error)
             } finally {
@@ -89,106 +91,153 @@ export default function AddPost({neighborhoodId}: PostFieldDialogProps) {
     }
 
 
-    if (loading) return <p>Chargement des posts...</p>
+    if (loading) {
+        return (
+            <div className="space-y-6">
+                {[...Array(3)].map((_, i) => (
+                    <Card className="mb-6" key={i}>
+                        <CardContent className="pr-4 pl-4 py-6 space-y-4">
+                            <div className="flex justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Skeleton className="h-10 w-10 rounded-full"/>
+                                    <div className="flex flex-col space-y-1">
+                                        <Skeleton className="h-4 w-40 rounded"/>
+                                        <Skeleton className="h-3 w-24 rounded"/>
+                                    </div>
+                                </div>
+                                <Skeleton className="h-6 w-20 rounded-full"/>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Skeleton className="h-4 w-full rounded"/>
+                                <Skeleton className="h-4 w-3/4 rounded"/>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2 mt-4">
+                                <Skeleton className="h-32 w-full rounded-lg"/>
+                                <Skeleton className="h-32 w-full rounded-lg"/>
+                            </div>
+
+                            <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
+                                <Skeleton className="h-4 w-16"/>
+                                <Skeleton className="h-4 w-24"/>
+                                <Skeleton className="h-4 w-16"/>
+                                <Skeleton className="h-4 w-6"/>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        )
+    }
+
 
     return (
         <>
-            {posts.map((post) => (
-                <Card className="mb-6" key={post._id}>
-                    <CardContent className="pr-4 pl-4">
-                        <div className="flex justify-between">
-                            <div className="flex items-center">
-                                <Avatar className="mr-2">
-                                    <AvatarImage src={post.user.image?.toString()} alt={post.user.firstName}/>
-                                    <AvatarFallback>{getInitials(post?.user.firstName)}</AvatarFallback>
-                                </Avatar>
-                                <div className="text-sm font-medium">
-                                    {post.user.firstName} {post.user.lastName} · <span
-                                    className="text-muted-foreground">{formatJoinedDuration(post.createdAt)}</span>
+            <div className="max-h-[60vh] max-w-[55vw] overflow-y-auto pr-2 space-y-6">
+                {posts.map((post) => (
+                    <Card className="mb-6" key={post._id}>
+                        <CardContent className="pr-4 pl-4">
+                            <div className="flex justify-between">
+                                <div className="flex items-center">
+                                    <Avatar className="mr-2">
+                                        <AvatarImage src={post.user.image?.toString()} alt={post.user.firstName}/>
+                                        <AvatarFallback>{getInitials(post?.user.firstName)}</AvatarFallback>
+                                    </Avatar>
+                                    <div className="text-sm font-medium">
+                                        {post.user.firstName} {post.user.lastName} · <span
+                                        className="text-muted-foreground">{formatJoinedDuration(post.createdAt)}</span>
 
-                                </div>
-                            </div>
-                            <Badge
-                                variant="outline"
-                                className={`${getBadgeColor(post.type)} rounded-full px-3 py-0.5`}
-                            >
-                                {capitalize(post.type)}
-                            </Badge>
-                        </div>
-
-
-                        <div
-                            className="mt-2"
-                            dangerouslySetInnerHTML={{__html: post.content}}
-                        />
-
-                        {post.images.length > 0 && (
-                            <div className={`grid gap-2 mt-4 ${
-                                post.images.length === 1 ? 'grid-cols-1' :
-                                    post.images.length === 2 ? 'grid-cols-2' :
-                                        'grid-cols-2 grid-rows-2'
-                            }`}>
-                                {post.images.slice(0, 4).map((img, idx) => {
-                                    // Si 3 images, on peut faire une mise en page spéciale
-                                    if (post.images.length === 3) {
-                                        if (idx === 0)
-                                            return (
-                                                <img
-                                                    key={idx}
-                                                    src={img}
-                                                    alt={`Image ${idx + 1}`}
-                                                    className="rounded-lg cursor-pointer row-span-2 object-cover w-full h-full"
-                                                    onClick={() => openLightbox(post.images, idx)}
-                                                />
-                                            )
-                                        else
-                                            return (
-                                                <img
-                                                    key={idx}
-                                                    src={img}
-                                                    alt={`Image ${idx + 1}`}
-                                                    className="rounded-lg cursor-pointer object-cover w-full h-full"
-                                                    onClick={() => openLightbox(post.images, idx)}
-                                                />
-                                            )
-                                    }
-
-                                    return (
-                                        <img
-                                            key={idx}
-                                            src={img}
-                                            alt={`Image ${idx + 1}`}
-                                            className="rounded-lg cursor-pointer object-cover w-full h-full"
-                                            onClick={() => openLightbox(post.images, idx)}
-                                        />
-                                    )
-                                })}
-
-                                {post.images.length > 4 && (
-                                    <div
-                                        className="relative rounded-lg cursor-pointer bg-black bg-opacity-50 flex items-center justify-center text-white text-2xl font-bold"
-                                        onClick={() => openLightbox(post.images, 4)}
-                                    >
-                                        <img
-                                            src={post.images[4]}
-                                            alt="Plus d'images"
-                                            className="rounded-lg object-cover w-full h-full opacity-50"
-                                        />
-                                        <span className="absolute">+{post.images.length - 4}</span>
                                     </div>
-                                )}
+                                </div>
+                                <Badge
+                                    variant="outline"
+                                    className={`${getBadgeColor(post.type)} rounded-full px-3 py-0.5`}
+                                >
+                                    {capitalize(post.type)}
+                                </Badge>
                             </div>
-                        )}
 
-                        <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
-                            <span>👍 Upvote</span>
-                            <span>💬 Commenter</span>
-                            <span>👀 Vu</span>
-                            <span></span> {/*Ne pas enlever*/}
-                        </div>
-                    </CardContent>
-                </Card>
-            ))}
+
+                            <div
+                                className="mt-2 wrap-normal large-text"
+                                style={{
+                                    whiteSpace: "normal",
+                                    wordWrap: "break-word",
+                                    overflowWrap: "break-word",
+                                    wordBreak: "break-word"
+                                }}
+                                dangerouslySetInnerHTML={{ __html: post.content }}
+                            />
+
+                            {post.images.length > 0 && (
+                                <div className={`grid gap-2 mt-4 ${
+                                    post.images.length === 1 ? 'grid-cols-1' :
+                                        post.images.length === 2 ? 'grid-cols-2' :
+                                            'grid-cols-2 grid-rows-2'
+                                }`}>
+                                    {post.images.slice(0, 4).map((img, idx) => {
+                                        // Si 3 images, on peut faire une mise en page spéciale
+                                        if (post.images.length === 3) {
+                                            if (idx === 0)
+                                                return (
+                                                    <img
+                                                        key={idx}
+                                                        src={img}
+                                                        alt={`Image ${idx + 1}`}
+                                                        className="rounded-lg cursor-pointer row-span-2 object-cover w-full h-full"
+                                                        onClick={() => openLightbox(post.images, idx)}
+                                                    />
+                                                )
+                                            else
+                                                return (
+                                                    <img
+                                                        key={idx}
+                                                        src={img}
+                                                        alt={`Image ${idx + 1}`}
+                                                        className="rounded-lg cursor-pointer object-cover w-full h-full"
+                                                        onClick={() => openLightbox(post.images, idx)}
+                                                    />
+                                                )
+                                        }
+
+                                        return (
+                                            <img
+                                                key={idx}
+                                                src={img}
+                                                alt={`Image ${idx + 1}`}
+                                                className="rounded-lg cursor-pointer object-cover w-full h-full"
+                                                onClick={() => openLightbox(post.images, idx)}
+                                            />
+                                        )
+                                    })}
+
+                                    {post.images.length > 4 && (
+                                        <div
+                                            className="relative rounded-lg cursor-pointer bg-black bg-opacity-50 flex items-center justify-center text-white text-2xl font-bold"
+                                            onClick={() => openLightbox(post.images, 4)}
+                                        >
+                                            <img
+                                                src={post.images[4]}
+                                                alt="Plus d'images"
+                                                className="rounded-lg object-cover w-full h-full opacity-50"
+                                            />
+                                            <span className="absolute">+{post.images.length - 4}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
+                                <span>👍 Upvote</span>
+                                <span>💬 Commenter</span>
+                                <span>👀 Vu</span>
+                                <span></span> {/*Ne pas enlever*/}
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
 
             {isOpen && activeImages.length > 0 && (
                 <Lightbox
