@@ -40,17 +40,17 @@ jobs:
     - name: Deploy to VPS
       uses: easingthemes/ssh-deploy@v2.1.4
       env:
-        SSH_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-        REMOTE_HOST: ${{ secrets.HOST }}
-        REMOTE_USER: ${{ secrets.USERNAME }}
+        SSH_PRIVATE_KEY: ${{ secrets.VPS_PRIVATE_KEY }}
+        REMOTE_HOST: ${{ secrets.VPS_HOST }}
+        REMOTE_USER: ${{ secrets.VPS_USERNAME }}
         SOURCE: "/"
         TARGET: "~"
     - name: Execute remote release script via SSH
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.PRIVATE_KEY }}
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        key: ${{ secrets.VPS_PRIVATE_KEY }}
         port: 22
         script: |
           cd ~/Projet_Annuel_3AL
