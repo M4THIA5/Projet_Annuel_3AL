@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from "react"
-import { Post } from "#/types/post"
-import { getPostsByNeighborhoodId } from "#/lib/api_requests/post"
-import { Card, CardContent } from "#/components/ui/card"
-import { Button } from "#/components/ui/button"
+import React, {useEffect, useState} from "react"
+import {Post} from "#/types/post"
+import {getPostsByNeighborhoodId} from "#/lib/api_requests/post"
+import {Card, CardContent} from "#/components/ui/card"
+import {Button} from "#/components/ui/button"
 import Lightbox from "react-image-lightbox"
 import "react-image-lightbox/style.css"
+import {Avatar, AvatarFallback, AvatarImage} from "#/components/ui/avatar"
+import {Badge} from "#/components/ui/badge"
 
 interface PostFieldDialogProps {
     neighborhoodId: string
 }
 
-export default function AddPost({ neighborhoodId }: PostFieldDialogProps) {
+export default function AddPost({neighborhoodId}: PostFieldDialogProps) {
     const [posts, setPosts] = useState<Post[]>([])
     const [loading, setLoading] = useState(true)
 
@@ -33,6 +35,44 @@ export default function AddPost({ neighborhoodId }: PostFieldDialogProps) {
         fetchNeighborhood()
     }, [neighborhoodId])
 
+    const getInitials = (value: string | undefined) =>
+        value ? value.split(" ").map(word => word[0]?.toUpperCase()).join("").slice(0, 2) : ""
+
+    const formatJoinedDuration = (joinedAt: string | number | Date) => {
+        const joinedDate = new Date(joinedAt)
+        const now = new Date()
+        const diffMs = now.getTime() - joinedDate.getTime()
+        const diffMinutes = Math.floor(diffMs / (1000 * 60))
+        const diffHours = Math.floor(diffMinutes / 60)
+        const diffDays = Math.floor(diffHours / 24)
+        const diffMonths = Math.floor(diffDays / 30)
+        const diffYears = Math.floor(diffDays / 365)
+
+        if (diffYears >= 1) return `Il y a ${diffYears} an${diffYears > 1 ? "s" : ""}`
+        if (diffMonths >= 1) return `Il y a ${diffMonths} mois`
+        if (diffDays >= 1) return `Il y a ${diffDays} jour${diffDays > 1 ? "s" : ""}`
+        if (diffHours >= 1) return `Il y a ${diffHours} heure${diffHours > 1 ? "s" : ""}`
+        return `Il y a ${diffMinutes} minute${diffMinutes > 1 ? "s" : ""}`
+    }
+
+    const getBadgeColor = (type: string) => {
+        switch (type.toLowerCase()) {
+            case "post":
+                return "bg-gray-100 text-gray-700 border-gray-200"
+            case "événement":
+                return "bg-blue-100 text-blue-700 border-blue-200"
+            case "annonce":
+                return "bg-green-100 text-green-700 border-green-200"
+            case "discussion":
+                return "bg-yellow-100 text-yellow-700 border-yellow-200"
+            default:
+                return "bg-muted text-muted-foreground border"
+        }
+    }
+
+    const capitalize = (s: string) =>
+        s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()
+
 
     const openLightbox = (images: string[], index: number) => {
         if (isOpen) return
@@ -48,29 +88,38 @@ export default function AddPost({ neighborhoodId }: PostFieldDialogProps) {
         setPhotoIndex(0)
     }
 
+
     if (loading) return <p>Chargement des posts...</p>
 
     return (
         <>
             {posts.map((post) => (
                 <Card className="mb-6" key={post._id}>
-                    <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                            <div className="text-sm font-medium">
-                                {post.user.firstName} {post.user.lastName} ·{" "}
-                                {new Date(post.createdAt).toLocaleDateString("fr-FR", {
-                                    day: "numeric",
-                                    month: "short",
-                                })}
+                    <CardContent className="pr-4 pl-4">
+                        <div className="flex justify-between">
+                            <div className="flex items-center">
+                                <Avatar className="mr-2">
+                                    <AvatarImage src={post.user.image?.toString()} alt={post.user.firstName}/>
+                                    <AvatarFallback>{getInitials(post?.user.firstName)}</AvatarFallback>
+                                </Avatar>
+                                <div className="text-sm font-medium">
+                                    {post.user.firstName} {post.user.lastName} · <span
+                                    className="text-muted-foreground">{formatJoinedDuration(post.createdAt)}</span>
+
+                                </div>
                             </div>
-                            <Button variant="outline" size="sm">
-                                {post.type}
-                            </Button>
+                            <Badge
+                                variant="outline"
+                                className={`${getBadgeColor(post.type)} rounded-full px-3 py-0.5`}
+                            >
+                                {capitalize(post.type)}
+                            </Badge>
                         </div>
+
 
                         <div
                             className="mt-2"
-                            dangerouslySetInnerHTML={{ __html: post.content }}
+                            dangerouslySetInnerHTML={{__html: post.content}}
                         />
 
                         {post.images.length > 0 && (
@@ -134,8 +183,8 @@ export default function AddPost({ neighborhoodId }: PostFieldDialogProps) {
                         <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
                             <span>👍 Upvote</span>
                             <span>💬 Commenter</span>
-                            <span>👀 Voir</span>
-                            <Button size="sm">Participer</Button>
+                            <span>👀 Vu</span>
+                            <span></span> {/*Ne pas enlever*/}
                         </div>
                     </CardContent>
                 </Card>
