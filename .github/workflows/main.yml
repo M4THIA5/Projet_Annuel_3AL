@@ -39,7 +39,7 @@ jobs:
         npm test
     - name: Deploy to VPS
       uses: easingthemes/ssh-deploy@v2.1.4
-      env:
+      with:
         SSH_PRIVATE_KEY: ${{ secrets.VPS_PRIVATE_KEY }}
         REMOTE_HOST: ${{ secrets.VPS_HOST }}
         REMOTE_USER: ${{ secrets.VPS_USERNAME }}
