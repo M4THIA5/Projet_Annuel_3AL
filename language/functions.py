@@ -2,202 +2,39 @@
 import os
 import pathlib as pathlib
 import platform
-import ply.lex as lex
-import ply.yacc as yacc
 import stat
 import subprocess
 from datetime import datetime
+from fpdf import XPos, YPos, FPDF
 
 PATH = pathlib.Path(__file__).parent.resolve()
 
-reserved = {
-    'select': 'SELECT',
-    'insert': 'INSERT',
-    'update': 'UPDATE',
-    'delete': 'DELETE',
-    'print': 'PRINT',
-    'into': 'INTO',
-    'create': 'CREATE',
-    'where': 'WHERE',
-    'search': 'SEARCH',
-    'with': 'WITH',
-    'in': 'IN',
-    'dir': "DIR",
-    'file': "FILE",
-    "startsw": "STARTSW",
-    "like": "LIKE",
-    "endsw": "ENDSW",
-    'rename': "RENAME"
-}
-
-tokens = ['NUMBER', 'MINUS', 'PLUS', 'TIMES', 'DIVIDE',
-          'LPAREN', 'RPAREN', 'AND', 'OR', 'SEMI', 'NAME',
-          'EQUAL', 'GT', 'LT', 'GTE', 'LTE', 'DEQUAL',
-          'ACCDEB', 'ACCFERM', 'INC', 'DEC',
-          'CRDEB', 'CRFIN', 'VIR', 'NOTEQUAL', 'POINT',
-          'TEXT'
-          ] + list(reserved.values())
-
-t_PLUS = r'\+'
-t_INC = r'\+\+'
-t_DEC = r'--'
-t_MINUS = r'-'
-t_TIMES = r'\*'
-t_DIVIDE = r'/'
-t_LPAREN = r'\('
-t_RPAREN = r'\)'
-t_AND = r'\&'
-t_OR = r'\|'
-t_SEMI = r';'
-t_EQUAL = r'='
-t_GT = r'>'
-t_LT = r'<'
-t_GTE = r'>='
-t_LTE = r'<='
-t_DEQUAL = r'=='
-t_NOTEQUAL = r'!='
-t_ACCDEB = r'{'
-t_ACCFERM = r'}'
-t_CRDEB = r'\['
-t_CRFIN = r'\]'
-t_VIR = r','
-t_POINT = r'\.'
-t_ignore = " \t"
 
 
-
-
-def t_NUMBER(t):
-    r'\-?\d+(\.\d+)?'
-    if t.value.__contains__("."):
-        t.value = float(t.value)
-    else:
-        t.value = int(t.value)
-    return t
-
-
-def t_newline(t):
-    r'\n+'
-    t.lexer.lineno += t.value.count("\n")
-
-
-def t_print(t):
-    r'print'
-    t.type = reserved.get(t.value, 'PRINT')
-    return t
-
-
-def t_select(t):
-    r'select'
-    t.type = reserved.get(t.value, 'SELECT')
-    return t
-
-
-def t_insert(t):
-    r'insert'
-    t.type = reserved.get(t.value, 'INSERT')
-    return t
-
-
-def t_update(t):
-    r'update'
-    t.type = reserved.get(t.value, 'UPDATE')
-    return t
-
-
-def t_delete(t):
-    r'delete'
-    t.type = reserved.get(t.value, 'DELETE')
-    return t
-
-
-def t_into(t):
-    r'into'
-    t.type = reserved.get(t.value, 'INTO')
-    return t
-
-
-def t_search(t):
-    r'search'
-    t.type = reserved.get(t.value, 'SEARCH')
-    return t
-
-
-def t_with(t):
-    r'with'
-    t.type = reserved.get(t.value, 'WITH')
-    return t
-
-
-def t_where(t):
-    r'where'
-    t.type = reserved.get(t.value, 'WHERE')
-    return t
-
-
-def t_in(t):
-    r'in'
-    t.type = reserved.get(t.value, 'IN')
-    return t
-
-
-def t_dir(t):
-    r'dir'
-    t.type = reserved.get(t.value, 'DIR')
-    return t
-
-
-def t_file(t):
-    r'file'
-    t.type = reserved.get(t.value, 'FILE')
-    return t
-
-
-def t_startsw(t):
-    r'startsw'
-    t.type = reserved.get(t.value, 'STARTSW')
-    return t
-
-
-def t_like(t):
-    r'like'
-    t.type = reserved.get(t.value, 'LIKE')
-    return t
-
-
-def t_endsw(t):
-    r'endsw'
-    t.type = reserved.get(t.value, 'ENDSW')
-    return t
-
-
-def t_rename(t):
-    r'rename'
-    t.type = reserved.get(t.value, 'RENAME')
-    return t
-
-
-def t_name(t):
-    r'[a-zA-Z_][a-zA-Z_0-9]*'
-    t.type = reserved.get(t.value, 'NAME')
-    return t
-
-
-def t_TEXT(t):
-    r'"[\(\)\[\]\w,éèàâêùëöÿäçô$*#&\/\\*\-+\s]*"'
-    t.value = t.value
-    return t
-
-
-def t_error(t):
-    print("Illegal character '%s'" % t.value[0])
-    t.lexer.skip(1)
-
-
-def t_ccode_comment(t):
-    r'(/\*(.|\n)*?\*/)|(//.*)'
-    pass
-
+def setup():
+    if not os.path.exists(PATH):
+        print("The path does not exist.")
+        exit(1)
+    if not os.access(PATH, os.R_OK | os.W_OK | os.X_OK):
+        print("You do not have the necessary permissions to access this path.")
+        exit(1)
+    if not os.path.isdir(PATH):
+        print("The path is not a directory.")
+        exit(1)
+    if not os.path.exists(PATH / 'launchjava.bat'):
+        print("The required file 'launchjava.bat' does not exist in the specified path.")
+        exit(1)
+    if not os.access(PATH / 'launchjava.bat', os.R_OK | os.W_OK | os.X_OK):
+        print("You do not have the necessary permissions to access 'launchjava.bat'.")
+        exit(1)
+    if not os.path.exists(PATH / 'pdfs'):
+        os.mkdir(PATH / 'pdfs')
+    if not os.access(PATH / 'pdfs', os.R_OK | os.W_OK | os.X_OK):
+        os.chmod(PATH / 'pdfs', 0o755)
+    if not os.path.exists(PATH / 'searches'):
+        os.mkdir(PATH / 'searches')
+    if not os.access(PATH / 'searches', os.R_OK | os.W_OK | os.X_OK):
+        os.chmod(PATH / 'searches', 0o755)
 
 def eval_expr(tree):
     if isinstance(tree, int) or isinstance(tree, float):
@@ -280,11 +117,11 @@ def eval_cond(tree, elem, PATH):
     elif tree[0] == '!=':
         return resolveProp(tree[1], elem, PATH) != eval_expr(tree[2])
     elif tree[0] == "startsw":
-            return resolveProp(tree[1], elem, PATH).startswith(str(eval_expr(tree[2])))
+        return resolveProp(tree[1], elem, PATH).startswith(str(eval_expr(tree[2])))
     elif tree[0] == "like":
         return (str(eval_expr(tree[2]))) in resolveProp(tree[1], elem, PATH)
     elif tree[0] == "endsw":
-            return resolveProp(tree[1], elem, PATH).endswith(str(eval_expr(tree[2])))
+        return resolveProp(tree[1], elem, PATH).endswith(str(eval_expr(tree[2])))
     else:
         return tree
 
@@ -308,6 +145,7 @@ def checkup(property, value, operator):
         return False
     return True
 
+
 def printStatData(stats, pa):
     if stat.S_ISREG(stats.st_mode):
         print("Is a file")
@@ -327,8 +165,6 @@ def printStatData(stats, pa):
     dt = datetime.fromtimestamp(stats.st_atime)  # convert from epoch timestamp to datetime
     dt_str = datetime.strftime(dt, "%a %d %b %H:%M:%S %Y")  # format the datetime
     print("Last accessed on :", dt_str)
-
-
 
 
 def isValid(elem, param, PATH):
@@ -373,6 +209,8 @@ def filterCondsWithType(path, param, elementType):
         for elem in os.listdir(path):
             if stat.S_ISREG(os.stat(path / elem).st_mode) and isValid(elem, param, path):
                 print(elem, end='    ')
+
+
 def calculate(t):
     sum = 0
     for elem in t:
@@ -382,6 +220,41 @@ def calculate(t):
             sum += elem[0]
     return sum
 
+
+
+def print_help(command=None):
+    command = ' '.join(command[:-1]) if command else None
+    if command == "select":
+        print("Select statement allows you to retrieve or show data from a file in the file system.")
+    elif command == "insert":
+        print("Insert statement allows you to add data to a file.")
+    elif command == "update":
+        print("Update statement allows you to modify existing data in a file.")
+    elif command == "delete":
+        print("Delete statement allows you to remove data from a file.")
+    elif command == "load":
+        print("Load statement allows you to load commands written a file in the system.")
+    elif command == "create":
+        print("Create statement allows you to create files or directories.")
+    elif command == "rename":
+        print("Rename statement allows you to rename files or directories.")
+    elif command == "search":
+        print("Search statement allows you to search about a keyword and get information about it.")
+    elif command == "print":
+        print("Print statement allows you to display the contents of a file or the result of an expression.")
+    elif command == "create post":
+        print("Create post statement allows you to create a new post in the system. Authentication will be required.")
+    elif command == "see exchanges":
+        print("See exchanges statement allows you to view available exchange proposals in the system. Authentication will be required.")
+    elif command == "create pdf":
+        print("Generate PDF statement allows you to create a PDF document extracting data from the files present in the directory.")
+    elif command == None:
+        print("Help for all commands:")
+        print("Available commands:")
+        print("\tselect, insert, update, delete, print, load, create, rename, search, create post, see exchanges, create pdf")
+        print("\tFor more information on a specific command, type 'help <command>'")
+    else:
+        print(f"Unknown command '{command}'. Type 'help' for a list of available commands.")
 
 def eval_inst(t):
     if t[0] == 'empty' or t == 'empty':
@@ -507,8 +380,83 @@ def eval_inst(t):
     elif t[0] == "statement":
         eval_inst(t[1])
         eval_inst(t[2])
+    elif t[0]== 'create_post':
+        pass
+    elif t[0]== 'see_exchanges':
+        pass
+    elif t[0]== 'gen_pdf':
+        if t[1] == 'data':
+            generate_data_pdf()
+        elif t[1] == 'search':
+            print("Generating PDF for search results is not implemented yet.")
+    elif t[0] == 'help':
+        print_help(t[1] if len(t) > 1 else None)
     else:
         print("Unknown instruction:", t)
+
+def generate_data_pdf():
+
+    class PDF(FPDF):
+        def header(self):
+            # Setting font: helvetica bold 15
+            self.set_font("helvetica", style="B", size=15)
+            # Calculating width of title and setting cursor position:
+            width = self.get_string_width(self.title) + 6
+            self.set_x((210 - width) / 2)
+
+            # Setting colors for frame, background and text:
+            self.set_draw_color(255, 255, 255)
+            self.set_fill_color(255, 255, 255)
+            self.set_text_color(0, 0, 0)
+
+            self.cell(
+                width,
+                9,
+                self.title,
+                border=1,
+                new_x="LMARGIN",
+                new_y="NEXT",
+                align="C",
+                fill=True,
+            )
+            # Performing a line break:
+            self.ln(10)
+
+    pdf = PDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.set_font("Helvetica", size=12)
+    pdf.set_title("File Management System Report")
+    pdf.add_page()
+    pdf.ln(10)
+    pdf.set_font("Helvetica", size=12)
+    pdf.cell(0, 10, "Generated by the file management system", align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    pdf.set_font("Helvetica", size=12)
+    pdf.ln(10)
+    pdf.cell(200, 10, text="This PDF contains information about files in the current directory.", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    for elem in os.listdir(PATH):
+        pdf.set_title(elem)
+        pdf.add_page()
+        stats = os.stat(PATH / elem)
+        pdf.cell(200, 10, text=f"{elem}",  new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.cell(200, 10, text=f"Size: {human_size(stats.st_size)} ({stats.st_size} bytes)",  new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.cell(200, 10, text=f"Type: {'Directory' if stat.S_ISDIR(stats.st_mode) else 'File'}",  new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.cell(200, 10, text=f"Created on: {datetime.fromtimestamp(stats.st_ctime)}",  new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.cell(200, 10, text=f"Last modified on: {datetime.fromtimestamp(stats.st_mtime)}",  new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.cell(200, 10, text=f"Last accessed on: {datetime.fromtimestamp(stats.st_atime)}",  new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.ln()
+        if stat.S_ISREG(stats.st_mode):
+            try:
+                with open(PATH / elem, "r") as file:
+                    pdf.cell(200, 10, text="Content:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    content = file.read()
+                    pdf.multi_cell(0, 10, content)
+            except Exception as e:
+                pdf.cell(200, 10, text=f"File is not writable as text here.", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    pdf.set_font("Helvetica", style="I", size=10)
+
+    output_path = PATH / "output.pdf"
+    pdf.output(output_path)
+    print(f"PDF generated at {output_path}")
 
 
 def human_size(bytes, units=None):
@@ -517,201 +465,8 @@ def human_size(bytes, units=None):
         units = [' bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB']
     return str(bytes) + units[0] if bytes < 1024 else human_size(bytes >> 10, units[1:])
 
-
-lex.lex()
-
-
-def p_start(p):
-    '''start : statement_list'''
-    p[0] = p[1]
-    eval_inst(p[1])
-
-
-def p_statements(p):
-    '''statement_list : statement_list statement
-                      | statement'''
-    if len(p) == 2:
-        p[0] = ('statement', p[1], 'empty')
-    else:
-        p[0] = ('statement', p[1], p[2])
-
-
-def p_statement(p):
-    '''statement : insert_statement
-    | select_statement
-    | print_statement
-    | create_statement
-    | update_statement
-    | delete_statement
-    | rename_statement
-    | search_statement'''
-    p[0] = p[1]
-
-
-def p_delete_statement(p):
-    '''delete_statement : DELETE NAME SEMI'''
-    p[0] = ('delete', p[2])
-
-
-def p_search_statement(p):
-    '''search_statement : SEARCH NAME SEMI'''
-    p[0] = ('search', p[2])
-
-
-def p_create_statement(p):
-    '''create_statement : CREATE dir NAME SEMI'''
-    if p[2] == 'dir':
-        p[0] = ('create', p[2], p[3])
-    else:
-        p[0] = ('create', p[3])
-
-
-def p_update_statement(p):
-    '''update_statement : UPDATE NAME WITH expression SEMI'''
-    p[0] = ('update', p[2], p[4])
-
-
-def p_rename_statement(p):
-    '''rename_statement : RENAME dir NAME WITH expression SEMI'''
-    if p[2] == 'dir':
-        p[0] = ('rename', p[2], p[3], p[5])
-    else:
-        p[0] = ('rename', p[3], p[5])
-
-
-def p_dir(p):
-    '''dir : DIR
-    | empty'''
-    if p[1] == 'dir':
-        p[0] = 'dir'
-def p_insert_statement(p):
-    '''insert_statement : INSERT expression INTO NAME SEMI'''
-    p[0] = ('insert', p[2], p[4])
-
-
-def p_print_statement(p):
-    '''print_statement : PRINT expression SEMI'''
-    p[0] = ('print', p[2])
-
-
-def p_new_select(p):
-    '''select_statement : SELECT selector params SEMI'''
-    p[0] = ('select', p[2], p[3])
-
-
-def p_selector(p):
-    '''selector : NAME
-    | TEXT
-    | type
-    | empty
-    '''
-    if p[1] in ["file", "dir"]:
-        p[0] = (1, p[1])
-    elif p[1] != None:
-        p[0] = (-0xffffff, p[1])
-    else:
-        p[0] = (0, p[1])
-
-
-def p_params(p):
-    '''params : in_clause where_clause
-    | in_clause
-    | where_clause
-    | empty'''
-    if len(p) == 2:
-        p[0] = p[1]
-    else:
-        p[0] = (6, p[1], p[2])
-
-
-def p_in_clause(p):
-    '''in_clause : IN TEXT
-    | IN NAME
-    | empty'''
-    if len(p) == 2:
-        p[0] = p[1]
-    else:
-        p[0] = (2, p[2])
-
-
-def p_where_clause(p):
-    '''where_clause : WHERE liste_condition
-    | empty'''
-    if len(p) == 2:
-        p[0] = p[1]
-    else:
-        p[0] = (4, p[2])
-
-
-def p_type(p):
-    '''type : DIR
-            | FILE'''
-    p[0] = p[1]
-
-
-def p_list_condition(p):
-    '''liste_condition : liste_condition boolean_operator condition
-        | condition'''
-    if len(p) > 2:
-        p[0] = ('liste_conditions', p[1], p[2], p[3])
-    else:
-        p[0] = p[1]
-
-
-def p_boolean_operator(p):
-    '''boolean_operator : AND
-                        | OR'''
-    p[0] = p[1]
-
-
-def p_condition(p):
-    '''condition : NAME GT result
-                 | NAME LT result
-                 | NAME GTE result
-                 | NAME LTE result
-                 | NAME DEQUAL result
-                 | NAME NOTEQUAL result
-                 | NAME STARTSW result
-                 | NAME LIKE result
-                 | NAME ENDSW result'''
-    p[0] = ('condition', p[1], p[2], p[3])
-
-
-def p_empty(p):
-    '''empty :'''
-    pass
-
-
-def p_expression(p):
-    '''expression : expression PLUS expression
-                  | expression MINUS expression
-                  | expression TIMES expression
-                  | expression DIVIDE expression
-                  | expression AND expression
-                  | expression OR expression
-                  | LPAREN expression RPAREN
-                  | NUMBER
-                  | NAME
-                  | TEXT'''
-    if len(p) == 4:
-        p[0] = (p[2], p[1], p[3])
-    else:
-        p[0] = p[1]
-
-
-def p_prop(p):
-    '''result : NUMBER
-            | NAME
-            | type
-             '''
-    p[0] = p[1]
-
-
-def p_error(p):
-    print(p)
-    print("Syntax error in input!")
-
-
-yacc.yacc()
-s: str = input('calc > ')
-yacc.parse(s)
+def find_column(input, token):
+    last_cr = input.rfind('\n', 0, token.lexpos)
+    if last_cr < 0:
+        last_cr = -1
+    return token.lexpos - last_cr
