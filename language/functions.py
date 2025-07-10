@@ -426,6 +426,23 @@ def eval_inst(t):
             generate_data_pdf()
         elif t[1] == 'search':
             generate_search_pdf()
+    elif t[0] == 'load':
+        if len(t) < 2:
+            print("No file specified to load commands from.")
+            return
+        file_path = PATH / t[1]
+        if not file_path.exists():
+            print(f"File '{file_path}' does not exist.")
+            return
+        try:
+            with open(file_path, 'r') as file:
+                commands = file.readlines()
+            for command in commands:
+                command = command.strip()
+                if command:  # Skip empty lines
+                    eval_inst(command.split())
+        except Exception as e:
+            print(f"Error loading commands from '{file_path}': {e}")
     elif t[0] == 'help':
         print_help(t[1] if len(t) > 1 else None)
     else:

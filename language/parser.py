@@ -63,9 +63,13 @@ def p_delete_statement(p):
     p[0] = ('delete', p[2])
 
 def p_load_statement(p):
-    '''load_statement : LOAD NAME SEMI'''
+    '''load_statement : LOAD nt SEMI'''
     p[0] = ('load', p[2])
-
+def p_nt(p):
+    '''nt : TEXT
+            | NAME
+             '''
+    p[0] = p[1]
 def p_create_post_statement(p):
     '''create_post_statement : CREATE POST SEMI'''
     p[0] = ('create_post', None)
