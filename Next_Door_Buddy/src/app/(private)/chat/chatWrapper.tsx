@@ -1,5 +1,5 @@
 "use client"
-import {useEffect, useMemo, useRef, useState} from "react"
+import {FormEvent, useEffect, useMemo, useRef, useState} from "react"
 import {MySocket, useSocket} from "./socketProvider"
 import {
     Dialog, DialogClose,
@@ -85,7 +85,10 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
     typingStatus: string
 }) {
 
-    const handleCreateGroupChat = async (evt: { preventDefault: () => void; target: HTMLFormElement | undefined }) => {
+    const handleCreateGroupChat = async (evt: FormEvent<HTMLFormElement>& {
+        target: HTMLFormElement;
+        preventDefault: () => void;
+    }) => {
         evt.preventDefault()
         const formData = new FormData(evt.target)
         const az: {

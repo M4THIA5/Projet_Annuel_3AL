@@ -39,7 +39,7 @@ async function getMessages(props: any = {room: ""}): Promise<any[]> {
 
 }
 
-const socketHandler = async (socket: Socket, io: Server): Promise<void> => {
+const socketHandler = async (socket: Socket & {username:string}, io: Server): Promise<void> => {
     console.log('A user connected:', socket.id)
 
     const messages = await getMessages();
