@@ -33,7 +33,6 @@ export async function getUserFriends(userId: number): Promise<FriendsResult> {
       received.some(r => r.userId === s.userId)
     )
 
-    // en_attente = sent but not received
     const pending: UserProperties[] = sent.filter(s =>
       !received.some(r => r.userId === s.userId)
     )

@@ -38,7 +38,8 @@
     "neogma": "^1.14.1",
     "nodemailer": "^7.0.3",
     "pg": "^8.13.3",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "zod": "^3.25.71"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.26.0",

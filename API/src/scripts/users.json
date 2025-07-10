@@ -4,174 +4,299 @@
     "lastName": "User1",
     "email": "user1@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.8566,
+    "longitude": 2.3522,
+    "address": "10 Rue de Rivoli",
+    "city": "Paris",
+    "postalCode": "75001"
   },
   {
     "firstName": "User2",
     "lastName": "User2",
     "email": "user2@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.8575,
+    "longitude": 2.3458,
+    "address": "15 Avenue de l'Opéra",
+    "city": "Paris",
+    "postalCode": "75001"
   },
   {
     "firstName": "User3",
     "lastName": "User3",
     "email": "user3@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.8584,
+    "longitude": 2.2945,
+    "address": "5 Avenue Anatole France",
+    "city": "Paris",
+    "postalCode": "75007"
   },
   {
     "firstName": "User4",
     "lastName": "User4",
     "email": "user4@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.8606,
+    "longitude": 2.3376,
+    "address": "Rue de Rivoli",
+    "city": "Paris",
+    "postalCode": "75001"
   },
   {
     "firstName": "User5",
     "lastName": "User5",
     "email": "user5@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.8667,
+    "longitude": 2.3333,
+    "address": "8 Boulevard Montmartre",
+    "city": "Paris",
+    "postalCode": "75009"
   },
   {
     "firstName": "User6",
     "lastName": "User6",
     "email": "user6@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.8708,
+    "longitude": 2.3048,
+    "address": "20 Avenue des Champs-Élysées",
+    "city": "Paris",
+    "postalCode": "75008"
   },
   {
     "firstName": "User7",
     "lastName": "User7",
     "email": "user7@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.8738,
+    "longitude": 2.2950,
+    "address": "1 Rue de la Boétie",
+    "city": "Paris",
+    "postalCode": "75008"
   },
   {
     "firstName": "User8",
     "lastName": "User8",
     "email": "user8@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.8790,
+    "longitude": 2.3426,
+    "address": "12 Rue de Maubeuge",
+    "city": "Paris",
+    "postalCode": "75009"
   },
   {
     "firstName": "User9",
     "lastName": "User9",
     "email": "user9@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.8822,
+    "longitude": 2.3331,
+    "address": "3 Rue de Clichy",
+    "city": "Paris",
+    "postalCode": "75009"
   },
   {
     "firstName": "User10",
     "lastName": "User10",
     "email": "user10@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.8867,
+    "longitude": 2.3431,
+    "address": "18 Rue Lepic",
+    "city": "Paris",
+    "postalCode": "75018"
   },
   {
     "firstName": "User11",
     "lastName": "User11",
     "email": "user11@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.9886,
+    "longitude": 2.1536,
+    "address": "5 Rue de Paris",
+    "city": "Herblay",
+    "postalCode": "95220"
   },
   {
     "firstName": "User12",
     "lastName": "User12",
     "email": "user12@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.9890,
+    "longitude": 2.1510,
+    "address": "10 Avenue Paul Langevin",
+    "city": "Herblay",
+    "postalCode": "95220"
   },
   {
     "firstName": "User13",
     "lastName": "User13",
     "email": "user13@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.9902,
+    "longitude": 2.1544,
+    "address": "2 Rue de l'Église",
+    "city": "Herblay",
+    "postalCode": "95220"
   },
   {
     "firstName": "User14",
     "lastName": "User14",
     "email": "user14@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.9911,
+    "longitude": 2.1577,
+    "address": "8 Rue de Conflans",
+    "city": "Herblay",
+    "postalCode": "95220"
   },
   {
     "firstName": "User15",
     "lastName": "User15",
     "email": "user15@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.9920,
+    "longitude": 2.1590,
+    "address": "15 Rue de Pontoise",
+    "city": "Herblay",
+    "postalCode": "95220"
   },
   {
     "firstName": "User16",
     "lastName": "User16",
     "email": "user16@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.9930,
+    "longitude": 2.1600,
+    "address": "20 Avenue de la Gare",
+    "city": "Herblay",
+    "postalCode": "95220"
   },
   {
     "firstName": "User17",
     "lastName": "User17",
     "email": "user17@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.9940,
+    "longitude": 2.1610,
+    "address": "25 Rue de la République",
+    "city": "Herblay",
+    "postalCode": "95220"
   },
   {
     "firstName": "User18",
     "lastName": "User18",
     "email": "user18@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.9950,
+    "longitude": 2.1620,
+    "address": "30 Rue de la Frette",
+    "city": "Herblay",
+    "postalCode": "95220"
   },
   {
     "firstName": "User19",
     "lastName": "User19",
     "email": "user19@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.9960,
+    "longitude": 2.1630,
+    "address": "35 Rue de l'Abbé Fleury",
+    "city": "Herblay",
+    "postalCode": "95220"
   },
   {
     "firstName": "User20",
     "lastName": "User20",
     "email": "user20@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.9970,
+    "longitude": 2.1640,
+    "address": "40 Rue de la Fontaine",
+    "city": "Herblay",
+    "postalCode": "95220"
   },
   {
     "firstName": "User21",
     "lastName": "User21",
     "email": "user21@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.9980,
+    "longitude": 2.1650,
+    "address": "45 Rue de la Gare",
+    "city": "Herblay",
+    "postalCode": "95220"
   },
   {
     "firstName": "User22",
     "lastName": "User22",
     "email": "user22@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 48.9990,
+    "longitude": 2.1660,
+    "address": "50 Rue de la Liberté",
+    "city": "Herblay",
+    "postalCode": "95220"
   },
   {
     "firstName": "User23",
     "lastName": "User23",
     "email": "user23@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 49.0000,
+    "longitude": 2.1670,
+    "address": "55 Rue de la Paix",
+    "city": "Herblay",
+    "postalCode": "95220"
   },
   {
     "firstName": "User24",
     "lastName": "User24",
     "email": "user24@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 49.0010,
+    "longitude": 2.1680,
+    "address": "60 Rue de la Concorde",
+    "city": "Herblay",
+    "postalCode": "95220"
   },
   {
     "firstName": "User25",
     "lastName": "User25",
     "email": "user25@example.com",
     "password": "hashed_password",
-    "roles": ["classic"]
+    "roles": ["classic"],
+    "latitude": 49.0020,
+    "longitude": 2.1690,
+    "address": "65 Rue de la Victoire",
+    "city": "Herblay",
+    "postalCode": "95220"
   }
 ]

@@ -68,7 +68,7 @@ export const deleteJournalById = async (id: string) => {
 
 export const updateJournal = async (id: string, content: object) => {
     try {
-        const response = await API.put('/journal/' + id, {accessToken: await getAccessToken(), data: content})
+        const response = await API.put(`/journal/${id}`, {accessToken: await getAccessToken(), data: content})
         if (!response.ok) {
             throw new Error('Failed to get page')
         }

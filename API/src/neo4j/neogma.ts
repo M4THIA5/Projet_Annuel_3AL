@@ -38,4 +38,13 @@ User.addRelationships({
   },
 })
 
+export async function removeFriendRelation(userId1: number, userId2: number): Promise<void> {
+  const query = `
+    MATCH (u1:User {userId: $userId1})-[r:${neoRelations.friends}]->(u2:User {userId: $userId2})
+    DELETE r
+  `;
+
+  await neogma.queryRunner.run(query, { userId1, userId2 });
+}
+
 export { neogma, User }
