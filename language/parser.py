@@ -67,8 +67,8 @@ def p_load_statement(p):
     p[0] = ('load', p[2])
 
 def p_create_post_statement(p):
-    '''create_post_statement : CREATE POST LPAREN params RPAREN SEMI'''
-    p[0] = ('create_post', p[4])
+    '''create_post_statement : CREATE POST SEMI'''
+    p[0] = ('create_post', None)
 
 
 def p_see_exchanges_statement(p):

@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
+import json
 import os
 import pathlib as pathlib
 import platform
 import stat
 import subprocess
 from datetime import datetime
+
+import requests
 from fpdf import XPos, YPos, FPDF
 import webbrowser
 
@@ -342,7 +345,6 @@ def eval_inst(t):
             print("File not found")
     elif t[0] == 'select':
         calc = calculate(t)
-        # print(calc)
         if calc < 0:
             elem = t[1][1].replace('"', '')
             try:
@@ -407,7 +409,15 @@ def eval_inst(t):
         eval_inst(t[1])
         eval_inst(t[2])
     elif t[0]== 'create_post':
-        pass
+        data = input("What do you want to publish ? ")
+        if not data:
+            print("You must provide some data to create a post.")
+            return
+        try:
+            create_post(data)
+            print("Post created successfully.")
+        except requests.exceptions.RequestException as e:
+            print(f"Failed to create post: {e}")
     elif t[0]== 'see_exchanges':
         url = "https://laporteacote.online/troc"
         webbrowser.open(url)
@@ -489,6 +499,42 @@ def generate_search_pdf():
     pdf.output(output_path)
     print(f"PDF generated at {output_path}")
 
+def create_post(data): #TODo : fix this
+    """ Creates a post by sending data to the server """
+    url = "https://api.laporteacote.online/login"
+    headers = {
+        "Content-Type": "application/json",
+    }
+    payload = {
+        "email": "user1@example.com",
+        "password": "hashed_password",
+    }
+    response = requests.post(url, json=payload, headers=headers)
+    text = json.loads(response.text)
+    token = text.accessToken
+    url = "https://api.laporteacote.online/users/me"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer "+ token
+    }
+    response = requests.post(url, json=payload, headers=headers)
+    text = json.loads(response.text)
+    url = "https://api.laporteacote.online/post/create"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer "+ token
+    }
+    payload = {
+        "userId":text.id,
+        "neighborhoodId":text.userNeighborhoods[0].neighborhoodId,
+        "content": data,
+    }
+    response = requests.post(url, json=payload, headers=headers)
+    response.raise_for_status()  # Raise an error for bad responses (4xx or 5xx)
+    if response.status_code == 201:
+        print("Post created successfully.")
+    else:
+        print(f"Failed to create post: {response.status_code} - {response.text}")
 
 def human_size(bytes, units=None):
     """ Returns a human-readable string representation of bytes """
