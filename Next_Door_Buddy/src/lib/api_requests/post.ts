@@ -100,7 +100,7 @@ export const updatePost = async (id: string, content: Record<string, never>): Pr
             formData.append(key, content[key])
         })
 
-        const response = await API.put(`/posts/${id}`,formData, {
+        const response = await API.put(`/post/${id}`,formData, {
             accessToken: await getAccessToken(),
         })
 
@@ -124,7 +124,7 @@ export const updatePost = async (id: string, content: Record<string, never>): Pr
 // Supprimer un post
 export const deletePost = async (id: string): Promise<void> => {
     try {
-        const response = await API.delete(`/posts/${id}`, { accessToken: await getAccessToken() })
+        const response = await API.delete(`/post/${id}`, { accessToken: await getAccessToken() })
         if (!response.ok) {
             throw new Error('Failed to delete post')
         }

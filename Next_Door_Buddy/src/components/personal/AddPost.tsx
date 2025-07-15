@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from "react"
+import {useState, useRef} from "react"
 import {
     Dialog,
     DialogTrigger,
@@ -8,15 +8,15 @@ import {
     DialogHeader,
     DialogTitle,
 } from "#/components/ui/dialog"
-import { Button } from "#/components/ui/button"
-import { Input } from "#/components/ui/input"
-import { TooltipProvider } from "#/components/ui/tooltip"
-import { MinimalTiptapEditor } from "#/components/minimal-tiptap"
-import { toast } from "react-toastify"
-import { createPost } from "#/lib/api_requests/post"
-import { Skeleton } from "#/components/ui/skeleton"
-import { Avatar, AvatarImage, AvatarFallback } from "#/components/ui/avatar"
-import { mdiHandshake, mdiSwapHorizontal, mdiCompass, mdiPlusBox } from "@mdi/js"
+import {Button} from "#/components/ui/button"
+import {Input} from "#/components/ui/input"
+import {TooltipProvider} from "#/components/ui/tooltip"
+import {MinimalTiptapEditor} from "#/components/minimal-tiptap"
+import {toast} from "react-toastify"
+import {createPost} from "#/lib/api_requests/post"
+import {Skeleton} from "#/components/ui/skeleton"
+import {Avatar, AvatarImage, AvatarFallback} from "#/components/ui/avatar"
+import {mdiHandshake, mdiSwapHorizontal, mdiCompass, mdiPlusBox} from "@mdi/js"
 import Icon from "@mdi/react"
 import {Neighborhood} from "#/types/neighborghood";
 import {UserNeighborhood} from "#/types/user";
@@ -28,7 +28,7 @@ interface PostDialogProps {
     neighborhood: Neighborhood
 }
 
-export default function AddPost({ profileId, neighborhoodId, profile, neighborhood }: PostDialogProps) {
+export default function AddPost({profileId, neighborhoodId, profile, neighborhood}: PostDialogProps) {
     const [value, setValue] = useState<string>("")
     const [formErrors, setFormErrors] = useState<Record<string, string>>({})
     const [images, setImages] = useState<File[]>([])
@@ -71,7 +71,7 @@ export default function AddPost({ profileId, neighborhoodId, profile, neighborho
             return
         }
 
-        setFormErrors((prev) => ({ ...prev, image: "" }))  // Corrigé: "image" et non "images"
+        setFormErrors((prev) => ({...prev, image: ""}))  // Corrigé: "image" et non "images"
         setImages(validImages)
     }
 
@@ -103,7 +103,7 @@ export default function AddPost({ profileId, neighborhoodId, profile, neighborho
             <div className="flex flex-col items-center gap-4 bg-gray-100 rounded-xl px-4 py-3 mb-6 shadow-sm">
                 <div className="flex w-full items-center">
                     <Avatar className="mr-2">
-                        <AvatarImage src={profile?.user.image?.toString()} alt={profile?.user.firstName} />
+                        <AvatarImage src={profile?.user.image?.toString()} alt={profile?.user.firstName}/>
                         <AvatarFallback>{getInitials(profile?.user.firstName)}</AvatarFallback>
                     </Avatar>
 
@@ -119,28 +119,31 @@ export default function AddPost({ profileId, neighborhoodId, profile, neighborho
 
                 <div className="flex justify-around text-sm text-black space-x-4 select-none w-full">
                     <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400">
-                        <Icon path={mdiHandshake} size={0.9} className="mr-2" />
+                        <Icon path={mdiHandshake} size={0.9} className="mr-2"/>
                         <span>Proposer un service</span>
                     </div>
-                    <div className="border-l h-5 border-gray-400" />
+                    <div className="border-l h-5 border-gray-400"/>
                     <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400">
-                        <Icon path={mdiSwapHorizontal} size={0.9} className="mr-2" />
+                        <Icon path={mdiSwapHorizontal} size={0.9} className="mr-2"/>
                         <span>Échanger</span>
                     </div>
-                    <div className="border-l h-5 border-gray-400" />
+                    <div className="border-l h-5 border-gray-400"/>
                     <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400">
-                        <Icon path={mdiCompass} size={0.9} className="mr-2" />
+                        <Icon path={mdiCompass} size={0.9} className="mr-2"/>
                         <span>Proposer une excursion</span>
                     </div>
-                    <div className="border-l h-5 border-gray-400" />
-                    <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400 font-semibold">
-                        <Icon path={mdiPlusBox} size={0.9} className="mr-2" />
-                        <span>Publier</span>
-                    </div>
+                    <div className="border-l h-5 border-gray-400"/>
+                    <DialogTrigger asChild>
+                        <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400 font-semibold">
+                            <Icon path={mdiPlusBox} size={0.9} className="mr-2"/>
+                            <span>Publier</span>
+                        </div>
+                    </DialogTrigger>
                 </div>
             </div>
 
-            <DialogContent className="p-6" style={{ width: '600px', maxWidth: '700px', height: '500px', maxHeight: '500px' }}>
+            <DialogContent className="p-6"
+                           style={{width: '600px', maxWidth: '700px', height: '500px', maxHeight: '500px'}}>
                 <DialogHeader>
                     <DialogTitle>Ajouter un post</DialogTitle>
                 </DialogHeader>
@@ -148,14 +151,16 @@ export default function AddPost({ profileId, neighborhoodId, profile, neighborho
                 <TooltipProvider>
                     <form className="flex flex-col w-full h-full" onSubmit={(e) => e.preventDefault()}>
                         {isLoading ? (
-                            <Skeleton className="w-full h-full rounded-md" />
+                            <div className="w-full h-full rounded-md border border-input">
+                                <Skeleton className="w-full h-[35vh] rounded-md" />
+                            </div>
                         ) : (
-                            <div className="flex-1 w-full h-full rounded border border-input">
+                            <div className="w-full h-full rounded-md border border-input">
                                 <MinimalTiptapEditor
                                     value={value}
                                     onChange={setValue}
-                                    className="w-full"
-                                    editorContentClassName="p-5 max-h-[30vh] max-w-[35vw] overflow-y-auto"
+                                    className="w-full h-full"
+                                    editorContentClassName="p-4 max-h-[30vh] max-w-[35vw] overflow-y-auto"
                                     output="html"
                                     autofocus
                                     editable
@@ -163,6 +168,7 @@ export default function AddPost({ profileId, neighborhoodId, profile, neighborho
                                 />
                             </div>
                         )}
+
                         <Input
                             type="file"
                             accept="image/*"
