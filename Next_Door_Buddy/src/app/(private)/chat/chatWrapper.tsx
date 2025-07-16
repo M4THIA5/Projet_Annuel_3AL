@@ -1,5 +1,5 @@
 "use client"
-import {useEffect, useMemo, useRef, useState} from "react"
+import {FormEvent, useEffect, useMemo, useRef, useState} from "react"
 import {MySocket, useSocket} from "./socketProvider"
 import {
     Dialog, DialogClose,
@@ -48,18 +48,22 @@ export function ChatWrapper({firstName, lastName, id}: { firstName: string, last
         // 👇️ scroll to bottom every time messages change
         lastMessageRef.current?.scrollIntoView({behavior: 'smooth'})
     }, [messages])
+    const [reload, setReload] = useState<boolean>(false)
 
     return (
-        <div className="chat">
-            <ChatBar setCurrentRoom={setCurrentRoom}/>
-            <div className="chat__main">
-                <ChatBody
-                    messages={messages}
-                    user={{firstName, lastName, id}}
-                    lastMessageRef={lastMessageRef}
-                    typingStatus={typingStatus}
-                />
-                {socket && <ChatFooter socket={socket} user={{firstName, lastName}} currentRoom={currentRoom}/>}
+        <div>
+            <div className="flex flex-row">
+                <ChatBar setCurrentRoom={setCurrentRoom} reload={reload}/>
+                <div className="flex flex-col w-full">
+                        <ChatBody
+                            messages={messages}
+                            user={{firstName, lastName, id}}
+                            lastMessageRef={lastMessageRef}
+                            typingStatus={typingStatus}
+                            reload={setReload}
+                        />
+                    {socket && <ChatFooter socket={socket} user={{firstName, lastName}} currentRoom={currentRoom}/>}
+                </div>
             </div>
         </div>
     )
@@ -74,7 +78,7 @@ type Message = {
     }
 }
 
-function ChatBody({messages, user, lastMessageRef, typingStatus}: {
+function ChatBody({messages, user, lastMessageRef, typingStatus, reload }: {
     messages: Message[]
     user: {
         firstName: string
@@ -83,10 +87,12 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
     }
     lastMessageRef: React.RefObject<HTMLDivElement | null>
     typingStatus: string
+    reload: (value: (((prevState: (boolean)) => (boolean)) | boolean)) => void
 }) {
 
-    const handleCreateGroupChat = async (evt: { preventDefault: () => void; target: HTMLFormElement | undefined }) => {
+    const handleCreateGroupChat = async (evt: FormEvent<HTMLFormElement>) => {
         evt.preventDefault()
+        // @ts-expect-error evt.target not recognized
         const formData = new FormData(evt.target)
         const az: {
             name: string
@@ -100,6 +106,8 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
             az.users.push(value as string)
         }
         await createGroupChat(az)
+        reload((prevState) => !prevState)
+        setOpen(false)
     }
     const username = user.firstName + " " + user.lastName
     const [users, setUsers] = useState<GroupUser[]>([])
@@ -129,12 +137,16 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
         options.push({label: elem.name, value: elem.id})
     }
 
+    const [open, setOpen] = useState(false)
+
 
     return (
-        <>
-            <header className="chat__mainHeader">
-                <p>Hangout with Colleagues</p>
-                <Dialog>
+        <div className="">
+            <header className="flex flex-col items-start mb-5">
+                <p className="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight m-2">
+                    Hangout with Colleagues
+                </p>
+                <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
                         <Button variant="outline">Create a new Group
                         </Button>
@@ -172,32 +184,44 @@ function ChatBody({messages, user, lastMessageRef, typingStatus}: {
                 </Dialog>
             </header>
             {/*This shows messages sent from you*/}
-            <div className="message__container">
-                {messages.map((message) =>
-                    `${message.name}` === username ? (
-                        <div className="message__chats" key={message.id}>
-                            <p className="sender__name">You</p>
-                            <div className="message__sender">
-                                <p>{message.text}</p>
+            <div className="flex">
+                <div
+                    className="px-4 flex flex-col py-2 space-y-2 align-middle justify-around flex-1 overflow-y-auto h-[65vh]">
+                    {messages.map((message) =>
+                        message.name === username ? (
+                            // Messages de l'utilisateur
+                            <div key={message.id} className="flex justify-end mb-2">
+                                <div className="flex flex-col items-end max-w-xs sm:max-w-md">
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">You</p>
+                                    <div
+                                        className="bg-blue-500 text-white px-4 py-2 rounded-2xl rounded-br-none shadow">
+                                        <p>{message.text}</p>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    ) : (
-                        <div className="message__chats" key={message.id}>
-                            <p>{message.name}</p>
-                            <div className="message__recipient">
-                                <p>{message.text}</p>
+                        ) : (
+                            // Messages des autres
+                            <div key={message.id} className="flex justify-start mb-2">
+                                <div className="flex flex-col items-start max-w-xs sm:max-w-md">
+                                    <p className="text-sm text-gray-600 dark:text-gray-300">{message.name}</p>
+                                    <div
+                                        className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2 rounded-2xl rounded-bl-none shadow">
+                                        <p>{message.text}</p>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    )
+                        )
+                    )}
+                </div>
+                {/* Indicateur de frappe */}
+                {typingStatus && (
+                    <div className="text-sm italic text-gray-500 px-4 mt-2">{typingStatus}</div>
                 )}
 
-                {/*This is triggered when a user is typing*/}
-                <div className="message__status">
-                    <p>{typingStatus}</p>
-                </div>
                 <div ref={lastMessageRef}/>
             </div>
-        </>
+        </div>
+
     )
 }
 
@@ -207,7 +231,7 @@ function ChatFooter({socket, user, currentRoom}: {
         lastName: string
     }
     socket: MySocket,
-    currentRoom:string
+    currentRoom: string
 }) {
 
     const [message, setMessage] = useState('')
@@ -232,18 +256,24 @@ function ChatFooter({socket, user, currentRoom}: {
         setMessage('')
     }
     return (
-        <div className="chat__footer">
+        <div className="fixed bottom-0 min-w-6xl">
             <form className="form" onSubmit={handleSendMessage}>
-                <input
-                    type="text"
-                    placeholder="Write message"
-                    className="message"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyDown={handleTyping}
-                    onKeyUp={handleEndTyping}
-                />
-                <button className="sendBtn">SEND</button>
+                <div
+                    className="w-full px-4 py-3 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700 flex items-center space-x-3">
+                    <input
+                        type="text"
+                        placeholder="Write message..."
+                        className="flex-1 px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        onKeyDown={handleTyping}
+                        onKeyUp={handleEndTyping}
+                    />
+                    <button
+                        className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-full transition">
+                        Envoyer
+                    </button>
+                </div>
             </form>
         </div>
     )
@@ -251,30 +281,28 @@ function ChatFooter({socket, user, currentRoom}: {
 
 interface ChatBarProps {
     setCurrentRoom: (value: (((prevState: (string)) => (string)) | string)) => void
+    reload: boolean
 }
 
-function ChatBar({setCurrentRoom}: ChatBarProps) {
+function ChatBar({setCurrentRoom, reload}: ChatBarProps) {
     const [groups, setGroups] = useState<Group[]>([])
-    useEffect(() => {
 
+    useEffect(() => {
         const getgrps = async () => {
             const d = await getUserGroups()
-            const globalGroup = { id: "", nom: "Global Chat" }
+            const globalGroup = {id: "", nom: "Global Chat"}
 
             setGroups([globalGroup, ...d])
-
         }
         getgrps()
-    }, [])
+    }, [reload])
     return (
-        <div className="chat__sidebar">
-            <h2>Open Chat</h2>
-
+        <div className="w-1/8">
             <div>
                 <h4 className="chat__header">Select Group</h4>
                 <div className="chat__users">
                     {groups.map(group => (
-                        <div key={group.id} onClick={() => setCurrentRoom(group.id)}>
+                        <div key={group.id} onClick={() => setCurrentRoom(group.id)} className="text-gray-800 text-l">
                             {group.nom}
                         </div>
                     ))}
