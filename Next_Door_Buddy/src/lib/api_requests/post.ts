@@ -100,14 +100,16 @@ export const updatePost = async (content: {
     content: string
     type: string
     images: File[]
+    keptImages: string[]
 }): Promise<object> => {
     try {
-        console.log("content",content)
+        console.log("content", content)
         const formData = new FormData()
 
         formData.append('postId', content.postId)
         formData.append('content', content.content)
         formData.append('type', content.type)
+        formData.append('keptImages', JSON.stringify(content.keptImages))
 
         content.images.forEach((image) => {
             formData.append('images', image)
@@ -129,6 +131,7 @@ export const updatePost = async (content: {
         throw error
     }
 }
+
 
 
 

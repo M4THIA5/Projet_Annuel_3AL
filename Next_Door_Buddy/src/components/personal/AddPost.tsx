@@ -26,6 +26,7 @@ interface PostDialogProps {
     neighborhoodId: string
     profile: UserNeighborhood
     neighborhood: Neighborhood
+    loadPosts: () => Promise<void>
 }
 
 export default function AddPost({profileId, neighborhoodId, profile, neighborhood}: PostDialogProps) {

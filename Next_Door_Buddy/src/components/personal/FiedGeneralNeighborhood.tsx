@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react"
 import { Post } from "#/types/post"
-import { getPostsByNeighborhoodId } from "#/lib/api_requests/post"
+import { getPostsByNeighborhoodId, deletePost } from "#/lib/api_requests/post"
 import { Card, CardContent } from "#/components/ui/card"
 import { Badge } from "#/components/ui/badge"
 import { Skeleton } from "../ui/skeleton"
 import { Avatar, AvatarFallback, AvatarImage } from "#/components/ui/avatar"
+import { Button } from "#/components/ui/button"
 import Lightbox from "react-image-lightbox"
 import "react-image-lightbox/style.css"
-import EditPost from "#/components/personal/EditPost";
+import EditPost from "#/components/personal/EditPost"
+import { getProfile } from "#/lib/api_requests/user"
+import { User } from "#/types/user"
+import {toast} from "react-toastify";
 
 interface PostFieldDialogProps {
     neighborhoodId: string
@@ -19,21 +23,36 @@ export default function AddPost({ neighborhoodId }: PostFieldDialogProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [photoIndex, setPhotoIndex] = useState(0)
     const [activeImages, setActiveImages] = useState<string[]>([])
+    const [currentUser, setCurrentUser] = useState<string>("")
+
+    const loadPosts = async () => {
+        setLoading(true)
+        try {
+            const postData = await getPostsByNeighborhoodId(neighborhoodId)
+            const sortedPosts = postData.toSorted((a, b) =>
+                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            )
+            setPosts(sortedPosts)
+        } catch (error) {
+            console.error("Erreur lors du chargement des posts", error)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     useEffect(() => {
-        const fetchNeighborhood = async () => {
+        loadPosts()
+
+        const fetchCurrentUser = async () => {
             try {
-                const postData = await getPostsByNeighborhoodId(neighborhoodId)
-                const sortedPosts = postData.toSorted((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                setPosts(sortedPosts)
+                const user = await getProfile()
+                setCurrentUser(user.id)
             } catch (error) {
-                console.error("Erreur lors du chargement des posts", error)
-            } finally {
-                setLoading(false)
+                console.error("Erreur lors de la récupération de l'utilisateur courant", error)
             }
         }
 
-        fetchNeighborhood()
+        fetchCurrentUser()
     }, [neighborhoodId])
 
     const getInitials = (value: string | undefined) =>
@@ -58,11 +77,16 @@ export default function AddPost({ neighborhoodId }: PostFieldDialogProps) {
 
     const getBadgeColor = (type: string) => {
         switch (type.toLowerCase()) {
-            case "post": return "bg-gray-100 text-gray-700 border-gray-200"
-            case "événement": return "bg-blue-100 text-blue-700 border-blue-200"
-            case "annonce": return "bg-green-100 text-green-700 border-green-200"
-            case "discussion": return "bg-yellow-100 text-yellow-700 border-yellow-200"
-            default: return "bg-muted text-muted-foreground border"
+            case "post":
+                return "bg-gray-100 text-gray-700 border-gray-200"
+            case "événement":
+                return "bg-blue-100 text-blue-700 border-blue-200"
+            case "annonce":
+                return "bg-green-100 text-green-700 border-green-200"
+            case "discussion":
+                return "bg-yellow-100 text-yellow-700 border-yellow-200"
+            default:
+                return "bg-muted text-muted-foreground border"
         }
     }
 
@@ -87,30 +111,9 @@ export default function AddPost({ neighborhoodId }: PostFieldDialogProps) {
                 {[...Array(3)].map((_, i) => (
                     <Card className="mb-6" key={i}>
                         <CardContent className="pr-4 pl-4 py-6 space-y-4">
-                            <div className="flex justify-between">
-                                <div className="flex items-center gap-2">
-                                    <Skeleton className="h-10 w-10 rounded-full" />
-                                    <div className="flex flex-col space-y-1">
-                                        <Skeleton className="h-4 w-40 rounded" />
-                                        <Skeleton className="h-3 w-24 rounded" />
-                                    </div>
-                                </div>
-                                <Skeleton className="h-6 w-20 rounded-full" />
-                            </div>
-                            <div className="space-y-2">
-                                <Skeleton className="h-4 w-full rounded" />
-                                <Skeleton className="h-4 w-3/4 rounded" />
-                            </div>
-                            <div className="grid grid-cols-2 gap-2 mt-4">
-                                <Skeleton className="h-32 w-full rounded-lg" />
-                                <Skeleton className="h-32 w-full rounded-lg" />
-                            </div>
-                            <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
-                                <Skeleton className="h-4 w-16" />
-                                <Skeleton className="h-4 w-24" />
-                                <Skeleton className="h-4 w-16" />
-                                <Skeleton className="h-4 w-6" />
-                            </div>
+                            <Skeleton className="h-4 w-[60%]" />
+                            <Skeleton className="h-4 w-[80%]" />
+                            <Skeleton className="h-64 w-full rounded-lg" />
                         </CardContent>
                     </Card>
                 ))}
@@ -132,9 +135,7 @@ export default function AddPost({ neighborhoodId }: PostFieldDialogProps) {
                                     </Avatar>
                                     <div className="text-sm font-medium">
                                         {post.user.firstName} {post.user.lastName} ·{" "}
-                                        <span className="text-muted-foreground">
-                      {formatJoinedDuration(post.createdAt)}
-                    </span>
+                                        <span className="text-muted-foreground">{formatJoinedDuration(post.createdAt)}</span>
                                     </div>
                                 </div>
                                 <Badge
@@ -162,17 +163,13 @@ export default function AddPost({ neighborhoodId }: PostFieldDialogProps) {
                                         ? "grid-cols-1"
                                         : post.images.length === 2
                                             ? "grid-cols-2"
-                                            : post.images.length === 3
-                                                ? "grid-cols-2 grid-rows-2"
-                                                : "grid-cols-2 grid-rows-2"
+                                            : "grid-cols-2 grid-rows-2"
                                 }`}>
                                     {post.images.slice(0, 4).map((img, idx) => {
                                         let className = "rounded-lg cursor-pointer object-cover w-full h-64"
-
                                         if (post.images.length === 3 && idx === 0) {
                                             className += " row-span-2 h-full"
                                         }
-
                                         return (
                                             <img
                                                 key={idx}
@@ -183,7 +180,6 @@ export default function AddPost({ neighborhoodId }: PostFieldDialogProps) {
                                             />
                                         )
                                     })}
-
                                     {post.images.length > 4 && (
                                         <div
                                             className="relative rounded-lg cursor-pointer bg-black bg-opacity-50 flex items-center justify-center text-white text-2xl font-bold h-64"
@@ -203,26 +199,39 @@ export default function AddPost({ neighborhoodId }: PostFieldDialogProps) {
                             <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
                                 <span>👍 Upvote</span>
                                 <span>💬 Commenter</span>
-                                <span>👀 Vu</span>
-                                <EditPost
-                                    post={post}
-                                    onUpdate={async () => {
-                                        try {
-                                            const updatedPosts = await getPostsByNeighborhoodId(neighborhoodId)
-                                            const sorted = updatedPosts.toSorted((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                                            setPosts(sorted)
-                                        } catch (err) {
-                                            console.error("Erreur lors de la mise à jour des posts après édition :", err)
-                                        }
-                                    }}
-                                />
+                                <span>👀 Vu </span>
+                                {currentUser == post.userId && (
+                                    <div className="flex gap-2">
+                                        <EditPost
+                                            post={post}
+                                            onUpdate={loadPosts}
+                                        />
+                                        <Button
+                                            variant="ghost"
+                                            className="text-xs px-2 py-1"
+                                            type="button"
+                                            onClick={async () => {
+                                                try {
+                                                    await deletePost(post._id)
+                                                    toast.success("✅ Votre post a bien été supprimé.")
+                                                    await loadPosts()
+                                                } catch (error) {
+                                                    console.error("Erreur lors de la suppression du post :", error)
+                                                    toast.error("❌ Une erreur est survenue lors de la suppression du post.")
+                                                }
+                                            }}
+                                        >
+                                            Supprimer
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
                 ))}
             </div>
 
-            {isOpen && activeImages.length > 0 && (
+            {isOpen && (
                 <Lightbox
                     mainSrc={activeImages[photoIndex]}
                     nextSrc={activeImages[(photoIndex + 1) % activeImages.length]}

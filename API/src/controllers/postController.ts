@@ -108,34 +108,34 @@ export default class PostController {
     };
 
     update: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-
         const postId = req.params.id;
         const files = (req.files as Express.Multer.File[]) || [];
 
         try {
-            // Vérifie si le post existe
             const existingPost = await db.post.findUnique({
                 where: { id: postId },
             });
-
-            console.log(existingPost)
 
             if (!existingPost) {
                 res.status(404).send({ error: "Post non trouvé" });
                 return;
             }
 
-            // Génère les URLs des nouvelles images (s'il y en a)
-            const imageUrls = files.map((file) => `/uploads/${file.filename}`);
+            // Images à conserver (venant du frontend)
+            const keptImages = req.body.keptImages ? JSON.parse(req.body.keptImages) : [];
 
-            // Fusionne les données : données reçues + existantes
+            // Nouvelles images uploadées
+            const newImageUrls = files.map((file) => `/uploads/${file.filename}`);
+
+            const updatedImages = [...keptImages, ...newImageUrls];
+
             const postData = {
                 userId : existingPost.userId,
-                type : existingPost.type,
+                type : req.body.type ?? existingPost.type,
                 neighborhoodId : existingPost.neighborhoodId,
                 createdAt : existingPost.createdAt,
                 content: req.body.content ?? existingPost.content,
-                images: imageUrls.length ? imageUrls : existingPost.images,
+                images: updatedImages,
             };
 
             const updatedPost = await db.post.update({
@@ -143,7 +143,6 @@ export default class PostController {
                 data: postData,
             });
 
-            console.log("Resource updated");
             res.status(200).send({ message: "Resource updated", post: updatedPost });
         } catch (err) {
             console.error("Erreur lors de la mise à jour :", err);
