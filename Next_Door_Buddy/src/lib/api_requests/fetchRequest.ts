@@ -63,10 +63,29 @@ class Api {
     }
   }
 
+  async putF(endpoint: string, formData: FormData, options?: { accessToken?: string }): Promise<Response> {
+    const accessToken = options?.accessToken
+    console.log(formData)
+    try {
+      return await fetch(`${this.baseUrl}${endpoint}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          // Ne pas mettre Content-Type ici, FormData le gère automatiquement
+        },
+        body: formData,
+      })
+    } catch (error) {
+      console.error('Erreur lors de la requête PUT:', error)
+      throw error
+    }
+  }
+
 
   // Méthode pour effectuer une requête PUT
   async put(endpoint: string, formData: FormData, options?: {
-      accessToken?: string;
+      accessToken?: string
       data?: unknown
   }): Promise<Response> {
     const accessToken = options?.accessToken

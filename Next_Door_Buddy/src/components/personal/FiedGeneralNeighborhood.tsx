@@ -7,6 +7,7 @@ import { Skeleton } from "../ui/skeleton"
 import { Avatar, AvatarFallback, AvatarImage } from "#/components/ui/avatar"
 import Lightbox from "react-image-lightbox"
 import "react-image-lightbox/style.css"
+import EditPost from "#/components/personal/EditPost";
 
 interface PostFieldDialogProps {
     neighborhoodId: string
@@ -203,7 +204,18 @@ export default function AddPost({ neighborhoodId }: PostFieldDialogProps) {
                                 <span>👍 Upvote</span>
                                 <span>💬 Commenter</span>
                                 <span>👀 Vu</span>
-                                <span></span>
+                                <EditPost
+                                    post={post}
+                                    onUpdate={async () => {
+                                        try {
+                                            const updatedPosts = await getPostsByNeighborhoodId(neighborhoodId)
+                                            const sorted = updatedPosts.toSorted((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                                            setPosts(sorted)
+                                        } catch (err) {
+                                            console.error("Erreur lors de la mise à jour des posts après édition :", err)
+                                        }
+                                    }}
+                                />
                             </div>
                         </CardContent>
                     </Card>

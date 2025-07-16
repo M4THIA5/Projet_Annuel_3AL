@@ -31,7 +31,7 @@ postRoutes.get('/', postController.getAll);
 postRoutes.get('/:id', postController.getOne);
 postRoutes.get('/neighborhood/:neighborhoodId', postController.getByNeighborhood);
 postRoutes.post('/create', upload.array('images', 10), postController.create);
-postRoutes.put('/:id', postController.modify);
+postRoutes.put('/update/:id', upload.array('images', 10), postController.update);
 postRoutes.delete('/:id', postController.delete);
 
 export default postRoutes;

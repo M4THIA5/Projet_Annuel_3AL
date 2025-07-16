@@ -93,32 +93,43 @@ export const createPost = async (content: {
 
 
 // Mettre à jour un post
-export const updatePost = async (id: string, content: Record<string, never>): Promise<object> => {
+export const updatePost = async (content: {
+    postId: string
+    userId: string
+    neighborhoodId: string
+    content: string
+    type: string
+    images: File[]
+}): Promise<object> => {
     try {
+        console.log("content",content)
         const formData = new FormData()
-        Object.keys(content).forEach(key => {
-            formData.append(key, content[key])
+
+        formData.append('postId', content.postId)
+        formData.append('content', content.content)
+        formData.append('type', content.type)
+
+        content.images.forEach((image) => {
+            formData.append('images', image)
         })
 
-        const response = await API.put(`/post/${id}`,formData, {
+        const response = await API.putF('/post/update/' + content.postId.toString(), formData, {
             accessToken: await getAccessToken(),
         })
+        console.log(response)
 
         if (!response.ok) {
             throw new Error('Failed to update post')
         }
 
-        const data = await response.json()
-        if (!data) {
-            throw new Error('No data found')
-        }
-
-        return data
+        console.log(await response.text())
+        return response
     } catch (error) {
-        console.error('Error updating post:', error)
+        console.error('updatePost error:', error)
         throw error
     }
 }
+
 
 
 // Supprimer un post
