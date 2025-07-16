@@ -10,26 +10,28 @@ import Lightbox from "react-image-lightbox"
 import "react-image-lightbox/style.css"
 import EditPost from "#/components/personal/EditPost"
 import { getProfile } from "#/lib/api_requests/user"
-import {User, UserNeighborhood} from "#/types/user"
-import {toast} from "react-toastify"
-import {Search} from "lucide-react"
-import {Input} from "#/components/ui/input"
-import {Neighborhood} from "#/types/neighborghood"
-import AddPost from "#/components/personal/AddPost";
+import { User, UserNeighborhood } from "#/types/user"
+import { toast } from "react-toastify"
+import { Search } from "lucide-react"
+import { Input } from "#/components/ui/input"
+import { Neighborhood } from "#/types/neighborghood"
+import AddPost from "#/components/personal/AddPost"
 
 interface PostFieldDialogProps {
     neighborhoodId: string
     profile?: UserNeighborhood
-    neighborhood :Neighborhood
+    neighborhood: Neighborhood
 }
 
-export default function FiedGeneralNeighborhood({ neighborhoodId , profile ,neighborhood }: PostFieldDialogProps) {
+export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neighborhood }: PostFieldDialogProps) {
     const [posts, setPosts] = useState<Post[]>([])
     const [loading, setLoading] = useState(true)
     const [isOpen, setIsOpen] = useState(false)
     const [photoIndex, setPhotoIndex] = useState(0)
     const [activeImages, setActiveImages] = useState<string[]>([])
     const [currentUser, setCurrentUser] = useState<string>("")
+    const [searchTerm, setSearchTerm] = useState("")
+    const [selectedType, setSelectedType] = useState<string | null>(null)
 
     const loadPosts = async () => {
         setLoading(true)
@@ -48,7 +50,6 @@ export default function FiedGeneralNeighborhood({ neighborhoodId , profile ,neig
 
     useEffect(() => {
         loadPosts()
-
         const fetchCurrentUser = async () => {
             try {
                 const user = await getProfile()
@@ -57,7 +58,6 @@ export default function FiedGeneralNeighborhood({ neighborhoodId , profile ,neig
                 console.error("Erreur lors de la récupération de l'utilisateur courant", error)
             }
         }
-
         fetchCurrentUser()
     }, [neighborhoodId])
 
@@ -111,6 +111,23 @@ export default function FiedGeneralNeighborhood({ neighborhoodId , profile ,neig
         setPhotoIndex(0)
     }
 
+    const handleTypeFilter = (type: string | null) => {
+        setSelectedType(type)
+    }
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value.toLowerCase())
+    }
+
+    const filteredPosts = posts.filter(post => {
+        const matchType = selectedType ? post.type.toLowerCase() === selectedType.toLowerCase() : true
+        const matchSearch =
+            post.content.toLowerCase().includes(searchTerm) ||
+            post.user.firstName.toLowerCase().includes(searchTerm) ||
+            post.user.lastName.toLowerCase().includes(searchTerm)
+        return matchType && matchSearch
+    })
+
     if (loading) {
         return (
             <div className="space-y-6">
@@ -129,8 +146,7 @@ export default function FiedGeneralNeighborhood({ neighborhoodId , profile ,neig
 
     return (
         <>
-            {/* Top Bar */}
-            {!profile ? null : profile && neighborhood ? (
+            {profile && neighborhood && (
                 <AddPost
                     profileId={profile.user.id.toString()}
                     neighborhoodId={neighborhoodId}
@@ -138,39 +154,41 @@ export default function FiedGeneralNeighborhood({ neighborhoodId , profile ,neig
                     neighborhood={neighborhood}
                     loadPosts={loadPosts}
                 />
-            ) : (
-                <div className="flex flex-col gap-4 mb-6 px-4 py-3">
-                    <div className="flex items-center gap-2">
-                        <Skeleton className="h-10 w-10 rounded-full" />
-                        <Skeleton className="h-10 flex-1 rounded-full" />
-                    </div>
-                    <div className="flex justify-around text-sm space-x-4 w-full">
-                        <Skeleton className="h-5 w-32" />
-                        <Skeleton className="h-5 w-32" />
-                        <Skeleton className="h-5 w-32" />
-                        <Skeleton className="h-5 w-32" />
-                    </div>
-                </div>
             )}
 
-
-
-            {/* Navigation */}
+            {/* Barre de filtre */}
             <div className="flex items-center justify-between border-b pb-2 mb-4">
                 <div className="flex gap-6 font-medium">
-                    <span className="border-b-2 border-blue-500 pb-1">All</span>
-                    <span>Service</span>
-                    <span>Trocs</span>
-                    <span>Excursion</span>
+                    {["All", "Service", "Trocs", "Excursion"].map(type => (
+                        <span
+                            key={type}
+                            onClick={() => handleTypeFilter(type === "All" ? null : type)}
+                            className={`cursor-pointer pb-1 ${
+                                selectedType === null && type === "All"
+                                    ? "border-b-2 border-gray-500"
+                                    : selectedType?.toLowerCase() === type.toLowerCase()
+                                        ? "border-b-2 border-gray-500"
+                                        : ""
+                            }`}
+                        >
+                            {type}
+                        </span>
+                    ))}
                 </div>
                 <div className="relative">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400"/>
-                    <Input className="pl-8" placeholder="Rechercher"/>
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+                    <Input
+                        className="pl-8"
+                        placeholder="Rechercher"
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                    />
                 </div>
             </div>
 
+            {/* Liste des posts filtrés */}
             <div className="max-h-[60vh] max-w-[55vw] overflow-y-auto pr-2 space-y-6">
-                {posts.map((post) => (
+                {filteredPosts.map((post) => (
                     <Card className="mb-6" key={post._id}>
                         <CardContent className="pr-4 pl-4">
                             <div className="flex justify-between">
@@ -246,12 +264,9 @@ export default function FiedGeneralNeighborhood({ neighborhoodId , profile ,neig
                                 <span>👍 Upvote</span>
                                 <span>💬 Commenter</span>
                                 <span>👀 Vu </span>
-                                {currentUser == post.userId && (
+                                {currentUser === post.userId && (
                                     <div className="flex gap-2">
-                                        <EditPost
-                                            post={post}
-                                            onUpdate={loadPosts}
-                                        />
+                                        <EditPost post={post} onUpdate={loadPosts} />
                                         <Button
                                             variant="ghost"
                                             className="text-xs px-2 py-1"
