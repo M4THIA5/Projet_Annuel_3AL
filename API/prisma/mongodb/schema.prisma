@@ -41,4 +41,5 @@ model Post {
   type           String?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime? @updatedAt
+  images         String[]  @default([])
 }

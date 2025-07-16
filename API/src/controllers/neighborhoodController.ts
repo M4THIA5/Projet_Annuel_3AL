@@ -59,7 +59,7 @@ class NeighborhoodController {
             if (file) {
                 const fileBuffer = fs.readFileSync(file.path);
                 const base64 = fileBuffer.toString('base64');
-                const mimeType = file.mimetype; // exemple: 'image/jpeg'
+                const mimeType = file.mimetype;
                 data.image = `data:${mimeType};base64,${base64}`;
             }
 

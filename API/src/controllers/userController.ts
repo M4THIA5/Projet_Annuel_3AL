@@ -144,7 +144,7 @@ class UserController {
     me: RequestHandler = async (req: Request, res: Response, next) => {
         try {
             const {email} = (req as any).user
-            const user = await postgresClient.user.findUnique({where: {email: email}})
+            const user = await postgresClient.user.findUnique({where: {email: email}, include: {userNeighborhoods: true }})
             if (!user) {
                 res.status(404).json({error: 'User not found'})
                 return
@@ -155,6 +155,7 @@ class UserController {
                 lastName: user.lastName,
                 email: user.email,
                 roles: user.roles,
+                neighborhoods: user.userNeighborhoods ,
                 image: user.image,
                 latitude: user.latitude,
                 longitude: user.longitude,

@@ -11,7 +11,7 @@ import {getProfile, getRoleInArea} from "#/lib/api_requests/user"
 import {getNeighborhood, getUsersOfNeighborhood} from "#/lib/api_requests/neighborhood"
 import MapNeighborhood from "#/components/personal/MapNeighborhood"
 import {UserNeighborhood} from "#/types/user"
-import {Button} from "@react-email/components"
+import {Button} from "#/components/ui/button"
 import {Skeleton} from "#/components/ui/skeleton"
 
 export default function NeighborhoodView({params}: { params: Promise<{ id: string }> }) {

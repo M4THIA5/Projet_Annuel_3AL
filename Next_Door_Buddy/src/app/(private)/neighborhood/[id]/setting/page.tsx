@@ -1,20 +1,28 @@
 "use client"
 
-import React, {useEffect, useState} from "react"
-import {Card, CardContent} from "#/components/ui/card"
-import {Input} from "#/components/ui/input"
-import {Textarea} from "#/components/ui/textarea"
-import {Button} from "#/components/ui/button"
+import React, { useEffect, useState } from "react"
+import { Card, CardContent } from "#/components/ui/card"
+import { Input } from "#/components/ui/input"
+import { Textarea } from "#/components/ui/textarea"
+import { Button } from "#/components/ui/button"
 import Image from "next/image"
 import logo from "@/logo.png"
+import { useRouter } from "next/navigation"
+import { getProfile, getRoleInArea } from "#/lib/api_requests/user"
+import {
+    getNeighborhood,
+    getUsersOfNeighborhood,
+    updateNeighborhood,
+} from "#/lib/api_requests/neighborhood"
+import { Neighborhood } from "#/types/neighborghood"
 import {useRouter} from "next/navigation"
 import {getProfile, getRoleInArea} from "#/lib/api_requests/user"
 import {getNeighborhood, getUsersOfNeighborhood, updateNeighborhood} from "#/lib/api_requests/neighborhood"
 import MapNeighborhood from "#/components/personal/MapNeighborhood"
-import {UserNeighborhood} from "#/types/user"
+import { UserNeighborhood } from "#/types/user"
 import { Skeleton } from "#/components/ui/skeleton"
 
-export default function NeighborhoodForm({params}: { params: Promise<{ id: string }> }) {
+export default function NeighborhoodForm({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter()
     const NeighborhoodId = decodeURIComponent(React.use(params).id)
     const [userNeighborhoods, setUserNeighborhoods] = useState<UserNeighborhood[]>([])
@@ -73,16 +81,28 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
     }, [NeighborhoodId])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const {name, value} = e.target
-        setFormData((prev) => ({...prev, [name]: value}))
-        setFormErrors((prev) => ({...prev, [name]: ""}))
+        const { name, value } = e.target
+        setFormData((prev) => ({ ...prev, [name]: value }))
+        setFormErrors((prev) => ({ ...prev, [name]: "" }))
     }
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const file = e.target.files[0]
-            setFormData((prev) => ({...prev, image: file}))
-            setFormErrors((prev) => ({...prev, image: ""}))
+
+            // Vérification de type MIME (image uniquement)
+            if (!file.type.startsWith("image/")) {
+                setFormErrors((prev) => ({
+                    ...prev,
+                    image: "Seuls les fichiers image sont autorisés.",
+                }))
+                setFormData((prev) => ({ ...prev, image: null }))
+                setImagePreview(null)
+                return
+            }
+
+            setFormData((prev) => ({ ...prev, image: file }))
+            setFormErrors((prev) => ({ ...prev, image: "" }))
 
             const reader = new FileReader()
             reader.onload = () => {
@@ -133,9 +153,10 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
             updateNeighborhood(Number(NeighborhoodId), finalFormData)
                 .then(() => {
                     handleCancel()
-                }).catch(() => {
-                alert('Une erreur est survenue lors de la mise à jour. Veuillez réessayer.')
-            })
+                })
+                .catch(() => {
+                    alert('Une erreur est survenue lors de la mise à jour. Veuillez réessayer.')
+                })
         }
     }
 
@@ -154,7 +175,6 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
                         noValidate
                     >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Colonne gauche : Image + Description */}
                             <div className="flex flex-col gap-1 justify-center">
                                 {isLoading ? (
                                     <Skeleton className="w-[600px] h-[400px] rounded-lg mx-auto" />
@@ -164,8 +184,7 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
                                         alt="Aperçu"
                                         width={600}
                                         height={400}
-                                        className={`w-[600px] h-[400px] object-cover rounded-lg border mx-auto ${
-                                            formErrors.image ? "border-red-500" : ""
+                                        className={`w-[600px] h-[400px] object-cover rounded-lg border mx-auto ${formErrors.image ? "border-red-500" : ""
                                         }`}
                                     />
                                 )}
@@ -204,7 +223,6 @@ export default function NeighborhoodForm({params}: { params: Promise<{ id: strin
                                 )}
                             </div>
 
-                            {/* Colonne droite : Champs texte + Carte */}
                             <div className="flex flex-col gap-4">
                                 {isLoading ? (
                                     <Skeleton className="h-10 rounded-md" />
