@@ -50,11 +50,11 @@ def setup():
     if not os.path.isdir(PATH):
         print("The path is not a directory.")
         exit(1)
-    if not os.path.exists(PATH / 'launchjava.bat'):
-        print("The required file 'launchjava.bat' does not exist in the specified path.")
+    if not os.path.exists(PATH / 'launchjava.sh'):
+        print("The required file 'launchjava.sh' does not exist in the specified path.")
         exit(1)
-    if not os.access(PATH / 'launchjava.bat', os.R_OK | os.W_OK | os.X_OK):
-        print("You do not have the necessary permissions to access 'launchjava.bat'.")
+    if not os.access(PATH / 'launchjava.sh', os.R_OK | os.W_OK | os.X_OK):
+        print("You do not have the necessary permissions to access 'launchjava.sh'.")
         exit(1)
     if not os.path.exists(PATH / 'pdfs'):
         os.mkdir(PATH / 'pdfs')
@@ -396,12 +396,12 @@ def eval_inst(t):
             filterCondsWithType(PATH / t[2][1][1].replace('"', ''), t[2][1][1], t[1][1])
     elif t[0] == 'search':
         cmd = "where" if platform.system() == "Windows" else "which"
-        test = subprocess.call([cmd, "launchjava.bat"], stdout=subprocess.DEVNULL,
+        test = subprocess.call([cmd, "launchjava.sh"], stdout=subprocess.DEVNULL,
                                stderr=subprocess.STDOUT)
         if test != 0:
             print("The executable doesn't exist. Please install our Java app.")
             exit(1)
-        command = "launchjava.bat " + t[1]
+        command = "launchjava.sh " + t[1]
         with os.popen(command) as process:
             output = process.read()
         print("Sortie Java:", output)
