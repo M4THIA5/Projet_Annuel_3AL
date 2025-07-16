@@ -264,7 +264,7 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
                                 <span>👍 Upvote</span>
                                 <span>💬 Commenter</span>
                                 <span>👀 Vu </span>
-                                {currentUser === post.userId && (
+                                {currentUser.toString() === post.userId.toString() && (
                                     <div className="flex gap-2">
                                         <EditPost post={post} onUpdate={loadPosts} />
                                         <Button

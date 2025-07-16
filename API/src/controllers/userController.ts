@@ -155,7 +155,7 @@ class UserController {
                 lastName: user.lastName,
                 email: user.email,
                 roles: user.roles,
-                neighborhoods: user.userNeighborhoods 
+                neighborhoods: user.userNeighborhoods ,
                 image: user.image,
                 latitude: user.latitude,
                 longitude: user.longitude,
