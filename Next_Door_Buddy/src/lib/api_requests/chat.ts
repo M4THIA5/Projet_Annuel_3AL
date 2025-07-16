@@ -2,17 +2,13 @@ import {API} from "#/lib/api_requests/fetchRequest"
 import {getAccessToken} from "#/lib/authentification"
 import {Group, GroupUser} from "#/types/chat"
 
-export const createGroupChat = async (form:object): Promise<GroupUser[]> => {
+export const createGroupChat = async (form:object): Promise<boolean> => {
     try {
         const response = await API.post('/chat/group', {accessToken: await getAccessToken(), data: form})
         if (!response.ok) {
             throw new Error('Failed to get page')
         }
-        const data = await response.json()
-        if (!data) {
-            throw new Error('No data found')
-        }
-        return data
+        return true
     } catch (error) {
         throw error
     }
