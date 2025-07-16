@@ -35,7 +35,7 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
     const NeighborhoodId = decodeURIComponent(unwrappedParams.id)
     const router = useRouter()
     const [profile, setProfile] = useState<UserNeighborhood | undefined>(undefined)
-    const [neighborhood, setNeighborhood] = useState<Neighborhood | null>(null)
+    const [neighborhood, setNeighborhood] = useState<Neighborhood | undefined>(undefined)
     const [userNeighborhoods, setUserNeighborhoods] = useState<UserNeighborhood[]>([])
     const [loadingMembers, setLoadingMembers] = useState<boolean>(true)
     const [loadingButtons, setLoadingButtons] = useState<boolean>(true)
@@ -158,47 +158,11 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
 
             {/* Main Content */}
             <div className="flex-1 p-6 bg-white relative">
-                {/* Top Bar */}
-                {profile && neighborhood ? (
-                    <AddPost
-                        profileId={profile.user.id.toString()}
-                        neighborhoodId={NeighborhoodId}
-                        profile={profile}
-                        neighborhood={neighborhood}
-                    />
-                ) : (
-                    <div className="flex flex-col gap-4 mb-6 px-4 py-3">
-                        <div className="flex items-center gap-2">
-                            <Skeleton className="h-10 w-10 rounded-full" />
-                            <Skeleton className="h-10 flex-1 rounded-full" />
-                        </div>
-                        <div className="flex justify-around text-sm space-x-4 w-full">
-                            <Skeleton className="h-5 w-32" />
-                            <Skeleton className="h-5 w-32" />
-                            <Skeleton className="h-5 w-32" />
-                            <Skeleton className="h-5 w-32" />
-                        </div>
-                    </div>
-                )}
-
-
-
-                {/* Navigation */}
-                <div className="flex items-center justify-between border-b pb-2 mb-4">
-                    <div className="flex gap-6 font-medium">
-                        <span className="border-b-2 border-blue-500 pb-1">All</span>
-                        <span>Service</span>
-                        <span>Trocs</span>
-                        <span>Excursion</span>
-                    </div>
-                    <div className="relative">
-                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400"/>
-                        <Input className="pl-8" placeholder="Rechercher"/>
-                    </div>
-                </div>
-
                 {/* Post Example */}
-                <FiedGeneralNeighborhood neighborhoodId={NeighborhoodId}></FiedGeneralNeighborhood>
+                <FiedGeneralNeighborhood neighborhoodId={NeighborhoodId}
+                                         profile={profile}
+                                         neighborhood={neighborhood} >
+                </FiedGeneralNeighborhood>
             </div>
 
             {/* Community Member List */}

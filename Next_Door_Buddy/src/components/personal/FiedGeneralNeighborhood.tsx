@@ -10,14 +10,20 @@ import Lightbox from "react-image-lightbox"
 import "react-image-lightbox/style.css"
 import EditPost from "#/components/personal/EditPost"
 import { getProfile } from "#/lib/api_requests/user"
-import { User } from "#/types/user"
-import {toast} from "react-toastify";
+import {User, UserNeighborhood} from "#/types/user"
+import {toast} from "react-toastify"
+import {Search} from "lucide-react"
+import {Input} from "#/components/ui/input"
+import {Neighborhood} from "#/types/neighborghood"
+import AddPost from "#/components/personal/AddPost";
 
 interface PostFieldDialogProps {
     neighborhoodId: string
+    profile?: UserNeighborhood
+    neighborhood :Neighborhood
 }
 
-export default function AddPost({ neighborhoodId }: PostFieldDialogProps) {
+export default function FiedGeneralNeighborhood({ neighborhoodId , profile ,neighborhood }: PostFieldDialogProps) {
     const [posts, setPosts] = useState<Post[]>([])
     const [loading, setLoading] = useState(true)
     const [isOpen, setIsOpen] = useState(false)
@@ -123,6 +129,46 @@ export default function AddPost({ neighborhoodId }: PostFieldDialogProps) {
 
     return (
         <>
+            {/* Top Bar */}
+            {!profile ? null : profile && neighborhood ? (
+                <AddPost
+                    profileId={profile.user.id.toString()}
+                    neighborhoodId={neighborhoodId}
+                    profile={profile}
+                    neighborhood={neighborhood}
+                    loadPosts={loadPosts}
+                />
+            ) : (
+                <div className="flex flex-col gap-4 mb-6 px-4 py-3">
+                    <div className="flex items-center gap-2">
+                        <Skeleton className="h-10 w-10 rounded-full" />
+                        <Skeleton className="h-10 flex-1 rounded-full" />
+                    </div>
+                    <div className="flex justify-around text-sm space-x-4 w-full">
+                        <Skeleton className="h-5 w-32" />
+                        <Skeleton className="h-5 w-32" />
+                        <Skeleton className="h-5 w-32" />
+                        <Skeleton className="h-5 w-32" />
+                    </div>
+                </div>
+            )}
+
+
+
+            {/* Navigation */}
+            <div className="flex items-center justify-between border-b pb-2 mb-4">
+                <div className="flex gap-6 font-medium">
+                    <span className="border-b-2 border-blue-500 pb-1">All</span>
+                    <span>Service</span>
+                    <span>Trocs</span>
+                    <span>Excursion</span>
+                </div>
+                <div className="relative">
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400"/>
+                    <Input className="pl-8" placeholder="Rechercher"/>
+                </div>
+            </div>
+
             <div className="max-h-[60vh] max-w-[55vw] overflow-y-auto pr-2 space-y-6">
                 {posts.map((post) => (
                     <Card className="mb-6" key={post._id}>

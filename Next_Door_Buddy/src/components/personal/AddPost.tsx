@@ -29,7 +29,7 @@ interface PostDialogProps {
     loadPosts: () => Promise<void>
 }
 
-export default function AddPost({profileId, neighborhoodId, profile, neighborhood}: PostDialogProps) {
+export default function AddPost({profileId, neighborhoodId, profile, neighborhood,loadPosts}: PostDialogProps) {
     const [value, setValue] = useState<string>("")
     const [formErrors, setFormErrors] = useState<Record<string, string>>({})
     const [images, setImages] = useState<File[]>([])
@@ -90,6 +90,7 @@ export default function AddPost({profileId, neighborhoodId, profile, neighborhoo
             toast.success("✅ Votre post a bien été ajouté au quartier.")
             setValue("")
             setImages([])
+            await loadPosts()
             dialogRef.current?.click() // Ferme le Dialog
         } catch (error) {
             toast.error("❌ Impossible de publier le post. Veuillez réessayer.")
