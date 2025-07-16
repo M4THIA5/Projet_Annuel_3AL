@@ -84,20 +84,31 @@ class Api {
 
 
   // Méthode pour effectuer une requête PUT
-  async put(endpoint: string, formData: FormData, options?: {
-      accessToken?: string
+
+  async put(endpoint: string, options?: {
+      formData?: FormData,
+      accessToken?: string;
       data?: unknown
   }): Promise<Response> {
     const accessToken = options?.accessToken
-    const data = options?.data
+    let body: BodyInit | undefined
+    const headers: HeadersInit = {
+      'Authorization': `Bearer ${accessToken}`,
+    }
+
+    if (options?.formData) {
+      body = options.formData
+    } else if (options?.data) {
+      body = JSON.stringify(options.data)
+      headers['Content-Type'] = 'application/json'
+    }
+
     try {
       return await fetch(`${this.baseUrl}${endpoint}`, {
         method: 'PUT',
         credentials: 'include',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: formData,
+        headers,
+        body,
       })
     } catch (error) {
       console.error('Erreur lors de la requête PUT:', error)

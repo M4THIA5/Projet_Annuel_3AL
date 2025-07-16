@@ -40,8 +40,12 @@ export default function SigninPage() {
       if (!accessToken || !isTokenValid(accessToken.toString())) {
         throw new Error('Failed to login')
       }
-
-      window.location.href = Routes.home.toString()
+      const returnTo = new URLSearchParams(window.location.search).get("return_to")
+        if (returnTo) {
+            router.push(returnTo)
+        } else {
+            router.push(Routes.home.toString())
+        }
     } catch (error) {
       console.error(error)
       if (error instanceof Error) {
@@ -53,6 +57,7 @@ export default function SigninPage() {
       setIsLoading(false)
     }
   }
+
 
   return (
       <form onSubmit={handleSubmit} noValidate className="max-w-md w-full mx-auto mt-24 px-4">

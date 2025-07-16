@@ -81,8 +81,8 @@ function DeleteUserDialog({ onConfirm }: { onConfirm: () => void }) {
 }
 
 function getAllColumns(
-  deleteUser: (id: string) => void,
-  setUserDetails: (id: string) => void
+  deleteUser: (id: number) => void,
+  setUserDetails: (id: number) => void
 ): ColumnDef<UserProfile>[] {
   return [
   {
@@ -195,9 +195,9 @@ export default function DashboardAdminPage() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [totalPages, setTotalPages] = useState(1)
-  const [userDetails, setUserDetails] = useState<string | null>(null)
+  const [userDetails, setUserDetails] = useState<number | null>(null)
 
-  async function deleteUser(userId: string) {
+  async function deleteUser(userId: number) {
   const response = await deleteUserById(userId)
     if (response.ok) {
       toast.success("Utilisateur supprimé avec succès!")

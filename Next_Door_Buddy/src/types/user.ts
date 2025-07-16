@@ -1,10 +1,29 @@
 export type UserProfile = {
-  id: string
+  id: number
   firstName: string
   lastName: string
   email: string
   image: string
   roles: UserRole[]
+  latitude?: number
+  longitude?: number
+  address?: string
+  city?: string
+  postalCode?: string
+}
+
+export type Friend = {
+  id: number
+  firstName: string
+  lastName: string
+  image?: string
+  status: 'accepted' | 'pending' | 'requested' | 'none'
+}
+
+export type MultiFriendTypes = {
+  friends: Friend[]
+  pending: Friend[]
+  friend_requests: Friend[]
 }
 
 export type User = {

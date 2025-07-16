@@ -66,7 +66,7 @@ class AuthController {
                     secure: config.NODE_ENV === 'production',
                     sameSite: 'lax',
                     path: '/',
-                    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+                    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
                 })
 
                 res.cookie(accessTokenName, accessToken, {

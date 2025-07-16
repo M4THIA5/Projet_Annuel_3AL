@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
 import Image from "next/image"
 
-export function Details({ userId, setUserDetails }: { userId: string, setUserDetails: (details: string | null) => void }) {
+export function Details({ userId, setUserDetails }: { userId: number, setUserDetails: (details: number | null) => void }) {
   const [neighborhoods, setNeighborhoods] = useState<Neighborhood[] | []>([])
 
   const fetchNeighborhood = useCallback(async () => {
