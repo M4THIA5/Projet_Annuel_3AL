@@ -1,9 +1,9 @@
-import {getAllServices} from "#/lib/api_requests/services"
+import {getAvailableServices} from "#/lib/api_requests/services"
 import Link from "next/link"
 import Item from '#/app/(private)/services/item'
 
 export default async function Services() {
-    const services = await getAllServices()
+    const services = await getAvailableServices()
 
     return (
         <div className={`h-screen flex flex-col items-center justify-center`}>

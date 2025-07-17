@@ -18,6 +18,22 @@ export const getAllServices = async (): Promise<Service[]> => {
         throw error
     }
 }
+export const getAvailableServices = async (): Promise<Service[]> => {
+    try {
+        const response = await API.get('/services/available', {accessToken: await getAccessToken()})
+        if (!response.ok) {
+            throw new Error('Failed to get services')
+        }
+        const data = await response.json() as Service[]
+        if (!data) {
+            throw new Error('No data found')
+        }
+        return data
+    } catch (error) {
+        throw error
+    }
+}
+
 
 export const fetchUserServices = async (): Promise<Service[]> => {
     try {
@@ -67,7 +83,7 @@ export const createService = async (service: Service): Promise<void> => {
 
 export const acceptRequest = async (id: string): Promise<void> => {
     try {
-        const response = await API.get('/services/'+id, {accessToken: await getAccessToken()})
+        const response = await API.get('/services/'+id+"/accept", {accessToken: await getAccessToken()})
         if (!response.ok) {
             throw new Error('Failed to get service')
         }
