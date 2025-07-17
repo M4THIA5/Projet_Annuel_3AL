@@ -1,0 +1,100 @@
+import {PrismaClient as PostgresClient} from '../../prisma/client/postgresClient'
+import {RequestHandler, Request, Response, NextFunction} from "express"
+import fs from "fs"
+import {idValidator} from "../validators/objets"
+
+const postgresClient = new PostgresClient()
+
+export default class objetController {
+    getObjets: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        const objets = await postgresClient.objet.findMany({
+            select: {
+                id: true,
+                nom: true,
+                description: true,
+                createdAt: true,
+                image: true,
+            }
+        });
+        res.status(200).send(objets)
+    }
+    getOneObjet: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        const validator = idValidator.validate(req.params);
+        if (validator.error) {
+            res.status(400).send({ error: validator.error.message });
+            return;
+        }
+        const objet = await postgresClient.objet.findFirst({
+            where: {
+                id: validator.value.id
+            }
+        });
+        res.status(200).send(objet)
+    }
+    createObjet: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+
+            const body = req.body;
+            const file = req.file
+
+            const data: any = {
+                ...body,
+            };
+
+            if (file) {
+                const fileBuffer = fs.readFileSync(file.path);
+                const base64 = fileBuffer.toString('base64');
+                const mimeType = file.mimetype; // exemple: 'image/jpeg'
+                data.image = `data:${mimeType};base64,${base64}`;
+            }
+
+            const updated = await postgresClient.objet.create({
+                data,
+            });
+
+            res.status(200).json(updated);
+        } catch (error) {
+            next(error);
+        }
+    }
+    modifyObjet: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        const validator = idValidator.validate(req.params);
+        if (validator.error) {
+            res.status(400).send({ error: validator.error.message });
+            return;
+        }
+        const body = req.body;
+        const file = req.file
+        const data: any = {
+            ...body,
+        };
+        if (file) {
+            const fileBuffer = fs.readFileSync(file.path);
+            const base64 = fileBuffer.toString('base64');
+            const mimeType = file.mimetype; // exemple: 'image/jpeg'
+            data.image = `data:${mimeType};base64,${base64}`;
+        }
+
+        const updated = await postgresClient.objet.update({
+            data: data,
+             where: {
+                id: validator.value.id
+            }
+        });
+        res.status(200).send(updated)
+    }
+    deleteObjet: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        const validator = idValidator.validate(req.params);
+        if (validator.error) {
+            res.status(400).send({ error: validator.error.message });
+            return;
+        }
+        await postgresClient.objet.delete({
+            where: {
+                id: validator.value.id
+            }
+        })
+        res.status(204).send()
+    }
+
+}
