@@ -18,6 +18,7 @@ import cookieParser from "cookie-parser"
 import objetRoutes from "./routes/objetRoutes";
 import chatRoutes from "./routes/chatRoute"
 import postRoutes from "./routes/postRoutes";
+import trocRoutes from "./routes/trocRoutes";
 
 const postgresClient = new PostgresClient()
 const mongoClient = new MongoClient()
@@ -54,6 +55,8 @@ app.use("/geocode", mapBoxRoutes)
 app.use("/objets", verifyJwt, objetRoutes)
 app.use("/chat", verifyJwt, chatRoutes)
 app.use("/post", verifyJwt, postRoutes)
+app.use("/troc", verifyJwt, trocRoutes)
+app.use("/objets", verifyJwt, objetRoutes)
 
 
 // app.use(notFoundHandler)

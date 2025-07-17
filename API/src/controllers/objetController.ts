@@ -84,17 +84,25 @@ export default class objetController {
         res.status(200).send(updated)
     }
     deleteObjet: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        const validator = idValidator.validate(req.params);
-        if (validator.error) {
-            res.status(400).send({ error: validator.error.message });
+        const { error, value } = idValidator.validate(req.params);
+
+        if (error) {
+            res.status(400).json({ error: error.message });
             return;
         }
-        await postgresClient.objet.delete({
-            where: {
-                id: validator.value.id
-            }
-        })
-        res.status(204).send()
-    }
+
+        try {
+            await postgresClient.objet.delete({
+                where: {
+                    id: value.id,
+                },
+            });
+
+            res.status(204).send();
+        } catch (err) {
+            console.error('Error deleting objet:', err);
+            res.status(500).json({ error: 'Failed to delete the objet' });
+        }
+    };
 
 }

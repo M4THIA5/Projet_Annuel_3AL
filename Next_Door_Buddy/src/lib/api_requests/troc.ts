@@ -22,6 +22,7 @@ export const getObjets = async (): Promise<Objet[]> => {
 export const getObjet = async (id: string): Promise<Objet> => {
     try {
         const response = await API.get('/objets/' + id, {accessToken: await getAccessToken()})
+        console.log(response)
         if (!response.ok) {
             throw new Error('Failed to get page')
         }
@@ -37,7 +38,7 @@ export const getObjet = async (id: string): Promise<Objet> => {
 
 export const createObjet = async (formdata:FormData): Promise<Objet[]> => {
     try {
-        const response = await API.postf('/objets/', {accessToken: await getAccessToken(), data:formdata})
+        const response = await API.postF('/objets/',formdata, {accessToken: await getAccessToken()})
         if (!response.ok) {
             throw new Error('Failed to get page')
         }
@@ -80,7 +81,8 @@ export const getDemandesTroc= async (): Promise<DemandeTroc[]> => {
 
 export const createDemandeTroc = async (form:FormData): Promise<void> => {
     try {
-        const response = await API.postf('/troc/', {accessToken: await getAccessToken(), data:form})
+        const response = await API.postF('/troc/', form ,{accessToken: await getAccessToken()})
+        console.log(response)
         if (!response.ok) {
             throw new Error('Failed to get page')
         }

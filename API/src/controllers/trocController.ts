@@ -8,13 +8,21 @@ const pgdb = new PostgreClient()
 const db = new MongoClient()
 
 export default class TrocController {
-    getAll: RequestHandler = async (_: Request, res: Response) => {
-        const trocEntries = await db.troc.findMany({where: {
-            isOpen: true
-            }})
-        res.status(200).send(trocEntries)
 
-    }
+    getAll: RequestHandler = async (_req: Request, res: Response) => {
+        try {
+            const trocEntries = await db.troc.findMany({
+                where: {
+                    isOpen: true,
+                },
+            });
+
+            res.status(200).json(trocEntries);
+        } catch (error) {
+            console.error('Error fetching troc entries:', error);
+            res.status(500).json({ error: 'Failed to fetch troc entries' });
+        }
+    };
     getOne: RequestHandler = async (req: Request, res: Response) => {
         const Validator = idValidator.validate(req.query)
         if (Validator.error != undefined) {
