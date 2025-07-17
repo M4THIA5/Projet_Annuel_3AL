@@ -19,18 +19,29 @@ export default class objetController {
         res.status(200).send(objets)
     }
     getOneObjet: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        const validator = idValidator.validate(req.params);
-        if (validator.error) {
-            res.status(400).send({ error: validator.error.message });
-            return;
-        }
-        const objet = await postgresClient.objet.findFirst({
-            where: {
-                id: validator.value.id
+        try {
+            const { error, value } = idValidator.validate(req.params);
+            if (error) {
+                res.status(400).json({ error: error.message });
+                return;
             }
-        });
-        res.status(200).send(objet)
-    }
+
+            const objet = await postgresClient.objet.findFirst({
+                where: { id: value.id }
+            });
+
+            if (!objet) {
+                res.status(404).json({ error: "Objet not found" });
+                return;
+            }
+
+            console.log(objet)
+            res.status(200).json(objet);
+        } catch (err) {
+            console.error("Error fetching objet:", err);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    };
     createObjet: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
 

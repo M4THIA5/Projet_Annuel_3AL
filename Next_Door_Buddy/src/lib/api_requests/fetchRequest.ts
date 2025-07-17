@@ -10,6 +10,7 @@ class Api {
   // Méthode pour effectuer une requête GET
   async get(endpoint: string, options?: { accessToken?: string }): Promise<Response> {
     const accessToken = options?.accessToken
+    console.log(`${this.baseUrl}${endpoint}`)
     try {
       return await fetch(`${this.baseUrl}${endpoint}`, {
         method: 'GET',
@@ -47,7 +48,6 @@ class Api {
 
   async postF(endpoint: string,formData: FormData, options?: { accessToken?: string}): Promise<Response> {
     const accessToken = options?.accessToken
-    console.log(formData)
     try {
       return await fetch(`${this.baseUrl}${endpoint}`, {
         method: 'POST',
@@ -72,7 +72,6 @@ class Api {
         credentials: 'include',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
-          // Ne pas mettre Content-Type ici, FormData le gère automatiquement
         },
         body: formData,
       })

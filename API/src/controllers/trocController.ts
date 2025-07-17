@@ -1,4 +1,4 @@
-import {Request, RequestHandler, Response} from "express";
+import {NextFunction, Request, RequestHandler, Response} from "express";
 import {PrismaClient as MongoClient} from "../../prisma/client/mongoClient"
 import {PrismaClient as PostgreClient} from "../../prisma/client/postgresClient"
 import {idValidator} from "../validators/objets"
@@ -24,52 +24,68 @@ export default class TrocController {
         }
     };
     getOne: RequestHandler = async (req: Request, res: Response) => {
-        const Validator = idValidator.validate(req.query)
-        if (Validator.error != undefined) {
-            res.status(400).send(Validator.error.message)
-            return
-        }
-        const id = Validator.value.id
-        const trocEntries = await db.troc.findUniqueOrThrow({
-            where: {
-                id: id
-            }
-        })
-        res.status(200).send(trocEntries)
-    }
-    create: RequestHandler = async (req: Request, res: Response) => {
-        const user:CurrentUser = (req as any).user
+        console.log("trocEntry")
+        const { error, value } = idValidator.validate(req.query);
 
-        if (!user) {
-            res.status(401).send("Unauthorized")
+        if (error) {
+            res.status(400).send(error.message);
             return
         }
-        const full = await pgdb.user.findUniqueOrThrow({
-            where: {
-                id: user.id
-            }
-        })
-        if (!full){
-            res.status(404).send("User not found")
-            return
+
+        try {
+            const trocEntry = await db.troc.findUniqueOrThrow({
+                where: { id: value.id },
+            });
+
+            console.log(trocEntry)
+
+            res.status(200).json(trocEntry);
+        } catch (err) {
+            res.status(404).send("Troc entry not found.");
         }
-        const t = await db.troc.findUnique({
-            where: {
-                id: user.id.toString()
+    };
+    create = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const user = (req as any).user as CurrentUser;
+
+            if (!user) {
+                res.status(401).send("Unauthorized");
+                return
             }
-        })
-        if (t) {
-            res.status(403).send("Troc already exists for this user")
-            return
+
+            // Récupère l'utilisateur complet
+            const full = await pgdb.user.findUniqueOrThrow({
+                where: { id: user.id },
+            });
+
+            const existingTroc = await db.troc.findFirst({
+                where: { userId: user.id },
+            });
+
+            if (existingTroc) {
+                res.status(403).send("Troc already exists for this user");
+                return
+            }
+
+            const { description } = req.body;
+
+            // Crée le troc
+            await db.troc.create({
+                data: {
+                    asker: `${full.firstName} ${full.lastName}`,
+                    userId: full.id,
+                    description: description,
+                },
+            });
+
+            res.status(201).json({ message: "Troc created successfully" });
+        } catch (error) {
+            console.error("Error creating Troc:", error);
+            next(error); // Passe l'erreur au middleware de gestion des erreurs
         }
-        await db.troc.create({
-            data: {
-                asker: full.firstName + " " + full.lastName,
-                userId: full.id
-            }
-        })
-        res.status(201).send("Ressource created")
-    }
+    };
+
+
     modify: RequestHandler = async (req: Request, res: Response) => {
         const Validator = idValidator.validate(req.params)
         if (Validator.error != undefined) {
@@ -99,5 +115,4 @@ export default class TrocController {
         })
         res.status(204).send()
     }
-
 }

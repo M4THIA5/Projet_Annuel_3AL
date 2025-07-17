@@ -18,10 +18,8 @@ export default function Create() {
         const formData = new FormData()
         formData.append("nom", name)
         if (description) {
-
             formData.append("description", description)
         }
-
         await createDemandeTroc(formData).then(() => {
             window.location.href = "/troc"
         })

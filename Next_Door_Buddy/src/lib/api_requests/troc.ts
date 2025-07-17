@@ -21,17 +21,25 @@ export const getObjets = async (): Promise<Objet[]> => {
 }
 export const getObjet = async (id: string): Promise<Objet> => {
     try {
-        const response = await API.get('/objets/' + id, {accessToken: await getAccessToken()})
-        console.log(response)
+
+        const response = await API.get('/objets/' + id, {
+            accessToken: await getAccessToken(),
+        })
+
         if (!response.ok) {
-            throw new Error('Failed to get page')
+            const errorText = await response.text()
+            console.error('Erreur HTTP:', response.status, errorText)
+            throw new Error(`Failed to get object (status: ${response.status})`)
         }
+
         const data = await response.json()
         if (!data) {
             throw new Error('No data found')
         }
-        return data
+
+        return data as Objet
     } catch (error) {
+        console.error('Erreur dans getObjet:', error)
         throw error
     }
 }
@@ -81,8 +89,12 @@ export const getDemandesTroc= async (): Promise<DemandeTroc[]> => {
 
 export const createDemandeTroc = async (form:FormData): Promise<void> => {
     try {
-        const response = await API.postF('/troc/', form ,{accessToken: await getAccessToken()})
-        console.log(response)
+        const formDataJson: Record<string, any> = {}
+        form.forEach((value, key) => {
+            formDataJson[key] = value
+        })
+
+        const response = await API.post('/troc/', {accessToken: await getAccessToken(), data:formDataJson})
         if (!response.ok) {
             throw new Error('Failed to get page')
         }
