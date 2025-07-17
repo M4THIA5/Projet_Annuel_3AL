@@ -120,11 +120,18 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
     }
 
     const filteredPosts = posts.filter(post => {
-        const matchType = selectedType ? post.type.toLowerCase() === selectedType.toLowerCase() : true
-        const matchSearch =
-            post.content.toLowerCase().includes(searchTerm) ||
-            post.user.firstName.toLowerCase().includes(searchTerm) ||
-            post.user.lastName.toLowerCase().includes(searchTerm)
+        if (!post || !post.user) return false
+
+        const matchType = selectedType
+            ? post.type?.toLowerCase() === selectedType.toLowerCase()
+            : true
+
+        const contentMatch = post.content?.toLowerCase().includes(searchTerm)
+        const firstNameMatch = post.user.firstName?.toLowerCase().includes(searchTerm)
+        const lastNameMatch = post.user.lastName?.toLowerCase().includes(searchTerm)
+
+        const matchSearch = contentMatch || firstNameMatch || lastNameMatch
+
         return matchType && matchSearch
     })
 
