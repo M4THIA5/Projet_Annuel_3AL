@@ -1,4 +1,6 @@
+#!/bin/bash
+
 find ./ -type f -name "cli*.jar" > var
 test="$(cat var)"
 rm var
-java -jar $test "$1"
+java.exe -jar $test "$1"

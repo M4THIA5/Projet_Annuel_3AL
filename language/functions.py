@@ -6,17 +6,20 @@ import platform
 import stat
 import subprocess
 from datetime import datetime
-
+from unicodedata import normalize
 import requests
 from fpdf import XPos, YPos, FPDF
 import webbrowser
+import shutil
 
 PATH = pathlib.Path(__file__).parent.resolve()
 
+
 class PDF(FPDF):
     def header(self):
-        # Setting font: helvetica bold 15
-        self.set_font("helvetica", style="B", size=15)
+        # Setting font: dejavu-sans bold 15
+        self.add_font("dejavu-sans", "B", "DejaVuSans-Bold.ttf", uni=True)
+        self.set_font("dejavu-sans", style="B", size=15)
         # Calculating width of title and setting cursor position:
         width = self.get_string_width(self.title) + 6
         self.set_x((210 - width) / 2)
@@ -41,6 +44,56 @@ class PDF(FPDF):
 
 
 def setup():
+    os.chdir("../JavaWebScraper")
+
+    if not os.path.exists('launchjava.sh'):
+        print("The file 'launchjava.sh' does not exist in the specified path.")
+        exit(1)
+    if not os.access('launchjava.sh', os.R_OK | os.W_OK | os.X_OK):
+        print("You do not have the necessary permissions to access 'launchjava.sh'.")
+        exit(1)
+    folder = os.path.curdir / pathlib.Path('cli/target')
+    files = [filename for filename in os.listdir(folder) if filename.startswith('cli-') and filename.endswith('.jar')]
+    if not files:
+        print("The directory 'cli/target' does not exist in the specified path.")
+        exit(1)
+    if len(files) > 1:
+        print("Multiple files found in 'cli/target':")
+        for file in files:
+            print(f"- {file}")
+        print("Please remove the extra files or specify which one to use.")
+        exit(1)
+    jar_file = files[0]
+    if not os.path.exists('cli/target/' + jar_file):
+        print(f"The file '{jar_file}' does not exist in the 'cli/target' directory.")
+        exit(1)
+    if not os.access('cli/target/' + jar_file, os.R_OK | os.W_OK | os.X_OK):
+        print(f"You do not have the necessary permissions to access '{jar_file}'.")
+        exit(1)
+    files = [filename for filename in os.listdir(folder) if filename.startswith('chrome')]
+    if not files:
+        print("The directory 'cli/target' does not exist in the specified path.")
+        exit(1)
+    if len(files) > 1:
+        print("Multiple files found in 'cli/target':")
+        for file in files:
+            print(f"- {file}")
+        print("Please remove the extra files or specify which one to use.")
+        exit(1)
+    driver_file = files[0]
+    if not os.path.exists('cli/target/' + driver_file):
+        print(f"The file '{driver_file}' does not exist in the 'cli/target' directory.")
+        exit(1)
+    if not os.access('cli/target/' + driver_file, os.R_OK | os.W_OK | os.X_OK):
+        print(f"You do not have the necessary permissions to access '{driver_file}'.")
+        exit(1)
+    shutil.copy('cli/target/' + jar_file, PATH / jar_file)
+    shutil.copy('cli/target/' + driver_file, PATH / driver_file)
+    shutil.copy('launchjava.sh', PATH / 'launchjava.sh')
+    shutil.copy('.env', PATH / '.env')
+
+    os.chdir("../language")
+
     if not os.path.exists(PATH):
         print("The path does not exist.")
         exit(1)
@@ -64,6 +117,7 @@ def setup():
         os.mkdir(PATH / 'searches')
     if not os.access(PATH / 'searches', os.R_OK | os.W_OK | os.X_OK):
         os.chmod(PATH / 'searches', 0o755)
+
 
 def eval_expr(tree):
     if isinstance(tree, int) or isinstance(tree, float):
@@ -250,7 +304,6 @@ def calculate(t):
     return sum
 
 
-
 def print_help(command=None):
     command = ' '.join(command[:-1]) if command else None
     if command == "select":
@@ -274,16 +327,20 @@ def print_help(command=None):
     elif command == "create post":
         print("Create post statement allows you to create a new post in the system. Authentication will be required.")
     elif command == "see exchanges":
-        print("See exchanges statement allows you to view available exchange proposals in the system. Authentication will be required.")
+        print(
+            "See exchanges statement allows you to view available exchange proposals in the system. Authentication will be required.")
     elif command == "create pdf":
-        print("Generate PDF statement allows you to create a PDF document extracting data from the files present in the directory.")
+        print(
+            "Generate PDF statement allows you to create a PDF document extracting data from the files present in the directory.")
     elif command is None:
         print("Help for all commands:")
         print("Available commands:")
-        print("\tselect, insert, update, delete, print, load, create, rename, search, create post, see exchanges, create pdf")
+        print(
+            "\tselect, insert, update, delete, print, load, create, rename, search, create post, see exchanges, create pdf")
         print("\tFor more information on a specific command, type 'help <command>'")
     else:
         print(f"Unknown command '{command}'. Type 'help' for a list of available commands.")
+
 
 def eval_inst(t):
     if t[0] == 'empty' or t == 'empty':
@@ -401,14 +458,18 @@ def eval_inst(t):
         if test != 0:
             print("The executable doesn't exist. Please install our Java app.")
             exit(1)
-        command = "launchjava.sh " + t[1]
+        command = "bash launchjava.sh " + t[1]
         with os.popen(command) as process:
             output = process.read()
         print("Sortie Java:", output)
+        out_text = normalize('NFKD', output).encode('ascii','ignore')
+        open(PATH / "searches" / (
+                    t[1].replace("\"", '') + "_" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S_%f") + ".txt"), "w",
+             encoding='iso-8859-1').write(out_text.decode('iso-8859-1'))
     elif t[0] == "statement":
         eval_inst(t[1])
         eval_inst(t[2])
-    elif t[0]== 'create_post':
+    elif t[0] == 'create_post':
         data = input("What do you want to publish ? ")
         if not data:
             print("You must provide some data to create a post.")
@@ -418,10 +479,10 @@ def eval_inst(t):
             print("Post created successfully.")
         except requests.exceptions.RequestException as e:
             print(f"Failed to create post: {e}")
-    elif t[0]== 'see_exchanges':
+    elif t[0] == 'see_exchanges':
         url = "https://laporteacote.online/troc"
         webbrowser.open(url)
-    elif t[0]== 'gen_pdf':
+    elif t[0] == 'gen_pdf':
         if t[1] == 'data':
             generate_data_pdf()
         elif t[1] == 'search':
@@ -448,28 +509,36 @@ def eval_inst(t):
     else:
         print("Unknown instruction:", t)
 
+
 def generate_data_pdf():
     pdf = PDF()
+    pdf.add_font("dejavu-sans", "", "DejaVuSans.ttf", uni=True)
     pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.set_font("Helvetica", size=12)
+    pdf.set_font("dejavu-sans", size=12)
     pdf.set_title("File Management System Report")
     pdf.add_page()
     pdf.ln(10)
-    pdf.set_font("Helvetica", size=12, style="UBI")
+    pdf.set_font("dejavu-sans", size=12, style="UBI")
     pdf.cell(0, 10, "Generated by the file management system", align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-    pdf.set_font("Helvetica", size=12)
+    pdf.set_font("dejavu-sans", size=12)
     pdf.ln(10)
-    pdf.cell(200, 10, text="This PDF contains information about files in the current directory.", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    pdf.cell(200, 10, text="This PDF contains information about files in the current directory.", new_x=XPos.LMARGIN,
+             new_y=YPos.NEXT)
     for elem in os.listdir(PATH):
         pdf.set_title(elem)
         pdf.add_page()
         stats = os.stat(PATH / elem)
-        pdf.cell(200, 10, text=f"{elem}",  new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-        pdf.cell(200, 10, text=f"Size: {human_size(stats.st_size)} ({stats.st_size} bytes)",  new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-        pdf.cell(200, 10, text=f"Type: {'Directory' if stat.S_ISDIR(stats.st_mode) else 'File'}",  new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-        pdf.cell(200, 10, text=f"Created on: {datetime.fromtimestamp(stats.st_ctime)}",  new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-        pdf.cell(200, 10, text=f"Last modified on: {datetime.fromtimestamp(stats.st_mtime)}",  new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-        pdf.cell(200, 10, text=f"Last accessed on: {datetime.fromtimestamp(stats.st_atime)}",  new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.cell(200, 10, text=f"{elem}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.cell(200, 10, text=f"Size: {human_size(stats.st_size)} ({stats.st_size} bytes)", new_x=XPos.LMARGIN,
+                 new_y=YPos.NEXT)
+        pdf.cell(200, 10, text=f"Type: {'Directory' if stat.S_ISDIR(stats.st_mode) else 'File'}", new_x=XPos.LMARGIN,
+                 new_y=YPos.NEXT)
+        pdf.cell(200, 10, text=f"Created on: {datetime.fromtimestamp(stats.st_ctime)}", new_x=XPos.LMARGIN,
+                 new_y=YPos.NEXT)
+        pdf.cell(200, 10, text=f"Last modified on: {datetime.fromtimestamp(stats.st_mtime)}", new_x=XPos.LMARGIN,
+                 new_y=YPos.NEXT)
+        pdf.cell(200, 10, text=f"Last accessed on: {datetime.fromtimestamp(stats.st_atime)}", new_x=XPos.LMARGIN,
+                 new_y=YPos.NEXT)
         pdf.ln()
         if stat.S_ISREG(stats.st_mode):
             try:
@@ -479,28 +548,32 @@ def generate_data_pdf():
                     pdf.multi_cell(0, 10, content)
             except Exception as e:
                 pdf.cell(200, 10, text=f"File is not writable as text here.", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-    pdf.set_font("Helvetica", style="I", size=10)
+    pdf.set_font("dejavu-sans", style="I", size=10)
 
-    output_path = PATH / "pdfs"/ ("data_output_"+datetime.now().strftime("%Y-%m-%d_%H-%M-%S_%f")+".pdf")
+    output_path = PATH / "pdfs" / ("data_output_" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S_%f") + ".pdf")
     pdf.output(output_path)
     print(f"PDF generated at {output_path}")
 
 
 def generate_search_pdf():
     pdf = PDF()
+    pdf.add_font("dejavu-sans", "", "DejaVuSans.ttf", uni=True)
     pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.set_font("Helvetica", size=12)
+    pdf.set_font("dejavu-sans", size=12)
     pdf.set_title("Searches Report")
     pdf.add_page()
     pdf.ln(10)
-    pdf.set_font("Helvetica", size=12, style="UBI")
+    pdf.add_font("dejavu-sans", "BI", "DejaVuSans-BoldOblique.ttf", uni=True)
+
+    pdf.set_font("dejavu-sans", size=12, style="UBI")
     pdf.cell(0, 10, "Generated by the file management system", align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-    pdf.set_font("Helvetica", size=12)
+    pdf.set_font("dejavu-sans", size=12)
     pdf.ln(10)
-    pdf.cell(200, 10, text="This PDF contains information about files generated in the searches folder.", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    pdf.cell(200, 10, text="This PDF contains information about files generated in the searches folder.",
+             new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     if not os.path.exists(PATH / "searches") or not os.listdir(PATH / "searches"):
         pdf.cell(200, 10, text="No searches found.", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-        output_path = PATH / "pdfs"/ ("search_output_"+datetime.now().strftime("%Y-%m-%d_%H-%M-%S_%f")+".pdf")
+        output_path = PATH / "pdfs" / ("search_output_" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S_%f") + ".pdf")
         pdf.output(output_path)
         print(f"PDF generated at {output_path}")
         return
@@ -510,13 +583,15 @@ def generate_search_pdf():
         with open(PATH / "searches" / elem, "r") as file:
             content = file.read()
             pdf.multi_cell(0, 10, content)
-    pdf.set_font("Helvetica", style="I", size=10)
+    pdf.add_font("dejavu-sans", "I", "DejaVuSans-Oblique.ttf", uni=True)
+    pdf.set_font("dejavu-sans", style="I", size=10)
 
-    output_path = PATH / "pdfs"/ ("search_output_"+datetime.now().strftime("%Y-%m-%d_%H-%M-%S_%f")+".pdf")
+    output_path = PATH / "pdfs" / ("search_output_" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S_%f") + ".pdf")
     pdf.output(output_path)
     print(f"PDF generated at {output_path}")
 
-def create_post(data): #TODo : fix this
+
+def create_post(data):  # TODo : fix this
     """ Creates a post by sending data to the server """
     url = "https://api.laporteacote.online/login"
     headers = {
@@ -528,22 +603,23 @@ def create_post(data): #TODo : fix this
     }
     response = requests.post(url, json=payload, headers=headers)
     text = json.loads(response.text)
-    token = text.accessToken
+    token = text["accessToken"]
     url = "https://api.laporteacote.online/users/me"
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer "+ token
+        "Authorization": "Bearer " + token
     }
     response = requests.post(url, json=payload, headers=headers)
     text = json.loads(response.text)
+    print(text)
     url = "https://api.laporteacote.online/post/create"
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer "+ token
+        "Authorization": "Bearer " + token
     }
     payload = {
-        "userId":text.id,
-        "neighborhoodId":text.userNeighborhoods[0].neighborhoodId,
+        "userId": text["id"],
+        "neighborhoodId": text["userNeighborhoods"][0]["neighborhoodId"],
         "content": data,
     }
     response = requests.post(url, json=payload, headers=headers)
@@ -553,11 +629,13 @@ def create_post(data): #TODo : fix this
     else:
         print(f"Failed to create post: {response.status_code} - {response.text}")
 
+
 def human_size(bytes, units=None):
     """ Returns a human-readable string representation of bytes """
     if units is None:
         units = [' bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB']
     return str(bytes) + units[0] if bytes < 1024 else human_size(bytes >> 10, units[1:])
+
 
 def find_column(input, token):
     last_cr = input.rfind('\n', 0, token.lexpos)

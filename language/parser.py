@@ -90,7 +90,7 @@ def p_typepdf(p):
     p[0] = p[1]
 
 def p_search_statement(p):
-    '''search_statement : SEARCH NAME SEMI'''
+    '''search_statement : SEARCH TEXT SEMI'''
     p[0] = ('search', p[2])
 
 
