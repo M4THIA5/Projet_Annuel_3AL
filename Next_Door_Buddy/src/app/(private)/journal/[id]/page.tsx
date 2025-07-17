@@ -7,9 +7,9 @@ export default async function JournalPage({params}: Props) {
     return (
         <div className={`h-screen flex flex-col items-center justify-center`}>
             <h1>Page: {params.id}</h1>
-            ( page ? <>
-            {{page}}
-        </> : <p>Page non trouvée</p>
+            ( page ? <div>
+            {page.content}
+        </div> : <p>Page non trouvée</p>
         </div>
     )
 }

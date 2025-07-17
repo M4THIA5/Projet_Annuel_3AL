@@ -10,6 +10,7 @@ import errorHandler from "./middleware/errorHandler"
 import neighborhoodRoutes from "./routes/neighborhoodRoute"
 import authRoutes from "./routes/authRoutes"
 import userRoutes from "./routes/userRoutes"
+import serviceRoutes from "./routes/serviceRoutes"
 import userNeighborhoodRoutes from "./routes/userNeighborhoodRoute"
 import journalRoutes from "./routes/journalRoutes"
 import mapBoxRoutes from "./routes/mapBoxRoutes"
@@ -52,6 +53,7 @@ app.use("/journal", verifyJwt, journalRoutes)
 app.use("/geocode", mapBoxRoutes)
 app.use("/chat", verifyJwt, chatRoutes)
 app.use("/post", verifyJwt, postRoutes)
+app.use("/services", serviceRoutes)
 
 // app.use(notFoundHandler)
 app.use(errorHandler)

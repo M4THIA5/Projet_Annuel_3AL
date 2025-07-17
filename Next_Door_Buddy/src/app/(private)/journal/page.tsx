@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import Item from './item'
 import {getJournals} from "#/lib/api_requests/jounal"
+import {Post} from "#/types/post"
 
 
 export default function JournalPage() {
@@ -45,3 +46,4 @@ export default function JournalPage() {
         </div>
     )
 }
+

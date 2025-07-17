@@ -1,6 +1,7 @@
 import {API} from "#/lib/api_requests/fetchRequest"
 import {getAccessToken} from "#/lib/authentification"
 import { JournalEntry } from "#/types/journal"
+import {Post} from "#/types/post";
 
 export const getJournalPageById = async (id: string): Promise<object> => {
     try {
