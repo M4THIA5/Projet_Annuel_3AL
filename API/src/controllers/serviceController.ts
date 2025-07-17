@@ -1,7 +1,9 @@
 import {RequestHandler, Request, Response} from "express";
 import {PrismaClient as PostgresClient} from "../../prisma/client/postgresClient";
+import {PrismaClient as MongoClient} from "../../prisma/client/mongoClient";
 
 const postgresClient = new PostgresClient();
+const mongoClient = new MongoClient()
 
 export default class ServiceController {
     getAllServices: RequestHandler = async (req: Request, res: Response) => {
@@ -16,7 +18,8 @@ export default class ServiceController {
     getAvailableServices: RequestHandler = async (req: Request, res: Response) => {
         try {
             const services = await postgresClient.service.findMany({
-                where:{OR:[
+                where: {
+                    OR: [
                         {provider: undefined},
                         {providerId: null},
                         {provider: null},
@@ -48,22 +51,62 @@ export default class ServiceController {
     }
     createService: RequestHandler = async (req: Request, res: Response) => {
         try {
+            const user = await postgresClient.user.findUnique({
+                where: {email: req.body.asker},
+            });
+            if (!user) {
+                throw new Error("Utilisateur non trouvé");
+            }
+
+            const userNeighborhood = await postgresClient.userNeighborhood.findFirst({
+                where: {userId: user.id},
+            });
+            if (!userNeighborhood) {
+                throw new Error("Quartier non trouvé");
+            }
+
+            // Création du service
             const newService = await postgresClient.service.create({
                 data: {
-                    ...req.body, asker: {
+                    ...req.body,
+                    asker: {
                         connect: {
-                            email: req.body.asker
-                        }
-                    }
-                }
-
+                            email: req.body.asker,
+                        },
+                    },
+                },
             });
+
+            // Formatage HTML à partir du title et description
+            const formattedDate = new Date(req.body.createdAt || newService.createdAt).toLocaleString('fr-FR', {
+                dateStyle: 'medium',
+                timeStyle: 'short',
+            });
+
+            const htmlContent = `
+        <h2>${req.body.title}</h2>
+        <p>${req.body.description}</p>
+    `;
+
+            // Création du post associé
+            const postData = {
+                userId: user.id.toString(),
+                type: "service",
+                neighborhoodId: userNeighborhood.neighborhoodId.toString(),
+                createdAt: new Date(), // plus précis que Date.now()
+                content: htmlContent,
+                images: [],
+            };
+
+            await mongoClient.post.create({data: postData});
+
             res.status(201).json(newService);
         } catch (error) {
             console.error("Error creating service:", error);
             res.status(500).json({error: "Internal Server Error"});
         }
-    }
+    };
+
     acceptRequest: RequestHandler = async (req: Request, res: Response) => {
         const user = (req as any).user
         const id = user.id

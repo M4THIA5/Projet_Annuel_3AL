@@ -16,6 +16,9 @@ import { Search } from "lucide-react"
 import { Input } from "#/components/ui/input"
 import { Neighborhood } from "#/types/neighborghood"
 import AddPost from "#/components/personal/AddPost"
+import DOMPurify from "dompurify"
+import SafeHtmlRenderer from "#/components/personal/SafeHtmlRenderer";
+
 
 interface PostFieldDialogProps {
     neighborhoodId: string
@@ -216,17 +219,7 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
                                     {capitalize(post.type)}
                                 </Badge>
                             </div>
-
-                            <div
-                                className="mt-2 wrap-normal large-text"
-                                style={{
-                                    whiteSpace: "normal",
-                                    wordWrap: "break-word",
-                                    overflowWrap: "break-word",
-                                    wordBreak: "break-word"
-                                }}
-                                dangerouslySetInnerHTML={{ __html: post.content }}
-                            />
+                            <SafeHtmlRenderer html={post.content} />
 
                             {post.images.length > 0 && (
                                 <div className={`grid gap-2 mt-4 ${
@@ -267,33 +260,47 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
                                 </div>
                             )}
 
-                            <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
-                                <span>👍 Upvote</span>
-                                <span>💬 Commenter</span>
-                                <span>👀 Vu </span>
-                                {currentUser.toString() === post.userId.toString() && (
-                                    <div className="flex gap-2">
-                                        <EditPost post={post} onUpdate={loadPosts} />
-                                        <Button
-                                            variant="ghost"
-                                            className="text-xs px-2 py-1"
-                                            type="button"
-                                            onClick={async () => {
-                                                try {
-                                                    await deletePost(post._id)
-                                                    toast.success("✅ Votre post a bien été supprimé.")
-                                                    await loadPosts()
-                                                } catch (error) {
-                                                    console.error("Erreur lors de la suppression du post :", error)
-                                                    toast.error("❌ Une erreur est survenue lors de la suppression du post.")
-                                                }
-                                            }}
-                                        >
-                                            Supprimer
-                                        </Button>
-                                    </div>
-                                )}
-                            </div>
+                            {post.type === "post" ? (
+                                <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
+                                    <span>👍 Upvote</span>
+                                    <span>💬 Commenter</span>
+                                    <span>👀 Vu </span>
+                                    {currentUser.toString() === post.userId.toString() && (
+                                        <div className="flex gap-2">
+                                            <EditPost post={post} onUpdate={loadPosts} />
+                                            <Button
+                                                variant="ghost"
+                                                className="text-xs px-2 py-1"
+                                                type="button"
+                                                onClick={async () => {
+                                                    try {
+                                                        await deletePost(post._id)
+                                                        toast.success("✅ Votre post a bien été supprimé.")
+                                                        await loadPosts()
+                                                    } catch (error) {
+                                                        console.error("Erreur lors de la suppression du post :", error)
+                                                        toast.error("❌ Une erreur est survenue lors de la suppression du post.")
+                                                    }
+                                                }}
+                                            >
+                                                Supprimer
+                                            </Button>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : post.type === "service" ? (
+                                <div className="flex w-full justify-end mt-4">
+                                    <Button
+                                        variant="default"  // ou "primary" si tu as ce variant configuré dans ton thème
+                                        onClick={() => (window.location.href = "/services")}
+                                        className="px-4 py-2"
+                                        type="button"
+                                    >
+                                        Voir les services
+                                    </Button>
+                                </div>
+                            ) : null}
+
                         </CardContent>
                     </Card>
                 ))}
