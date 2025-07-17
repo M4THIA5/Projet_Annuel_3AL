@@ -591,7 +591,7 @@ def generate_search_pdf():
     print(f"PDF generated at {output_path}")
 
 
-def create_post(data):  # TODo : fix this
+def create_post(data):
     """ Creates a post by sending data to the server """
     url = "https://api.laporteacote.online/login"
     headers = {
@@ -603,13 +603,14 @@ def create_post(data):  # TODo : fix this
     }
     response = requests.post(url, json=payload, headers=headers)
     text = json.loads(response.text)
+    cookies = response.cookies.get_dict()
     token = text["accessToken"]
     url = "https://api.laporteacote.online/users/me"
     headers = {
         "Content-Type": "application/json",
         "Authorization": "Bearer " + token
     }
-    response = requests.post(url, json=payload, headers=headers)
+    response = requests.get(url, headers=headers, cookies=cookies)
     text = json.loads(response.text)
     print(text)
     url = "https://api.laporteacote.online/post/create"
@@ -618,16 +619,16 @@ def create_post(data):  # TODo : fix this
         "Authorization": "Bearer " + token
     }
     payload = {
-        "userId": text["id"],
-        "neighborhoodId": text["userNeighborhoods"][0]["neighborhoodId"],
+        "userId": str(text["id"]),
+        "neighborhoodId": str(text["neighborhoods"][0]["neighborhoodId"]),
         "content": data,
     }
-    response = requests.post(url, json=payload, headers=headers)
+    response = requests.post(url, json=payload, headers=headers, cookies=cookies)
     response.raise_for_status()  # Raise an error for bad responses (4xx or 5xx)
     if response.status_code == 201:
         print("Post created successfully.")
     else:
-        print(f"Failed to create post: {response.status_code} - {response.text}")
+        print(f"Failed to create post : {response.status_code} - {response.text}")
 
 
 def human_size(bytes, units=None):
