@@ -2,7 +2,7 @@
 
 import React, {useEffect, useState} from 'react'
 import {UserProfile} from "#/types/user"
-import {getprofile} from "#/lib/api_requests/user"
+import {getProfile} from "#/lib/api_requests/user"
 import {acceptRequest} from "#/lib/api_requests/services";
 
 interface Props {
@@ -19,7 +19,7 @@ export default function Item({service}: Props) {
 
     useEffect(() => {
         async function fetchProfile() {
-            const data = await getprofile()
+            const data = await getProfile()
             setProfile(data)
         }
         fetchProfile()

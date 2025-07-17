@@ -34,6 +34,9 @@ export const Routes = {
   chat: {
     toString: () => "/chat" as const,
   },
+  services: {
+    toString: () => "/services" as const,
+  },
 
   undefined: {
     toString: () => "/#" as const,

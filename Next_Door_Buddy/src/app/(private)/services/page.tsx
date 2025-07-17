@@ -1,8 +1,8 @@
 import {getAvailableServices} from "#/lib/api_requests/services"
 import Link from "next/link"
-import Item from '#/app/(private)/services/item'
+import Item from '#/components/item'
 
-export default async function Services() {
+export default async function ServicesPage() {
     const services = await getAvailableServices()
 
     return (
