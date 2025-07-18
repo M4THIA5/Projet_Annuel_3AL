@@ -21,7 +21,7 @@ export const getJournalPageById = async (id: string): Promise<object> => {
 
 export const createJournal = async (content: object): Promise<object> => {
     try {
-        const response = await API.post('/journal/', {accessToken: await getAccessToken(), data: content})
+        const response = await API.post('/journal', {accessToken: await getAccessToken(), data: content})
         if (!response.ok) {
             throw new Error('Failed to get page')
         }
@@ -37,7 +37,7 @@ export const createJournal = async (content: object): Promise<object> => {
 }
 export const getJournals = async (): Promise<JournalEntry[]> => {
     try {
-        const response = await API.get('/journal/', {accessToken: await getAccessToken()})
+        const response = await API.get('/journal', {accessToken: await getAccessToken()})
         if (!response.ok) {
             throw new Error('Failed to get page')
         }

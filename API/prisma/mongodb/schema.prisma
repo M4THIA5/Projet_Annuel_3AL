@@ -21,6 +21,7 @@ model JournalEntry {
   types      String[]
   content    String
   districtId Int
+  createdAt  DateTime @default(now())
 }
 
 model Message {

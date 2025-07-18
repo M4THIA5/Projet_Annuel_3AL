@@ -32,8 +32,11 @@ export default class JournalController {
             return
         }
         await db.journalEntry.create({
-            data: validator.value
-        })
+            data: {
+                ...validator.value,
+                createdAt: new Date(),
+            },
+        });
         res.status(201).send("Ressource created")
     }
     modify: RequestHandler = async (req: Request, res: Response) => {

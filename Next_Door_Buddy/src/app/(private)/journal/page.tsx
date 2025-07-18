@@ -16,7 +16,7 @@ export default function JournalPage() {
             setPosts(data.map(journalEntry => ({
                 id: journalEntry.id,
                 content: journalEntry.content,
-                title: journalEntry.types.join(', ')
+                title: journalEntry.types.join(', '),
             })))
         }
         fetchJournals()

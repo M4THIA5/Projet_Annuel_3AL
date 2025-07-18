@@ -146,10 +146,6 @@ const MainToolbarContent = ({
             <Spacer/>
 
             {isMobile && <ToolbarSeparator/>}
-
-            <ToolbarGroup>
-                <ThemeToggle/>
-            </ToolbarGroup>
         </>
     )
 }
@@ -214,7 +210,6 @@ export function SimpleEditor(props: { parentCallback: unknown }) {
             Typography,
             Superscript,
             Subscript,
-
             Selection,
             ImageUploadNode.configure({
                     accept: "image/*",
