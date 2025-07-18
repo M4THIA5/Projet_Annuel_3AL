@@ -1,6 +1,7 @@
 import {RequestHandler, Request, Response} from "express";
 import {PrismaClient as PostgresClient} from "../../prisma/client/postgresClient";
 import {PrismaClient as MongoClient} from "../../prisma/client/mongoClient";
+import {create} from "node:domain";
 
 const postgresClient = new PostgresClient();
 const mongoClient = new MongoClient()
@@ -65,7 +66,6 @@ export default class ServiceController {
                 throw new Error("Quartier non trouvé");
             }
 
-            // Création du service
             const newService = await postgresClient.service.create({
                 data: {
                     ...req.body,
@@ -77,7 +77,6 @@ export default class ServiceController {
                 },
             });
 
-            // Formatage HTML à partir du title et description
             const formattedDate = new Date(req.body.createdAt || newService.createdAt).toLocaleString('fr-FR', {
                 dateStyle: 'medium',
                 timeStyle: 'short',
@@ -88,12 +87,11 @@ export default class ServiceController {
         <p>${req.body.description}</p>
     `;
 
-            // Création du post associé
             const postData = {
                 userId: user.id.toString(),
                 type: "service",
                 neighborhoodId: userNeighborhood.neighborhoodId.toString(),
-                createdAt: new Date(), // plus précis que Date.now()
+                createdAt: new Date(),
                 content: htmlContent,
                 images: [],
             };
@@ -111,12 +109,24 @@ export default class ServiceController {
         const user = (req as any).user
         const id = user.id
         try {
-            await postgresClient.service.update({
+            const updateService = await postgresClient.service.update({
                 where: {id: Number(req.params.id)},
                 data: {
                     provider: {connect: {id: Number(id)}}
                 }
             })
+
+            const users = [updateService.askerId, updateService.providerId];
+
+            await postgresClient.rooms.create({
+                data: {
+                    nom: "Service - " + updateService.title,
+                    users: {
+                        connect: users.map((id) => ({ id: Number(id) }))
+                    }
+                }
+            });
+
             res.status(200).json({message: "Service request accepted"});
         } catch (e) {
             console.error("Error with the request : ", e)
