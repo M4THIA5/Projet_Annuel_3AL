@@ -5,6 +5,8 @@ import { UserProfile } from "#/types/user"
 import { getProfile } from "#/lib/api_requests/user"
 import { acceptRequest } from "#/lib/api_requests/services"
 import { Button } from "#/components/ui/button"
+import {toast} from "react-toastify";
+import {useRouter} from "next/navigation";
 
 interface Props {
     service: {
@@ -19,6 +21,7 @@ interface Props {
 export default function Item({ service, onAccept }: Props) {
     const [profile, setProfile] = useState<UserProfile | undefined>(undefined)
     const [loading, setLoading] = useState(false)
+    const router = useRouter()
 
     useEffect(() => {
         async function fetchProfile() {
@@ -38,6 +41,26 @@ export default function Item({ service, onAccept }: Props) {
         try {
             await acceptRequest(String(service.id))
             if (onAccept) onAccept(service.id)
+            toast.success(
+                ({ closeToast }) => (
+                    <div>
+                        <p>✅ Le service a été accepté avec succès.</p>
+                        <p>💬 Un groupe de discussion a été créé.</p>
+                        <Button
+                            className="mt-2"
+                            onClick={() => {
+                                router.push(`/chat`)
+                                closeToast?.()
+                            }}
+                        >
+                            Aller au chat
+                        </Button>
+                    </div>
+                ),
+                {
+                    autoClose: false, // Let user dismiss manually
+                }
+            );
         } catch (error) {
             console.error("Erreur lors de l'activation du service", error)
         } finally {

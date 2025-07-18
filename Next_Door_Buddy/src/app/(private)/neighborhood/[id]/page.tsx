@@ -100,6 +100,7 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
 
     const handleClickBack = () => router.back()
     const handleClickChat = () => router.push(`/chat`)
+    const handleClickJournal = () => router.push(`/journal`)
     const handleClickInformation = () => router.push(`${NeighborhoodId}/information`)
     const handleClickSetting = () => router.push(`${NeighborhoodId}/setting`)
 
@@ -119,7 +120,10 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
                         ))
                     ) : (
                         <>
-                            <Button variant="secondary" className="w-full justify-start bg-secondary hover:bg-gray-200">
+                            <Button variant="secondary"
+                                    className="w-full justify-start bg-secondary hover:bg-gray-200"
+                                    onClick={handleClickJournal}
+                            >
                                 <Icon path={mdiBookOpenPageVariant} size={0.9} className="mr-2"/>
                                 Newsletter locale
                             </Button>
