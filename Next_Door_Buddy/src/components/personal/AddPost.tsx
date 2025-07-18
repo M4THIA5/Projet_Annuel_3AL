@@ -20,6 +20,7 @@ import {mdiHandshake, mdiSwapHorizontal, mdiCompass, mdiPlusBox} from "@mdi/js"
 import Icon from "@mdi/react"
 import {Neighborhood} from "#/types/neighborghood";
 import {UserNeighborhood} from "#/types/user";
+import {useRouter} from "next/navigation";
 
 interface PostDialogProps {
     profileId: string
@@ -35,6 +36,7 @@ export default function AddPost({profileId, neighborhoodId, profile, neighborhoo
     const [images, setImages] = useState<File[]>([])
     const [isLoading, setIsLoading] = useState(false)
     const dialogRef = useRef<HTMLButtonElement | null>(null)
+    const router = useRouter()
 
     const getInitials = (value: string | undefined) =>
         value ? value.split(" ").map(word => word[0]?.toUpperCase()).join("").slice(0, 2) : ""
@@ -120,7 +122,7 @@ export default function AddPost({profileId, neighborhoodId, profile, neighborhoo
                 </div>
 
                 <div className="flex justify-around text-sm text-black space-x-4 select-none w-full">
-                    <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400">
+                    <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400" onClick={() => router.push('/services')}>
                         <Icon path={mdiHandshake} size={0.9} className="mr-2"/>
                         <span>Proposer un service</span>
                     </div>

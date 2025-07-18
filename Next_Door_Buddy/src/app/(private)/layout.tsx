@@ -66,6 +66,10 @@ export default function PrivateLayout({children}: { children: React.ReactNode })
                                 </NavigationMenuLink>
                                 &nbsp;
                                 <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                                    <Link href={Routes.services.toString()}>Mes services</Link>
+                                </NavigationMenuLink>
+                                &nbsp;
+                                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                                     <Link href={Routes.troc.toString()}>Mes échanges</Link>
                                 </NavigationMenuLink>
                                 &nbsp;
