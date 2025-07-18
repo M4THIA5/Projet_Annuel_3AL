@@ -6,6 +6,7 @@ import Item from './item'
 import { Button } from '#/components/ui/button'
 import { usePathname, useRouter } from 'next/navigation'
 import { getJournals } from '#/lib/api_requests/jounal'
+import { Skeleton } from '#/components/ui/skeleton'
 
 type Props = { params: Promise<{ id: string }> }
 
@@ -27,8 +28,10 @@ export default function JournalPage({ params }: Props) {
     const { id: neighborhoodId } = use(params)
 
     const [groupedJournals, setGroupedJournals] = useState<JournalsGroupedByDay[]>([])
+    const [isLoading, setIsLoading] = useState(true)
 
     const fetchJournals = async () => {
+        setIsLoading(true)
         const data = await getJournals()
         const filtered = data
             .filter(journal => journal.districtId.toString() === neighborhoodId)
@@ -59,6 +62,7 @@ export default function JournalPage({ params }: Props) {
             })
 
         setGroupedJournals(groupedArray)
+        setIsLoading(false)
     }
 
     useEffect(() => {
@@ -77,25 +81,38 @@ export default function JournalPage({ params }: Props) {
                 </Button>
             </div>
 
-            {groupedJournals.length === 0 && (
+            {isLoading ? (
+                <div className="space-y-16">
+                    {Array.from({ length: 2 }).map((_, i) => (
+                        <div key={i}>
+                            <Skeleton className="h-8 w-48 mb-6" />
+                            <div className="space-y-4">
+                                {Array.from({ length: 2 }).map((_, j) => (
+                                    <Skeleton key={j} className="h-24 w-full rounded-md" />
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : groupedJournals.length === 0 ? (
                 <div className="text-center text-zinc-500 mt-20 text-lg">
                     Aucun journal pour l’instant. Cliquez sur &quot;Nouveau Journal&quot; pour ajouter votre première entrée !
                 </div>
+            ) : (
+                <div className="space-y-16">
+                    {groupedJournals.map(({ day, journals }) => {
+                        const reversedJournals = [...journals].reverse()
+                        return (
+                            <div key={day}>
+                                <h2 className="text-3xl font-extrabold mb-8 border-b border-gray-400 pb-2">{day}</h2>
+                                {reversedJournals.map(journal => (
+                                    <Item key={journal.id} post={journal} onDeleted={fetchJournals} />
+                                ))}
+                            </div>
+                        )
+                    })}
+                </div>
             )}
-
-            <div className="space-y-16">
-                {groupedJournals.map(({ day, journals }) => {
-                    const reversedJournals = [...journals].reverse()
-                    return (
-                        <div key={day}>
-                            <h2 className="text-3xl font-extrabold mb-8 border-b border-gray-400 pb-2">{day}</h2>
-                            {reversedJournals.map(journal => (
-                                <Item key={journal.id} post={journal} onDeleted={fetchJournals} />
-                            ))}
-                        </div>
-                    )
-                })}
-            </div>
         </div>
     )
 }
