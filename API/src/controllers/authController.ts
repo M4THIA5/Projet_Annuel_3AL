@@ -317,11 +317,19 @@ class AuthController {
                 data: {refreshToken: undefined}
             })
 
-            res.cookie(refreshTokenName, '', {maxAge: 0})
-            res.clearCookie(refreshTokenName, {httpOnly: true, sameSite: 'lax', secure: true})
+            res.clearCookie(refreshTokenName, {
+                httpOnly: true,
+                secure: config.NODE_ENV === 'production',
+                sameSite: 'lax',
+                path: '/',
+            })
 
-            res.cookie(accessTokenName, '', {maxAge: 0})
-            res.clearCookie(accessTokenName, {httpOnly: true, sameSite: 'lax', secure: true})
+            res.clearCookie(accessTokenName, {
+                httpOnly: true,
+                secure: config.NODE_ENV === 'production',
+                sameSite: 'lax',
+                path: '/',
+            })
 
             res.status(200).json({message: 'Logout successful'})
         } catch (error) {
@@ -331,7 +339,7 @@ class AuthController {
 
     handleRefreshToken: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const token = req.body.refreshToken || req.cookies[refreshTokenName]
+            const token = req.cookies?.[refreshTokenName]
             if (!token) {
                 res.status(401).json({error: 'Unauthorized'})
                 return

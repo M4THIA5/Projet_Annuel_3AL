@@ -16,8 +16,10 @@ import journalRoutes from "./routes/journalRoutes"
 import mapBoxRoutes from "./routes/mapBoxRoutes"
 import { verifyJwt } from "./middleware/verifyJwt"
 import cookieParser from "cookie-parser"
+import objetRoutes from "./routes/objetRoutes";
 import chatRoutes from "./routes/chatRoute"
 import postRoutes from "./routes/postRoutes";
+import trocRoutes from "./routes/trocRoutes";
 
 const postgresClient = new PostgresClient()
 const mongoClient = new MongoClient()
@@ -51,8 +53,11 @@ app.use("/neighborhoods", verifyJwt, neighborhoodRoutes)
 app.use("/user-neighborhoods", verifyJwt, userNeighborhoodRoutes)
 app.use("/journal", verifyJwt, journalRoutes)
 app.use("/geocode", mapBoxRoutes)
+app.use("/objets", verifyJwt, objetRoutes)
 app.use("/chat", verifyJwt, chatRoutes)
 app.use("/post", verifyJwt, postRoutes)
+app.use("/troc", verifyJwt, trocRoutes)
+
 app.use("/services", serviceRoutes)
 
 // app.use(notFoundHandler)

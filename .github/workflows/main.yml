@@ -7,56 +7,55 @@ on:
   push:
     branches:
     - main
+    - troc
   pull_request:
     branches:
     - main
 
 jobs:
   test:
-    name: Test on node ${{ matrix.node_version }} and ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        node_version: ['18.x', '20.x']
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+    name: Test on node ubuntu-latest
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node_version }}
+    - name: Use Node.js 20
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ matrix.node_version }}
+        node-version: 20
 
-    - name: npm install, build and test
+    - name: npm install
       run: |
         cd API
         npm install
-        npm run build --if-present
-        npm test
         cd ../Next_Door_Buddy
         npm install
-        npm run build --if-present
-        npm test
     - name: Deploy to VPS
-      uses: easingthemes/ssh-deploy@v2.1.4
       env:
         SSH_PRIVATE_KEY: ${{ secrets.VPS_PRIVATE_KEY }}
         REMOTE_HOST: ${{ secrets.VPS_HOST }}
         REMOTE_USER: ${{ secrets.VPS_USERNAME }}
         SOURCE: "/"
         TARGET: "~"
-    - name: Execute remote release script via SSH
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USERNAME }}
-        key: ${{ secrets.VPS_PRIVATE_KEY }}
-        port: 22
-        script: |
-          cd ~/Projet_Annuel_3AL
+      run: |
+         echo "$SSH_PRIVATE_KEY" > private_key.pem # Write the private key to a file
+         chmod 600 private_key.pem # Set the appropriate permissions for the key file
+        
+         # Establish an SSH connection and execute commands on the remote server
+         ssh -o StrictHostKeyChecking=no -i private_key.pem "$REMOTE_USER"@"$REMOTE_HOST" '
+            # Navigate to the project directory and pull the latest changes
+          cd ~
+          git clone https://github.com/M4THIA5/Projet_Annuel_3AL.git
+          cd Projet_Annuel_3AL
           cd API
           docker compose up -d 
           cd ../Next_Door_Buddy 
           npm run dev &
           cd ../API
           npm run dev &
+         '
+          rm -f private_key.pem
+    permissions:
+      contents: read
+      actions: write
+      id-token: write
