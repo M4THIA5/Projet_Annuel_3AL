@@ -12,12 +12,14 @@ export default class JournalController {
 
     }
     getOne: RequestHandler = async (req: Request, res: Response) => {
-        const Validator = idValidator.validate(req.query)
+        const Validator = idValidator.validate(req.params)
         if (Validator.error != undefined) {
+            console.log("qsd")
             res.status(400).send(Validator.error.message)
             return
         }
         const id = Validator.value.id
+        console.log(id)
         const journalEntries = await db.journalEntry.findUniqueOrThrow({
             where: {
                 id: id

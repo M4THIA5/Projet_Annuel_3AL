@@ -6,6 +6,7 @@ import {Post} from "#/types/post";
 export const getJournalPageById = async (id: string): Promise<object> => {
     try {
         const response = await API.get('/journal/' + id, {accessToken: await getAccessToken()})
+        console.log(response)
         if (!response.ok) {
             throw new Error('Failed to get page')
         }
@@ -25,7 +26,7 @@ export const createJournal = async (content: object): Promise<object> => {
         if (!response.ok) {
             throw new Error('Failed to get page')
         }
-        const data = await response.json()
+        const data = await response
         if (!data) {
             throw new Error('No data found')
         }
@@ -57,7 +58,7 @@ export const deleteJournalById = async (id: string) => {
         if (!response.ok) {
             throw new Error('Failed to get page')
         }
-        const data = await response.json()
+        const data = await response
         if (!data) {
             throw new Error('No data found')
         }
@@ -73,7 +74,7 @@ export const updateJournal = async (id: string, content: object) => {
         if (!response.ok) {
             throw new Error('Failed to get page')
         }
-        const data = await response.json()
+        const data = await response
         if (!data) {
             throw new Error('No data found')
         }

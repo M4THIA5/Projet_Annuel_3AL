@@ -100,7 +100,7 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
 
     const handleClickBack = () => router.back()
     const handleClickChat = () => router.push(`/chat`)
-    const handleClickJournal = () => router.push(`/journal`)
+    const handleClickJournal = () => router.push(`${NeighborhoodId}/journal`)
     const handleClickInformation = () => router.push(`${NeighborhoodId}/information`)
     const handleClickSetting = () => router.push(`${NeighborhoodId}/setting`)
 
