@@ -12,12 +12,14 @@ export default class JournalController {
 
     }
     getOne: RequestHandler = async (req: Request, res: Response) => {
-        const Validator = idValidator.validate(req.query)
+        const Validator = idValidator.validate(req.params)
         if (Validator.error != undefined) {
+            console.log("qsd")
             res.status(400).send(Validator.error.message)
             return
         }
         const id = Validator.value.id
+        console.log(id)
         const journalEntries = await db.journalEntry.findUniqueOrThrow({
             where: {
                 id: id
@@ -32,8 +34,11 @@ export default class JournalController {
             return
         }
         await db.journalEntry.create({
-            data: validator.value
-        })
+            data: {
+                ...validator.value,
+                createdAt: new Date(),
+            },
+        });
         res.status(201).send("Ressource created")
     }
     modify: RequestHandler = async (req: Request, res: Response) => {

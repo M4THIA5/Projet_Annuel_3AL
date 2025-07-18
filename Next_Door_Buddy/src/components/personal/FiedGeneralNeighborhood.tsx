@@ -18,6 +18,7 @@ import { Neighborhood } from "#/types/neighborghood"
 import AddPost from "#/components/personal/AddPost"
 import DOMPurify from "dompurify"
 import SafeHtmlRenderer from "#/components/personal/SafeHtmlRenderer";
+import {useRouter} from "next/navigation";
 
 
 interface PostFieldDialogProps {
@@ -35,6 +36,7 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
     const [currentUser, setCurrentUser] = useState<string>("")
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedType, setSelectedType] = useState<string | null>(null)
+    const router = useRouter()
 
     const loadPosts = async () => {
         setLoading(true)
@@ -90,7 +92,7 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
                 return "bg-gray-100 text-gray-700 border-gray-200"
             case "service":
                 return "bg-blue-100 text-blue-700 border-blue-200"
-            case "annonce":
+            case "troc":
                 return "bg-green-100 text-green-700 border-green-200"
             case "discussion":
                 return "bg-yellow-100 text-yellow-700 border-yellow-200"
@@ -124,7 +126,6 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
 
     const filteredPosts = posts.filter(post => {
         if (!post || !post.user) return false
-
         const matchType = selectedType
             ? post.type?.toLowerCase() === selectedType.toLowerCase()
             : true
@@ -169,7 +170,7 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
             {/* Barre de filtre */}
             <div className="flex items-center justify-between border-b pb-2 mb-4">
                 <div className="flex gap-6 font-medium">
-                    {["All", "Service", "Trocs", "Excursion"].map(type => (
+                    {["All", "Service", "Troc", "Excursion"].map(type => (
                         <span
                             key={type}
                             onClick={() => handleTypeFilter(type === "All" ? null : type)}
@@ -296,12 +297,23 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
                             ) : post.type === "service" ? (
                                 <div className="flex w-full justify-end mt-4">
                                     <Button
-                                        variant="default"  // ou "primary" si tu as ce variant configuré dans ton thème
-                                        onClick={() => (window.location.href = "/services")}
+                                        variant="default"
+                                        onClick={() => (router.push("/services"))}
                                         className="px-4 py-2"
                                         type="button"
                                     >
                                         Voir les services
+                                    </Button>
+                                </div>
+                            ) : post.type === "troc" ? (
+                                <div className="flex w-full justify-end mt-4">
+                                    <Button
+                                        variant="default"
+                                        onClick={() => (router.push("/troc"))}
+                                        className="px-4 py-2"
+                                        type="button"
+                                    >
+                                        Voir les échanges
                                     </Button>
                                 </div>
                             ) : null}

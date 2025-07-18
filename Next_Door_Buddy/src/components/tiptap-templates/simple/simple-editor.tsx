@@ -75,7 +75,7 @@ import {handleImageUpload, MAX_FILE_SIZE} from "#/lib/tiptap-utils"
 // --- Styles ---
 import "#/components/tiptap-templates/simple/simple-editor.scss"
 
-import {useState} from "react"
+import {useEffect, useState} from "react"
 // import {createJournal} from "#/lib/api_requests/jounal"
 
 const MainToolbarContent = ({
@@ -146,18 +146,14 @@ const MainToolbarContent = ({
             <Spacer/>
 
             {isMobile && <ToolbarSeparator/>}
-
-            <ToolbarGroup>
-                <ThemeToggle/>
-            </ToolbarGroup>
         </>
     )
 }
 
 const MobileToolbarContent = ({
-    type,
-    onBack,
-}: {
+                                  type,
+                                  onBack,
+                              }: {
     type: "highlighter" | "link"
     onBack: () => void
 }) => (
@@ -182,16 +178,18 @@ const MobileToolbarContent = ({
         )}
     </>
 )
-
-export function SimpleEditor(props: { parentCallback: unknown }) {
+export function SimpleEditor({
+                                 parentCallback,
+                                 initialContent,
+                             }: {
+    parentCallback: (childData: string) => void
+    initialContent: string
+}) {
     const isMobile = useMobile()
     const windowSize = useWindowSize()
-    const [mobileView, setMobileView] = React.useState<
-        "main" | "highlighter" | "link"
-    >("main")
+    const [mobileView, setMobileView] = React.useState<"main" | "highlighter" | "link">("main")
     const toolbarRef = React.useRef<HTMLDivElement>(null)
-    const [editorContent, setEditorContent] = useState("")
-    // Function triggered when the form is submitted
+    const [editorContent, setEditorContent] = useState(initialContent)
 
     const editor = useEditor({
         immediatelyRender: false,
@@ -205,34 +203,41 @@ export function SimpleEditor(props: { parentCallback: unknown }) {
         },
         extensions: [
             StarterKit,
-            TextAlign.configure({types: ["heading", "paragraph"]}),
+            TextAlign.configure({ types: ["heading", "paragraph"] }),
             Underline,
             TaskList,
-            TaskItem.configure({nested: true}),
-            Highlight.configure({multicolor: true}),
+            TaskItem.configure({ nested: true }),
+            Highlight.configure({ multicolor: true }),
             Image,
             Typography,
             Superscript,
             Subscript,
-
             Selection,
             ImageUploadNode.configure({
-                    accept: "image/*",
-                    maxSize: MAX_FILE_SIZE,
-                    limit: 3,
-                    upload: handleImageUpload,
-                    onError: (error) => console.error("Upload failed:", error),
-                }
-            ),
+                accept: "image/*",
+                maxSize: MAX_FILE_SIZE,
+                limit: 3,
+                upload: handleImageUpload,
+                onError: (error) => console.error("Upload failed:", error),
+            }),
             TrailingNode,
-            Link.configure({openOnClick: false}),
+            Link.configure({ openOnClick: false }),
         ],
-        //content: content,
-        onUpdate({editor}) {
-            setEditorContent(editor.getHTML())
-            props.parentCallback(editorContent)
-        }
+        content: initialContent, // initial content at start
+        onUpdate({ editor }) {
+            const html = editor.getHTML()
+            setEditorContent(html)
+            parentCallback(html)
+        },
     })
+
+    // Whenever initialContent changes, update editor content
+    React.useEffect(() => {
+        if (editor && initialContent !== editor.getHTML()) {
+            editor.commands.setContent(initialContent, false) // false = do not emit update event
+            setEditorContent(initialContent)
+        }
+    }, [initialContent, editor])
 
     const bodyRect = useCursorVisibility({
         editor,
@@ -245,8 +250,12 @@ export function SimpleEditor(props: { parentCallback: unknown }) {
         }
     }, [isMobile, mobileView])
 
+    if (!editor) {
+        return null
+    }
+
     return (
-        <EditorContext.Provider value={{editor}}>
+        <EditorContext.Provider value={{ editor }}>
             <Toolbar
                 ref={toolbarRef}
                 style={
@@ -272,11 +281,7 @@ export function SimpleEditor(props: { parentCallback: unknown }) {
             </Toolbar>
 
             <div className="content-wrapper">
-                <EditorContent
-                    editor={editor}
-                    role="presentation"
-                    className="simple-editor-content"
-                />
+                <EditorContent editor={editor} role="presentation" className="simple-editor-content" />
             </div>
         </EditorContext.Provider>
     )

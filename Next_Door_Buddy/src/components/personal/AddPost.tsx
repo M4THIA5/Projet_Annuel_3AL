@@ -127,7 +127,7 @@ export default function AddPost({profileId, neighborhoodId, profile, neighborhoo
                         <span>Proposer un service</span>
                     </div>
                     <div className="border-l h-5 border-gray-400"/>
-                    <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400">
+                    <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400" onClick={() => router.push('/troc')}>
                         <Icon path={mdiSwapHorizontal} size={0.9} className="mr-2"/>
                         <span>Échanger</span>
                     </div>

@@ -52,7 +52,7 @@ export default class TrocController {
             const trocEntry = await db.troc.findUniqueOrThrow({
                 where: {id: value.id},
             });
-            if (trocEntry.isDone){
+            if (trocEntry.isDone) {
                 res.status(400).send("done");
                 return
             }
@@ -69,6 +69,7 @@ export default class TrocController {
     create = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const user = (req as any).user as CurrentUser;
+            console.log(req.body)
 
             if (!user) {
                 res.status(401).send("Unauthorized");
@@ -108,6 +109,41 @@ export default class TrocController {
                     }
                 })
             }
+
+            const userNeighborhood = await pgdb.userNeighborhood.findFirst({
+                where: {userId: user.id},
+            });
+            if (!userNeighborhood) {
+                throw new Error("Quartier non trouvé");
+            }
+
+            const htmlContent = `
+                <h2>${req.body.nom}</h2>
+                <p>${req.body.description}</p>
+            `;
+
+            const postData = {
+                userId: user.id.toString(),
+                type: "troc",
+                neighborhoodId: userNeighborhood.neighborhoodId.toString(),
+                createdAt: new Date(),
+                content: htmlContent,
+                images: [],
+            };
+
+            const content = `<p>L’utilisateur <strong>${full.firstName} ${full.lastName}</strong> a lancé un troc.</p>`;
+
+            await db.journalEntry.create({
+                data: {
+                    content,
+                    types: ["Information", "Troc"],
+                    districtId: userNeighborhood.neighborhoodId,
+                    createdAt: new Date(),
+                },
+            });
+
+            await db.post.create({data: postData});
+
             res.status(201).json({message: "Troc created successfully"});
         } catch (error) {
             console.error("Error creating Troc:", error);
@@ -138,6 +174,30 @@ export default class TrocController {
             return
         }
         const id = Validator.value.id
+
+
+        const troc = await db.troc.findUniqueOrThrow({
+            where: {
+                id: id
+            }
+        })
+        const user = (req as any).user
+        if (troc.userId !== user.id) {
+            res.status(403).send("You are not allowed to do this action")
+            return
+        }
+        const items = await pgdb.objet.findMany({
+            where: {TrocId: troc.id}
+        })
+        for (const item of items) {
+            if (item.userId === troc.helperId) {
+                await pgdb.objet.update({
+                    where: {id: item.id},
+                    data: {TrocId: null}
+                })
+            }
+        }
+
         await db.troc.update({
             where: {
                 id: id
@@ -163,50 +223,56 @@ export default class TrocController {
         res.status(204).send()
     }
     troc: RequestHandler = async (req: Request, res: Response) => {
-        const Validator = idValidator.validate(req.params)
+        const Validator = idValidator.validate(req.params);
         if (Validator.error != undefined) {
-            res.status(400).send(Validator.error.message)
-            return
+            res.status(400).send(Validator.error.message);
+            return;
         }
-        const id = Validator.value.id
-        const user = (req as any).user
+        const id = Validator.value.id;
+        const user = (req as any).user;
+
+        const full = await pgdb.user.findUnique({
+            where: {id: user.id},
+        });
+        if (!full) {
+            throw new Error("Utilisateur non trouvé");
+        }
 
         const troc = await db.troc.findUniqueOrThrow({
             where: {
                 id: id
             }
-        })
-        if (troc.userId !== user.id) {
-            res.status(403).send("You are not allowed to do this action")
-            return
-        }
-        //fix this
+        });
 
+        if (troc.userId !== user.id) {
+            res.status(403).send("You are not allowed to do this action");
+            return;
+        }
 
         const trocObjets = await pgdb.objet.findMany({
             where: {
                 TrocId: id
             }
-        })
+        });
+
         for (const item of trocObjets) {
-            if (item.userId == troc.userId){
+            if (item.userId == troc.userId) {
                 await pgdb.objet.update({
-                    where: {id: item.id},
+                    where: { id: item.id },
                     data: {
                         TrocId: null,
                         userId: Number(troc.helperId)
                     }
-                })
+                });
             } else {
                 await pgdb.objet.update({
-                    where: {id: item.id},
+                    where: { id: item.id },
                     data: {
                         TrocId: null,
                         userId: user.id
                     }
-                })
+                });
             }
-
         }
 
         await db.troc.update({
@@ -218,9 +284,32 @@ export default class TrocController {
                 needsConfirmation: false,
                 isDone: true
             }
-        })
-        res.status(204).send()
-    }
+        });
+
+        try {
+            const [userNeighborhood, helper] = await Promise.all([
+                pgdb.userNeighborhood.findFirst({ where: { userId: user.id } }),
+                pgdb.user.findUnique({ where: { id: troc.helperId ?? undefined } }),
+            ]);
+
+            if (userNeighborhood && helper) {
+                const content = `<p>L’utilisateur <strong>${full.firstName} ${full.lastName}</strong> a finalisé un troc avec l’utilisateur <strong>${helper.firstName} ${helper.lastName}</strong>.</p>`;
+
+                await db.journalEntry.create({
+                    data: {
+                        content,
+                        types: ["Information", "Troc"],
+                        districtId: userNeighborhood.neighborhoodId,
+                        createdAt: new Date(),
+                    },
+                });
+            }
+        } catch (err) {
+            console.error("Erreur lors de la création de l’entrée dans le journal :", err);
+        }
+
+        res.status(204).send();
+    };
     refuse: RequestHandler = async (req: Request, res: Response) => {
         const Validator = idValidator.validate(req.params)
         if (Validator.error != undefined) {

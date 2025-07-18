@@ -1,12 +1,14 @@
 import {NextFunction, Request, RequestHandler, Response} from "express"
 import {PrismaClient as PostgresClient} from "../../prisma/client/postgresClient"
+import {PrismaClient as MongoClient} from "../../prisma/client/mongoClient";
 
 const postgresClient = new PostgresClient()
+
 
 class UserNeighborhoodController {
     // Link a user to a neighborhood
     linkUserToNeighborhood = async (req: Request, res: Response, next: NextFunction) => {
-        const {userId, neighborhoodId, roleInArea} = req.body
+        const { userId, neighborhoodId, roleInArea } = req.body;
         try {
             const link = await postgresClient.userNeighborhood.create({
                 data: {
@@ -14,12 +16,14 @@ class UserNeighborhoodController {
                     neighborhoodId,
                     roleInArea,
                 },
-            })
-            res.status(201).json(link)
+            });
+
+            res.status(201).json(link);
         } catch (error) {
-            next(error)
+            next(error);
         }
-    }
+    };
+
 
     // Get all user-neighborhood links
     getAllUserNeighborhoods = async (req: Request, res: Response, next: NextFunction) => {

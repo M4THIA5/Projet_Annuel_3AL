@@ -77,6 +77,7 @@ export default class PostController {
 
     create: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         const { error, value } = createValidator.validate(req.body);
+        console.log(value)
 
         if (error) {
             console.log(error.message);
@@ -99,6 +100,27 @@ export default class PostController {
 
             await db.post.create({ data: postData });
 
+            const full = await postgresClient.user.findUniqueOrThrow({
+                where: {id: Number(value.userId)},
+            });
+
+            const userNeighborhood = await postgresClient.userNeighborhood.findFirst({
+                where: {userId: full.id},
+            });
+            if (!userNeighborhood) {
+                throw new Error("Quartier non trouvé");
+            }
+
+            const content = `<p>L’utilisateur <strong>${full.firstName} ${full.lastName}</strong> a créé un post.</p>`;
+
+            await db.journalEntry.create({
+                data: {
+                    content,
+                    types: ["Information", "Post"],
+                    districtId: userNeighborhood.neighborhoodId,
+                    createdAt: new Date(),
+                },
+            });
             console.log("Resource created")
             res.status(201).send({ message: "Resource created" });
         } catch (err) {
