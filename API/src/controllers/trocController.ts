@@ -131,6 +131,17 @@ export default class TrocController {
                 images: [],
             };
 
+            const content = `<p>L’utilisateur <strong>${full.firstName} ${full.lastName}</strong> a lancé un troc.</p>`;
+
+            await db.journalEntry.create({
+                data: {
+                    content,
+                    types: ["Information", "Troc"],
+                    districtId: userNeighborhood.neighborhoodId,
+                    createdAt: new Date(),
+                },
+            });
+
             await db.post.create({data: postData});
 
             res.status(201).json({message: "Troc created successfully"});

@@ -93,6 +93,17 @@ export default class ServiceController {
 
             await mongoClient.post.create({data: postData});
 
+            const content = `<p>L’utilisateur <strong>${user.firstName} ${user.lastName}</strong> a effectué une demande de service.</p>`;
+
+            await mongoClient.journalEntry.create({
+                data: {
+                    content,
+                    types: ["Information", "Service"],
+                    districtId: userNeighborhood.neighborhoodId,
+                    createdAt: new Date(),
+                },
+            });
+
             res.status(201).json(newService);
         } catch (error) {
             console.error("Error creating service:", error);
@@ -101,17 +112,19 @@ export default class ServiceController {
     };
 
     acceptRequest: RequestHandler = async (req: Request, res: Response) => {
-        const user = (req as any).user
-        const id = user.id
+        const user = (req as any).user;
+        const providerId = Number(user.id);
+
         try {
             const updateService = await postgresClient.service.update({
-                where: {id: Number(req.params.id)},
+                where: { id: Number(req.params.id) },
                 data: {
-                    provider: {connect: {id: Number(id)}}
+                    provider: { connect: { id: providerId } }
                 }
-            })
+            });
 
-            const users = [updateService.askerId, updateService.providerId];
+            const askerId = updateService.askerId;
+            const users = [askerId, providerId];
 
             await postgresClient.rooms.create({
                 data: {
@@ -122,12 +135,40 @@ export default class ServiceController {
                 }
             });
 
-            res.status(200).json({message: "Service request accepted"});
+            const [asker, provider] = await Promise.all([
+                postgresClient.user.findUnique({ where: { id: askerId } }),
+                postgresClient.user.findUnique({ where: { id: providerId } }),
+            ]);
+
+            if (!asker || !provider) {
+                throw new Error("Utilisateur manquant");
+            }
+
+            const providerNeighborhood = await postgresClient.userNeighborhood.findFirst({
+                where: { userId: providerId }
+            });
+
+            if (!providerNeighborhood) {
+                throw new Error("Quartier du provider non trouvé");
+            }
+
+            const journalContent = `<p>L’utilisateur <strong>${provider.firstName} ${provider.lastName}</strong> a accepté le service de l’utilisateur <strong>${asker.firstName} ${asker.lastName}</strong>.</p>`;
+
+            await mongoClient.journalEntry.create({
+                data: {
+                    content: journalContent,
+                    types: ["Information", "Service"],
+                    districtId: providerNeighborhood.neighborhoodId,
+                    createdAt: new Date(),
+                },
+            });
+
+            res.status(200).json({ message: "Service request accepted" });
         } catch (e) {
-            console.error("Error with the request : ", e)
-            res.status(500).json({error: "Internal Server Error"})
+            console.error("Error with the request:", e);
+            res.status(500).json({ error: "Internal Server Error" });
         }
-    }
+    };
     deleteRequest: RequestHandler = async (req: Request, res: Response) => {
         try {
             await postgresClient.service.delete({
