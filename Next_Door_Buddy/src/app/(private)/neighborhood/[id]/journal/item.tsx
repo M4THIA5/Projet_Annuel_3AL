@@ -1,9 +1,10 @@
 'use client'
 
 import React from 'react'
-import { useRouter } from 'next/navigation'
 import { deleteJournalById } from '#/lib/api_requests/jounal'
 import SafeHtmlRenderer from '#/components/personal/SafeHtmlRenderer'
+import { Button } from '#/components/ui/button'
+import { toast } from 'react-toastify'
 
 interface Props {
     post: {
@@ -12,14 +13,21 @@ interface Props {
         content: string
         createdAt: string
     }
+    onDeleted: () => void
 }
 
-export default function Item({ post }: Props) {
-    const router = useRouter()
-
+export default function Item({ post, onDeleted }: Props) {
     const handleDelete = async (id: string) => {
-        await deleteJournalById(id)
-        router.refresh()
+        if (!confirm('Voulez-vous vraiment supprimer ce journal ?')) return
+
+        try {
+            await deleteJournalById(id)
+            toast.success('Journal supprimé avec succès.')
+            onDeleted()
+        } catch (error) {
+            toast.error('Erreur lors de la suppression du journal.')
+            console.error(error)
+        }
     }
 
     const formattedDate = new Date(post.createdAt).toLocaleDateString('fr-FR', {
@@ -42,18 +50,20 @@ export default function Item({ post }: Props) {
             </section>
 
             <footer className="flex justify-end gap-4 text-sm">
-                <a
-                    href={`journal/${post.id}/update`}
-                    className="text-blue-600 hover:underline font-medium"
+                <Button
+                    variant="default"
+                    className="px-5 py-2 bg-zinc-900 hover:bg-zinc-800 rounded-md text-white font-medium shadow transition"
+                    asChild
                 >
-                    Modifier
-                </a>
-                <button
+                    <a href={`journal/${post.id}/update`}>Modifier</a>
+                </Button>
+                <Button
+                    variant="default"
+                    className="px-5 py-2 bg-red-600 hover:bg-red-500 rounded-md text-white font-medium shadow transition"
                     onClick={() => handleDelete(post.id)}
-                    className="text-red-600 hover:underline font-medium"
                 >
                     Supprimer
-                </button>
+                </Button>
             </footer>
         </div>
     )

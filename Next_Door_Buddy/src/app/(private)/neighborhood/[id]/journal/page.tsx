@@ -17,7 +17,7 @@ type JournalEntry = {
 }
 
 type JournalsGroupedByDay = {
-    day: string,  // ex: "7 mars 2000"
+    day: string
     journals: JournalEntry[]
 }
 
@@ -28,42 +28,40 @@ export default function JournalPage({ params }: Props) {
 
     const [groupedJournals, setGroupedJournals] = useState<JournalsGroupedByDay[]>([])
 
+    const fetchJournals = async () => {
+        const data = await getJournals()
+        const filtered = data
+            .filter(journal => journal.districtId.toString() === neighborhoodId)
+            .map(journal => ({
+                id: journal.id,
+                content: journal.content,
+                title: journal.types.join(', '),
+                createdAt: journal.createdAt,
+            }))
+
+        const grouped = filtered.reduce((acc: { [key: string]: JournalEntry[] }, entry) => {
+            const day = new Date(entry.createdAt).toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+            })
+            if (!acc[day]) acc[day] = []
+            acc[day].push(entry)
+            return acc
+        }, {})
+
+        const groupedArray: JournalsGroupedByDay[] = Object.entries(grouped)
+            .map(([day, journals]) => ({ day, journals }))
+            .sort((a, b) => {
+                const dateA = new Date(a.journals[0].createdAt).getTime()
+                const dateB = new Date(b.journals[0].createdAt).getTime()
+                return dateB - dateA
+            })
+
+        setGroupedJournals(groupedArray)
+    }
+
     useEffect(() => {
-        const fetchJournals = async () => {
-            const data = await getJournals()
-            const filtered = data
-                .filter(journalEntry => journalEntry.districtId.toString() === neighborhoodId)
-                .map(journalEntry => ({
-                    id: journalEntry.id,
-                    content: journalEntry.content,
-                    title: journalEntry.types.join(', '),
-                    createdAt: journalEntry.createdAt,
-                }))
-
-            // Grouper par jour avec date formatée en français
-            const grouped = filtered.reduce((acc: {[key:string]: JournalEntry[]}, entry) => {
-                const day = new Date(entry.createdAt).toLocaleDateString('fr-FR', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                })
-                if (!acc[day]) acc[day] = []
-                acc[day].push(entry)
-                return acc
-            }, {})
-
-            // Transformer en tableau avec tri décroissant sur la date du jour
-            const groupedArray: JournalsGroupedByDay[] = Object.entries(grouped)
-                .map(([day, journals]) => ({ day, journals }))
-                .sort((a, b) => {
-                    const dateA = new Date(a.journals[0].createdAt).getTime()
-                    const dateB = new Date(b.journals[0].createdAt).getTime()
-                    return dateB - dateA
-                })
-
-            setGroupedJournals(groupedArray)
-        }
-
         fetchJournals()
     }, [neighborhoodId])
 
@@ -86,14 +84,17 @@ export default function JournalPage({ params }: Props) {
             )}
 
             <div className="space-y-16">
-                {groupedJournals.map(({ day, journals }) => (
-                    <div key={day}>
-                        <h2 className="text-3xl font-extrabold mb-8 border-b border-gray-400 pb-2">{day}</h2>
-                        {journals.map(journal => (
-                            <Item key={journal.id} post={journal} />
-                        ))}
-                    </div>
-                ))}
+                {groupedJournals.map(({ day, journals }) => {
+                    const reversedJournals = [...journals].reverse()
+                    return (
+                        <div key={day}>
+                            <h2 className="text-3xl font-extrabold mb-8 border-b border-gray-400 pb-2">{day}</h2>
+                            {reversedJournals.map(journal => (
+                                <Item key={journal.id} post={journal} onDeleted={fetchJournals} />
+                            ))}
+                        </div>
+                    )
+                })}
             </div>
         </div>
     )
