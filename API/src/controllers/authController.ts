@@ -15,8 +15,10 @@ import {
 } from '../config/utils'
 import crypto from 'crypto'
 import MapBoxController from "./mapBoxController"
+import {PrismaClient as MongoClient} from "../../prisma/client/mongoClient";
 
 const postgresClient = new PostgresClient()
+const mongoClient = new MongoClient();
 
 const transporter = nodemailer.createTransport({
     service: 'ionos',
@@ -250,6 +252,23 @@ class AuthController {
                     otpCreatedAt: null,
                 },
             })
+
+            try {
+                if (user) {
+                    const content = `<p>L’utilisateur <strong>${user.firstName} ${user.lastName}</strong> a été rattaché au quartier.</p>`;
+
+                    await mongoClient.journalEntry.create({
+                        data: {
+                            content,
+                            types: ["Information", "Utilisateur"],
+                            districtId: neighborhood.id,
+                            createdAt: new Date(),
+                        },
+                    });
+                }
+            } catch (journalError) {
+                console.error("Erreur lors de la création de l’entrée dans le journal :", journalError);
+            }
 
 
             res.status(200).json({ message: 'OTP vérifié avec succès' })
