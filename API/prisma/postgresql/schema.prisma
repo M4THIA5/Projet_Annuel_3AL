@@ -33,13 +33,14 @@ model User {
   resetPasswordCode String?
   createdAt         DateTime           @default(now())
   updatedAt         DateTime?          @updatedAt
-  serviceAsker    Service[] @relation("ServiceAsker")
-  serviceProvider Service[] @relation("ServiceProvider")
-
+  serviceAsker      Service[]          @relation("ServiceAsker")
+  serviceProvider   Service[]          @relation("ServiceProvider")
+  SortiesCreated    Sortie[]           @relation("creator")
   Score             Score[]
   userNeighborhoods UserNeighborhood[]
   objets            Objet[]
   rooms             Rooms[]
+  sortiesAttended   Sortie[]           @relation("SortieParticipants")
 }
 
 model Game {
@@ -70,6 +71,20 @@ model Service {
   provider    User?    @relation("ServiceProvider", fields: [providerId], references: [id])
   providerId  Int?
   createdAt   DateTime @default(now())
+}
+
+model Sortie {
+  id           Int      @id @default(autoincrement())
+  title        String
+  description  String
+  open         Boolean  @default(true)
+  ended        Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  date         DateTime
+  address      String
+  creatorId    Int
+  creator      User     @relation("creator", fields: [creatorId], references: [id])
+  participants User[]   @relation("SortieParticipants")
 }
 
 model Neighborhood {
@@ -109,6 +124,6 @@ model Objet {
 
 model Rooms {
   id    String @id @default(cuid())
-  nom   String
+  nom   String @unique
   users User[]
 }

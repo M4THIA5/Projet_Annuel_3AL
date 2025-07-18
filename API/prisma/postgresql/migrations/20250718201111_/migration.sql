@@ -59,6 +59,19 @@ CREATE TABLE "Service" (
 );
 
 -- CreateTable
+CREATE TABLE "Sortie" (
+    "id" SERIAL NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "open" BOOLEAN NOT NULL DEFAULT true,
+    "ended" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "creatorId" INTEGER NOT NULL,
+
+    CONSTRAINT "Sortie_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Neighborhood" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
@@ -85,11 +98,33 @@ CREATE TABLE "UserNeighborhood" (
 );
 
 -- CreateTable
+CREATE TABLE "Objet" (
+    "id" TEXT NOT NULL,
+    "nom" TEXT NOT NULL,
+    "description" TEXT,
+    "image" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3),
+    "TrocId" TEXT,
+    "userId" INTEGER NOT NULL,
+
+    CONSTRAINT "Objet_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Rooms" (
     "id" TEXT NOT NULL,
     "nom" TEXT NOT NULL,
 
     CONSTRAINT "Rooms_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "_SortieParticipants" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL,
+
+    CONSTRAINT "_SortieParticipants_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateTable
@@ -110,6 +145,12 @@ CREATE UNIQUE INDEX "Game_name_key" ON "Game"("name");
 CREATE UNIQUE INDEX "Neighborhood_name_key" ON "Neighborhood"("name");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Objet_id_key" ON "Objet"("id");
+
+-- CreateIndex
+CREATE INDEX "_SortieParticipants_B_index" ON "_SortieParticipants"("B");
+
+-- CreateIndex
 CREATE INDEX "_RoomsToUser_B_index" ON "_RoomsToUser"("B");
 
 -- AddForeignKey
@@ -125,10 +166,22 @@ ALTER TABLE "Service" ADD CONSTRAINT "Service_askerId_fkey" FOREIGN KEY ("askerI
 ALTER TABLE "Service" ADD CONSTRAINT "Service_providerId_fkey" FOREIGN KEY ("providerId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Sortie" ADD CONSTRAINT "Sortie_creatorId_fkey" FOREIGN KEY ("creatorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "UserNeighborhood" ADD CONSTRAINT "UserNeighborhood_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UserNeighborhood" ADD CONSTRAINT "UserNeighborhood_neighborhoodId_fkey" FOREIGN KEY ("neighborhoodId") REFERENCES "Neighborhood"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Objet" ADD CONSTRAINT "Objet_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_SortieParticipants" ADD CONSTRAINT "_SortieParticipants_A_fkey" FOREIGN KEY ("A") REFERENCES "Sortie"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_SortieParticipants" ADD CONSTRAINT "_SortieParticipants_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_RoomsToUser" ADD CONSTRAINT "_RoomsToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "Rooms"("id") ON DELETE CASCADE ON UPDATE CASCADE;

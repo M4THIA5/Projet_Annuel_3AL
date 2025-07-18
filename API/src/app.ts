@@ -20,6 +20,7 @@ import objetRoutes from "./routes/objetRoutes";
 import chatRoutes from "./routes/chatRoute"
 import postRoutes from "./routes/postRoutes";
 import trocRoutes from "./routes/trocRoutes";
+import sortieRoutes from "./routes/sortieRoutes";
 
 const postgresClient = new PostgresClient()
 const mongoClient = new MongoClient()
@@ -59,6 +60,7 @@ app.use("/post", verifyJwt, postRoutes)
 app.use("/troc", verifyJwt, trocRoutes)
 
 app.use("/services", serviceRoutes)
+app.use("/sorties", verifyJwt, sortieRoutes)
 
 // app.use(notFoundHandler)
 app.use(errorHandler)

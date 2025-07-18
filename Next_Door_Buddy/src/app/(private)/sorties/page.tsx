@@ -1,43 +1,44 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { getAvailableServices } from "#/lib/api_requests/services"
-import ItemServices from "#/components/itemServices"
+import { getNextSorties } from "#/lib/api_requests/sorties"
+import ItemSorties from "#/components/itemSorties"
 import { Button } from "#/components/ui/button"
 import Link from "next/link"
+import {Sortie} from "#/types/sortie"
 
-export default function ServicesPageClient() {
-    const [services, setServices] = useState<any[]>([])
+export default function SortiesPageClient() {
+    const [sorties, setSorties] = useState<Sortie[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        async function fetchServices() {
+        async function fetchSorties() {
             setLoading(true)
             try {
-                const data = await getAvailableServices()
-                setServices(data)
+                const data = await getNextSorties()
+                setSorties(data)
             } catch (error) {
-                console.error("Erreur lors du chargement des services", error)
+                console.error("Erreur lors du chargement des sorties", error)
             } finally {
                 setLoading(false)
             }
         }
-        fetchServices()
+        fetchSorties()
     }, [])
 
     function handleAccept(id: number) {
-        setServices((prev) => prev.filter((service) => service.id !== id))
+        setSorties((prev) => prev.filter((service) => service.id !== id))
     }
 
     return (
         <div className="max-w-4xl mx-auto py-12 px-6">
             <div className="flex items-center justify-between mb-8">
                 <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
-                    Services disponibles
+                    Sorties prochaines
                 </h1>
-                <Link href="/services/create" passHref>
+                <Link href="/sorties/create" passHref>
                     <Button variant="default" className="px-6 py-2 text-base font-semibold">
-                        Créer un service
+                        Créer une sortie
                     </Button>
                 </Link>
             </div>
@@ -51,19 +52,19 @@ export default function ServicesPageClient() {
                         />
                     ))}
                 </div>
-            ) : services.length > 0 ? (
+            ) : sorties.length > 0 ? (
                 <ul className="space-y-6">
-                    {services.map((service) => (
-                        <ItemServices
-                            key={service.id}
-                            service={service}
+                    {sorties.map((sortie) => (
+                        <ItemSorties
+                            key={sortie.id}
+                            sortie={sortie}
                             onAccept={handleAccept}
                         />
                     ))}
                 </ul>
             ) : (
                 <p className="text-center text-gray-500 mt-12 text-lg italic">
-                    Aucun service disponible pour le moment.
+                    Aucune sortie disponible prochainement.
                 </p>
             )}
         </div>
