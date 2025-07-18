@@ -52,7 +52,7 @@ export default class TrocController {
             const trocEntry = await db.troc.findUniqueOrThrow({
                 where: {id: value.id},
             });
-            if (trocEntry.isDone){
+            if (trocEntry.isDone) {
                 res.status(400).send("done");
                 return
             }
@@ -69,6 +69,7 @@ export default class TrocController {
     create = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const user = (req as any).user as CurrentUser;
+            console.log(req.body)
 
             if (!user) {
                 res.status(401).send("Unauthorized");
@@ -108,6 +109,30 @@ export default class TrocController {
                     }
                 })
             }
+
+            const userNeighborhood = await pgdb.userNeighborhood.findFirst({
+                where: {userId: user.id},
+            });
+            if (!userNeighborhood) {
+                throw new Error("Quartier non trouvé");
+            }
+
+            const htmlContent = `
+                <h2>${req.body.nom}</h2>
+                <p>${req.body.description}</p>
+            `;
+
+            const postData = {
+                userId: user.id.toString(),
+                type: "troc",
+                neighborhoodId: userNeighborhood.neighborhoodId.toString(),
+                createdAt: new Date(),
+                content: htmlContent,
+                images: [],
+            };
+
+            await db.post.create({data: postData});
+
             res.status(201).json({message: "Troc created successfully"});
         } catch (error) {
             console.error("Error creating Troc:", error);
@@ -189,7 +214,7 @@ export default class TrocController {
             }
         })
         for (const item of trocObjets) {
-            if (item.userId == troc.userId){
+            if (item.userId == troc.userId) {
                 await pgdb.objet.update({
                     where: {id: item.id},
                     data: {

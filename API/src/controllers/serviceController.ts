@@ -77,11 +77,6 @@ export default class ServiceController {
                 },
             });
 
-            const formattedDate = new Date(req.body.createdAt || newService.createdAt).toLocaleString('fr-FR', {
-                dateStyle: 'medium',
-                timeStyle: 'short',
-            });
-
             const htmlContent = `
         <h2>${req.body.title}</h2>
         <p>${req.body.description}</p>
