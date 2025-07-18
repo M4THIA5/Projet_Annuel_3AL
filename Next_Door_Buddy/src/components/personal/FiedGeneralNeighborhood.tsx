@@ -88,7 +88,7 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
         switch (type.toLowerCase()) {
             case "post":
                 return "bg-gray-100 text-gray-700 border-gray-200"
-            case "événement":
+            case "service":
                 return "bg-blue-100 text-blue-700 border-blue-200"
             case "annonce":
                 return "bg-green-100 text-green-700 border-green-200"
@@ -219,7 +219,12 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
                                     {capitalize(post.type)}
                                 </Badge>
                             </div>
-                            <SafeHtmlRenderer html={post.content} />
+                            <SafeHtmlRenderer
+                                html={post.content}
+                                maxWidth="100%"
+                                maxHeight="400px"
+                            />
+
 
                             {post.images.length > 0 && (
                                 <div className={`grid gap-2 mt-4 ${
