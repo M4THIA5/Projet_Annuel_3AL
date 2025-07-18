@@ -56,7 +56,6 @@ app.use("/objets", verifyJwt, objetRoutes)
 app.use("/chat", verifyJwt, chatRoutes)
 app.use("/post", verifyJwt, postRoutes)
 app.use("/troc", verifyJwt, trocRoutes)
-app.use("/objets", verifyJwt, objetRoutes)
 
 
 // app.use(notFoundHandler)

@@ -18,20 +18,43 @@ export default class objetController {
         });
         res.status(200).send(objets)
     }
+    getMyObjets: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        const id = (req as any).user.id
+        const objets = await postgresClient.objet.findMany({
+            where: {
+                OR: [{
+                    user: {id: id},
+                    TrocId: undefined
+                }, {
+                    user: {id: id},
+                    TrocId: null
+                }]
+            },
+            select: {
+                id: true,
+                nom: true,
+                description: true,
+                createdAt: true,
+                image: true,
+                TrocId:true
+            }
+        });
+        res.status(200).send(objets)
+    }
     getOneObjet: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const { error, value } = idValidator.validate(req.params);
+            const {error, value} = idValidator.validate(req.params);
             if (error) {
-                res.status(400).json({ error: error.message });
+                res.status(400).json({error: error.message});
                 return;
             }
 
             const objet = await postgresClient.objet.findFirst({
-                where: { id: value.id }
+                where: {id: value.id}
             });
 
             if (!objet) {
-                res.status(404).json({ error: "Objet not found" });
+                res.status(404).json({error: "Objet not found"});
                 return;
             }
 
@@ -39,7 +62,7 @@ export default class objetController {
             res.status(200).json(objet);
         } catch (err) {
             console.error("Error fetching objet:", err);
-            res.status(500).json({ error: "Internal server error" });
+            res.status(500).json({error: "Internal server error"});
         }
     };
     createObjet: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -48,6 +71,7 @@ export default class objetController {
             const body = req.body;
             const file = req.file
 
+            const id = (req as any).user.id
             const data: any = {
                 ...body,
             };
@@ -60,7 +84,14 @@ export default class objetController {
             }
 
             const updated = await postgresClient.objet.create({
-                data,
+                data: {
+                    ...data,
+                    user: {
+                        connect: {
+                            id: id
+                        }
+                    }
+                }
             });
 
             res.status(200).json(updated);
@@ -71,7 +102,7 @@ export default class objetController {
     modifyObjet: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         const validator = idValidator.validate(req.params);
         if (validator.error) {
-            res.status(400).send({ error: validator.error.message });
+            res.status(400).send({error: validator.error.message});
             return;
         }
         const body = req.body;
@@ -88,17 +119,17 @@ export default class objetController {
 
         const updated = await postgresClient.objet.update({
             data: data,
-             where: {
+            where: {
                 id: validator.value.id
             }
         });
         res.status(200).send(updated)
     }
     deleteObjet: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        const { error, value } = idValidator.validate(req.params);
+        const {error, value} = idValidator.validate(req.params);
 
         if (error) {
-            res.status(400).json({ error: error.message });
+            res.status(400).json({error: error.message});
             return;
         }
 
@@ -112,7 +143,7 @@ export default class objetController {
             res.status(204).send();
         } catch (err) {
             console.error('Error deleting objet:', err);
-            res.status(500).json({ error: 'Failed to delete the objet' });
+            res.status(500).json({error: 'Failed to delete the objet'});
         }
     };
 

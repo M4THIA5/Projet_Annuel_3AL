@@ -34,15 +34,15 @@ model Message {
 }
 
 model Troc {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  asker       String
-  description String
-  userId      Int
-  helperId    Int?
-  createdAt   DateTime @default(now())
-  isAccepted  Boolean  @default(false)
-  isOpen      Boolean  @default(true)
-  isDone      Boolean  @default(false)
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  asker             String
+  description       String
+  userId            Int
+  helperId          Int?
+  createdAt         DateTime @default(now())
+  needsConfirmation Boolean  @default(false)
+  isOpen            Boolean  @default(true)
+  isDone            Boolean  @default(false)
 }
 
 model Post {

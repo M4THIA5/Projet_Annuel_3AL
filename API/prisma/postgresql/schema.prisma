@@ -13,35 +13,30 @@ datasource db {
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  password     String
-  roles        String[] @default(["classic"])
-  refreshToken String?
-  firstName    String?
-  lastName     String?
-  color        String   @default("212529")
-  image        Bytes?
-
-  latitude   Float?
-  longitude  Float?
-  address    String?
-  city       String?
-  postalCode String?
-
-  otpCode      String?
-  otpCreatedAt DateTime?
-  otpVerified  Boolean   @default(false)
-
+  id                Int                @id @default(autoincrement())
+  email             String             @unique
+  password          String
+  roles             String[]           @default(["classic"])
+  refreshToken      String?
+  firstName         String?
+  lastName          String?
+  color             String             @default("212529")
+  image             Bytes?
+  latitude          Float?
+  longitude         Float?
+  address           String?
+  city              String?
+  postalCode        String?
+  otpCode           String?
+  otpCreatedAt      DateTime?
+  otpVerified       Boolean            @default(false)
   resetPasswordCode String?
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime?          @updatedAt
   Score             Score[]
   userNeighborhoods UserNeighborhood[]
-
-  rooms Rooms[]
+  objets            Objet[]
+  rooms             Rooms[]
 }
 
 model Game {
@@ -67,28 +62,26 @@ model Data {
 }
 
 model Neighborhood {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique
-  city        String?
-  postalCode  String?
-  members     Int       @default(1)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime? @updatedAt
-  description String?
-  image       String?
-
+  id                Int                @id @default(autoincrement())
+  name              String             @unique
+  city              String?
+  postalCode        String?
+  members           Int                @default(1)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime?          @updatedAt
+  description       String?
+  image             String?
   userNeighborhoods UserNeighborhood[]
 }
 
 model UserNeighborhood {
-  id             Int      @id @default(autoincrement())
+  id             Int          @id @default(autoincrement())
   userId         Int
   neighborhoodId Int
-  joinedAt       DateTime @default(now())
+  joinedAt       DateTime     @default(now())
   roleInArea     String?
-
-  user         User         @relation(fields: [userId], references: [id])
-  neighborhood Neighborhood @relation(fields: [neighborhoodId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
+  neighborhood   Neighborhood @relation(fields: [neighborhoodId], references: [id])
 }
 
 model Objet {
@@ -98,6 +91,9 @@ model Objet {
   image       String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
+  TrocId      String?
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int
 }
 
 model Rooms {

@@ -27,8 +27,10 @@ const upload = multer({ storage:storage , limits: { fieldSize: 10 * 1024 * 1024 
 const objetController = new ObjetController()
 
 const objetRoutes = Router()
-objetRoutes.get('/:id', objetController.getOneObjet)
 objetRoutes.get('/', objetController.getObjets)
+objetRoutes.get('/me', objetController.getMyObjets)
+objetRoutes.get('/:id', objetController.getOneObjet)
+
 objetRoutes.post('/', upload.single('image'), objetController.createObjet)
 objetRoutes.put('/:id', upload.single('image'), objetController.modifyObjet)
 objetRoutes.delete('/:id', objetController.deleteObjet)

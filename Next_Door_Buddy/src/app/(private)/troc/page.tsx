@@ -1,35 +1,55 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
-import { DemandeTroc, Objet } from "#/types/troc"
-import { redirect } from "next/navigation"
-import { deleteObjet, getObjets, getDemandesTroc } from "#/lib/api_requests/troc"
-import { Button } from "#/components/ui/button"
-import { Card, CardHeader, CardTitle, CardContent } from "#/components/ui/card"
+import React, {useEffect, useState} from "react"
+import {DemandeTroc, Objet} from "#/types/troc"
+import {redirect} from "next/navigation"
+import {createAcceptionTroc, deleteObjet, getDemandesTroc, getMyItems} from "#/lib/api_requests/troc"
+import {Button} from "#/components/ui/button"
+import {Card, CardHeader, CardTitle, CardContent} from "#/components/ui/card"
 import Image from "next/image"
-import { Routes } from "#/Routes"
-import { Skeleton } from "#/components/ui/skeleton"
+import {Routes} from "#/Routes"
+import {Skeleton} from "#/components/ui/skeleton"
+import {getProfile} from "#/lib/api_requests/user"
+import {UserProfile} from "#/types/user"
+import {CardMaker} from "#/app/(private)/troc/cards"
 
 export default function TrocPage() {
     const [objets, setObjets] = useState<Objet[]>([])
     const [demandes, setDemandes] = useState<DemandeTroc[]>([])
     const [loading, setLoading] = useState(true)
+    const [user, setUser] = useState<UserProfile | undefined>()
 
     async function fetchAll() {
         setLoading(true)
-        const [objetsData, demandesData] = await Promise.all([
-            getObjets(),
-            getDemandesTroc()
+        const [objetsData, demandesData, profile] = await Promise.all([
+            getMyItems(),
+            getDemandesTroc(),
+            getProfile()
         ])
         setObjets(objetsData || [])
         setDemandes(demandesData || [])
+        setUser(profile)
         setLoading(false)
     }
+
+
 
     useEffect(() => {
         fetchAll()
     }, [])
 
+    const checkRedirect = (demande: DemandeTroc) => {
+        if (!demande.helperId) {
+            createAcceptionTroc(demande.id).then(redirect(Routes.troc.accept.toString(String(demande.id))))
+        } else if (demande.needsConfirmation) {
+            redirect(Routes.troc.confirm.toString(String(demande.id)))
+        } else {
+            redirect(Routes.troc.accept.toString(String(demande.id)))
+        }
+    }
+    const demandesList = demandes.map((demande) => (
+        <CardMaker key={demande.id} demande={demande} user={user} checkRedirect={checkRedirect}/>
+    ))
     return (
         <div className="flex flex-col lg:flex-row gap-8 p-6 bg-gray-50 min-h-screen">
             {/* Mes objets */}
@@ -42,15 +62,15 @@ export default function TrocPage() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
                     {loading ? (
-                        Array.from({ length: 4 }).map((_, idx) => (
+                        Array.from({length: 4}).map((_, idx) => (
                             <Card key={idx} className="rounded-lg shadow p-4 space-y-4">
-                                <Skeleton className="w-[180px] h-[180px] mx-auto rounded-md" />
-                                <Skeleton className="h-4 w-3/4 mx-auto" />
-                                <Skeleton className="h-4 w-1/2 mx-auto" />
+                                <Skeleton className="w-[180px] h-[180px] mx-auto rounded-md"/>
+                                <Skeleton className="h-4 w-3/4 mx-auto"/>
+                                <Skeleton className="h-4 w-1/2 mx-auto"/>
                                 <div className="flex justify-center gap-2">
-                                    <Skeleton className="h-8 w-16" />
-                                    <Skeleton className="h-8 w-16" />
-                                    <Skeleton className="h-8 w-16" />
+                                    <Skeleton className="h-8 w-16"/>
+                                    <Skeleton className="h-8 w-16"/>
+                                    <Skeleton className="h-8 w-16"/>
                                 </div>
                             </Card>
                         ))
@@ -71,7 +91,8 @@ export default function TrocPage() {
                                                 className="rounded-md object-cover mb-3 border"
                                             />
                                         ) : (
-                                            <div className="w-[180px] h-[180px] flex items-center justify-center bg-gray-200 rounded-md mb-3 border text-gray-400 text-5xl">
+                                            <div
+                                                className="w-[180px] h-[180px] flex items-center justify-center bg-gray-200 rounded-md mb-3 border text-gray-400 text-5xl">
                                                 <span role="img" aria-label="placeholder">📦</span>
                                             </div>
                                         )}
@@ -81,13 +102,14 @@ export default function TrocPage() {
                                                 : objet.description}
                                         </p>
                                         <div className="flex gap-2 justify-center">
-                                            <Button size="sm" onClick={() => redirect(Routes.troc.objet.toString(objet.id))}>
+                                            <Button size="sm"
+                                                    onClick={() => redirect(Routes.troc.objet.toString(String(objet.id)))}>
                                                 Voir
                                             </Button>
                                             <Button
                                                 size="sm"
                                                 variant="secondary"
-                                                onClick={() => redirect(Routes.troc.objet.modify.toString(objet.id))}
+                                                onClick={() => redirect(Routes.troc.objet.modify.toString(String(objet.id)))}
                                             >
                                                 Modifier
                                             </Button>
@@ -124,39 +146,20 @@ export default function TrocPage() {
                     </Button>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-                    {loading ? (
-                        Array.from({ length: 3 }).map((_, idx) => (
+                    {loading && (
+                        Array.from({length: 3}).map((_, idx) => (
                             <Card key={idx} className="rounded-lg shadow p-4 space-y-4">
-                                <Skeleton className="h-6 w-2/3 mx-auto" />
-                                <Skeleton className="h-4 w-3/4 mx-auto" />
-                                <Skeleton className="h-8 w-full" />
-                            </Card>
-                        ))
-                    ) : (
-                        demandes.map((demande) => (
-                            <Card key={demande.id} className="rounded-lg shadow hover:shadow-lg transition-shadow">
-                                <CardHeader>
-                                    <CardTitle className="text-lg font-semibold">{demande.asker}</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="flex flex-col items-center">
-                                        <p className="mb-4 text-gray-600 text-sm text-center">
-                                            Souhaite troquer depuis le{" "}
-                                            <strong>{new Date(demande.createdAt).toLocaleDateString()}</strong>
-                                        </p>
-                                        <Button size="sm" onClick={() => {}} className="w-full">
-                                            Accepter le troc
-                                        </Button>
-                                    </div>
-                                </CardContent>
+                                <Skeleton className="h-6 w-2/3 mx-auto"/>
+                                <Skeleton className="h-4 w-3/4 mx-auto"/>
+                                <Skeleton className="h-8 w-full"/>
                             </Card>
                         ))
                     )}
-                    {!loading && demandes.length === 0 && (
+                    {(!loading && (demandes.length === 0 || demandesList.length === 0)) ? (
                         <div className="text-center text-gray-400 italic col-span-full">
                             Aucune demande pour le moment.
                         </div>
-                    )}
+                    ): demandesList }
                 </div>
             </div>
         </div>

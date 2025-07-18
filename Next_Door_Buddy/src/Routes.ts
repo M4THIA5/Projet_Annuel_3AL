@@ -47,6 +47,12 @@ export const Routes = {
         },
         create: {
             toString: () => "/troc/create" as const,
+        },
+        accept: {
+            toString: (id:string) => `/troc/accept/${id}` as const,
+        },
+        confirm: {
+            toString: (id:string) => `/troc/confirm/${id}` as const,
         }
     },
 
