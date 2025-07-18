@@ -126,7 +126,6 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
 
     const filteredPosts = posts.filter(post => {
         if (!post || !post.user) return false
-
         const matchType = selectedType
             ? post.type?.toLowerCase() === selectedType.toLowerCase()
             : true
@@ -171,7 +170,7 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
             {/* Barre de filtre */}
             <div className="flex items-center justify-between border-b pb-2 mb-4">
                 <div className="flex gap-6 font-medium">
-                    {["All", "Service", "Trocs", "Excursion"].map(type => (
+                    {["All", "Service", "Troc", "Excursion"].map(type => (
                         <span
                             key={type}
                             onClick={() => handleTypeFilter(type === "All" ? null : type)}
