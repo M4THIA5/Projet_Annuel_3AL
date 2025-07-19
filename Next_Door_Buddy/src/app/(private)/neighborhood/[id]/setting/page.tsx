@@ -7,14 +7,6 @@ import { Textarea } from "#/components/ui/textarea"
 import { Button } from "#/components/ui/button"
 import Image from "next/image"
 import logo from "@/logo.png"
-import { useRouter } from "next/navigation"
-import { getProfile, getRoleInArea } from "#/lib/api_requests/user"
-import {
-    getNeighborhood,
-    getUsersOfNeighborhood,
-    updateNeighborhood,
-} from "#/lib/api_requests/neighborhood"
-import { Neighborhood } from "#/types/neighborghood"
 import {useRouter} from "next/navigation"
 import {getProfile, getRoleInArea} from "#/lib/api_requests/user"
 import {getNeighborhood, getUsersOfNeighborhood, updateNeighborhood} from "#/lib/api_requests/neighborhood"

@@ -119,8 +119,10 @@ export default function NeighborhoodsPage() {
                                     <CardContent className="">
                                         <h3 className="text-lg font-semibold w-full">{n.name}</h3>
                                         <p className="text-sm text-muted-foreground">{n.members} Members</p>
-                                        <br/>
-                                        <p className="text-sm text-gray-600">{n.description}</p>
+                                        <br />
+                                        <p className="text-sm text-gray-600 line-clamp-3 overflow-hidden text-ellipsis">
+                                            {n.description}
+                                        </p>
                                     </CardContent>
                                 </div>
                             </div>
