@@ -1,0 +1,20 @@
+[
+  {
+    "types": ["news", "announcement"],
+    "content": "Le nouveau parc du quartier a été inauguré.",
+    "districtId": 101,
+    "createdAt": "2023-10-01T10:00:00Z"
+  },
+  {
+    "types": ["event", "reminder"],
+    "content": "N'oubliez pas la réunion communautaire prévue pour vendredi prochain.",
+    "districtId": 102,
+    "createdAt": "2023-10-02T14:30:00Z"
+  },
+  {
+    "types": ["alert", "weather"],
+    "content": "Alerte météo sévère émise pour le quartier.",
+    "districtId": 103,
+    "createdAt": "2023-10-03T08:15:00Z"
+  }
+]
