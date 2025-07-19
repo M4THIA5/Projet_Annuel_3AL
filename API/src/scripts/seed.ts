@@ -140,6 +140,59 @@ async function main() {
     }
   }
 
+  const sortiesPath = path.resolve(__dirname, './sorties.json')
+  const sortiesData = JSON.parse(fs.readFileSync(sortiesPath, 'utf-8'))
+
+  for (const sortie of sortiesData) {
+    await postgresql.sortie.upsert({
+      where: { id: sortie.id },
+      update: {},
+      create: {
+        title: sortie.title,
+        description: sortie.description,
+        date: new Date(sortie.date),
+        address: sortie.address,
+        creatorId: sortie.creatorId,
+        participants: {
+          connect: sortie.participants.map((id: number) => ({ id }))
+        },
+      }
+    })
+  }
+
+  const objetsPath = path.resolve(__dirname, './objets.json')
+  const objetsData = JSON.parse(fs.readFileSync(objetsPath, 'utf-8'))
+
+  for (const objet of objetsData) {
+    await postgresql.objet.upsert({
+      where: { id: objet.id },
+      update: {},
+      create: {
+        nom: objet.nom,
+        description: objet.description,
+        userId: objet.userId,
+        TrocId: objet.TrocId,
+      }
+    })
+  }
+
+  const roomsPath = path.resolve(__dirname, './rooms.json')
+  const roomsData = JSON.parse(fs.readFileSync(roomsPath, 'utf-8'))
+
+  for (const room of roomsData) {
+    await postgresql.rooms.upsert({
+      where: { id: room.id },
+      update: {},
+      create: {
+        id: room.id,
+        nom: room.nom,
+        users: {
+          connect: room.users.map((userId: number) => ({ id: userId }))
+        }
+      }
+    })
+  }
+
   const allUsers = await postgresql.user.findMany({
     select: {
       id: true,
@@ -184,4 +237,8 @@ main()
     console.error(e)
     await postgresql.$disconnect()
     process.exit(1)
+  })
+  .finally(async () => {
+    await postgresql.$disconnect()
+    process.exit(0)
   })

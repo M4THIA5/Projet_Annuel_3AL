@@ -1,0 +1,27 @@
+[
+  {
+    "id": "room1",
+    "nom": "Salle de réunion",
+    "users": [1, 2, 3, 4, 5]
+  },
+  {
+    "id": "room2",
+    "nom": "Salle de conférence",
+    "users": [6, 7, 8, 9, 10]
+  },
+  {
+    "id": "room3",
+    "nom": "Salle de classe",
+    "users": [11, 12, 13, 14, 15]
+  },
+  {
+    "id": "room4",
+    "nom": "Salle informatique",
+    "users": [16, 17, 18, 19, 20]
+  },
+  {
+    "id": "room5",
+    "nom": "Salle de repos",
+    "users": [21, 22, 23, 24, 25]
+  }
+]
