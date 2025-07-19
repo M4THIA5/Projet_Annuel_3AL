@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from "react"
-import { Post } from "#/types/post"
-import { getPostsByNeighborhoodId, deletePost } from "#/lib/api_requests/post"
-import { Card, CardContent } from "#/components/ui/card"
-import { Badge } from "#/components/ui/badge"
-import { Skeleton } from "../ui/skeleton"
-import { Avatar, AvatarFallback, AvatarImage } from "#/components/ui/avatar"
-import { Button } from "#/components/ui/button"
+import React, {useEffect, useState} from "react"
+import {Post} from "#/types/post"
+import {getPostsByNeighborhoodId, deletePost} from "#/lib/api_requests/post"
+import {Card, CardContent} from "#/components/ui/card"
+import {Badge} from "#/components/ui/badge"
+import {Skeleton} from "../ui/skeleton"
+import {Avatar, AvatarFallback, AvatarImage} from "#/components/ui/avatar"
+import {Button} from "#/components/ui/button"
 import Lightbox from "react-image-lightbox"
 import "react-image-lightbox/style.css"
 import EditPost from "#/components/personal/EditPost"
-import { getProfile } from "#/lib/api_requests/user"
-import { User, UserNeighborhood } from "#/types/user"
-import { toast } from "react-toastify"
-import { Search } from "lucide-react"
-import { Input } from "#/components/ui/input"
-import { Neighborhood } from "#/types/neighborghood"
+import {getProfile} from "#/lib/api_requests/user"
+import {User, UserNeighborhood} from "#/types/user"
+import {toast} from "react-toastify"
+import {Search} from "lucide-react"
+import {Input} from "#/components/ui/input"
+import {Neighborhood} from "#/types/neighborghood"
 import AddPost from "#/components/personal/AddPost"
 import DOMPurify from "dompurify"
 import SafeHtmlRenderer from "#/components/personal/SafeHtmlRenderer";
@@ -27,7 +27,7 @@ interface PostFieldDialogProps {
     neighborhood: Neighborhood
 }
 
-export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neighborhood }: PostFieldDialogProps) {
+export default function FiedGeneralNeighborhood({neighborhoodId, profile, neighborhood}: PostFieldDialogProps) {
     const [posts, setPosts] = useState<Post[]>([])
     const [loading, setLoading] = useState(true)
     const [isOpen, setIsOpen] = useState(false)
@@ -94,7 +94,7 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
                 return "bg-blue-100 text-blue-700 border-blue-200"
             case "troc":
                 return "bg-green-100 text-green-700 border-green-200"
-            case "discussion":
+            case "sortie":
                 return "bg-yellow-100 text-yellow-700 border-yellow-200"
             default:
                 return "bg-muted text-muted-foreground border"
@@ -145,9 +145,9 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
                 {[...Array(3)].map((_, i) => (
                     <Card className="mb-6" key={i}>
                         <CardContent className="pr-4 pl-4 py-6 space-y-4">
-                            <Skeleton className="h-4 w-[60%]" />
-                            <Skeleton className="h-4 w-[80%]" />
-                            <Skeleton className="h-64 w-full rounded-lg" />
+                            <Skeleton className="h-4 w-[60%]"/>
+                            <Skeleton className="h-4 w-[80%]"/>
+                            <Skeleton className="h-64 w-full rounded-lg"/>
                         </CardContent>
                     </Card>
                 ))}
@@ -170,24 +170,25 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
             {/* Barre de filtre */}
             <div className="flex items-center justify-between border-b pb-2 mb-4">
                 <div className="flex gap-6 font-medium">
-                    {["All", "Service", "Troc", "Excursion"].map(type => (
-                        <span
-                            key={type}
-                            onClick={() => handleTypeFilter(type === "All" ? null : type)}
-                            className={`cursor-pointer pb-1 ${
-                                selectedType === null && type === "All"
-                                    ? "border-b-2 border-gray-500"
-                                    : selectedType?.toLowerCase() === type.toLowerCase()
-                                        ? "border-b-2 border-gray-500"
-                                        : ""
-                            }`}
-                        >
-                            {type}
-                        </span>
-                    ))}
+                    {["All", "Service", "Troc", "Excursion"].map(type => {
+                        const filterValue = type === "All" ? null : type === "Excursion" ? "Sortie" : type
+                        const isSelected =
+                            (selectedType === null && type === "All") ||
+                            selectedType?.toLowerCase() === filterValue?.toLowerCase()
+
+                        return (
+                            <span
+                                key={type}
+                                onClick={() => handleTypeFilter(filterValue)}
+                                className={`cursor-pointer pb-1 ${isSelected ? "border-b-2 border-gray-500" : ""}`}
+                            >
+                                {type}
+                            </span>
+                        )
+                    })}
                 </div>
                 <div className="relative">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400"/>
                     <Input
                         className="pl-8"
                         placeholder="Rechercher"
@@ -205,12 +206,13 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
                             <div className="flex justify-between">
                                 <div className="flex items-center">
                                     <Avatar className="mr-2">
-                                        <AvatarImage src={post.user.image?.toString()} alt={post.user.firstName} />
+                                        <AvatarImage src={post.user.image?.toString()} alt={post.user.firstName}/>
                                         <AvatarFallback>{getInitials(post?.user.firstName)}</AvatarFallback>
                                     </Avatar>
                                     <div className="text-sm font-medium">
                                         {post.user.firstName} {post.user.lastName} ·{" "}
-                                        <span className="text-muted-foreground">{formatJoinedDuration(post.createdAt)}</span>
+                                        <span
+                                            className="text-muted-foreground">{formatJoinedDuration(post.createdAt)}</span>
                                     </div>
                                 </div>
                                 <Badge
@@ -273,7 +275,7 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
                                     <span>👀 Vu </span>
                                     {currentUser.toString() === post.userId.toString() && (
                                         <div className="flex gap-2">
-                                            <EditPost post={post} onUpdate={loadPosts} />
+                                            <EditPost post={post} onUpdate={loadPosts}/>
                                             <Button
                                                 variant="ghost"
                                                 className="text-xs px-2 py-1"
@@ -314,6 +316,17 @@ export default function FiedGeneralNeighborhood({ neighborhoodId, profile, neigh
                                         type="button"
                                     >
                                         Voir les échanges
+                                    </Button>
+                                </div>
+                            ) : post.type === "sortie" ? (
+                                <div className="flex w-full justify-end mt-4">
+                                    <Button
+                                        variant="default"
+                                        onClick={() => (router.push("/sorties"))}
+                                        className="px-4 py-2"
+                                        type="button"
+                                    >
+                                        Voir les excursions
                                     </Button>
                                 </div>
                             ) : null}

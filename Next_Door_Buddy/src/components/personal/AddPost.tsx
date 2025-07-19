@@ -132,7 +132,7 @@ export default function AddPost({profileId, neighborhoodId, profile, neighborhoo
                         <span>Échanger</span>
                     </div>
                     <div className="border-l h-5 border-gray-400"/>
-                    <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400">
+                    <div className="flex justify-center gap-1 cursor-pointer hover:text-gray-400" onClick={() => router.push('/sorties')}>
                         <Icon path={mdiCompass} size={0.9} className="mr-2"/>
                         <span>Proposer une excursion</span>
                     </div>

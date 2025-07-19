@@ -88,7 +88,7 @@ export default function ItemServices({ service, onAccept }: Props) {
                         size="sm"
                         className="flex items-center space-x-2"
                     >
-                        {loading ? "Chargement…" : "Activer"}
+                        {loading ? "Chargement…" : "Accepter"}
                     </Button>
                 )}
             </div>
