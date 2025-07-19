@@ -10,10 +10,11 @@ const postgresClient = new PostgresClient()
 export async function verifyJwt(req: Request, res: Response, next: NextFunction): Promise<void> {
   const token = req.header('Authorization')?.replace('Bearer ', '')
   const refreshCookie = req.cookies[refreshTokenName]
-  // if (!token || !refreshCookie) {
-  //   res.status(401).json({ error: 'Unauthorized' })
-  //   return
-  // }
+
+  if (!token || !refreshCookie) {
+    res.status(401).json({ error: 'Unauthorized' })
+    return
+  }
 
   try {
     jwt.verify(token, config.ACCESS_TOKEN_SECRET, async (err: jwt.VerifyErrors | null, decoded: any) => {
@@ -30,8 +31,8 @@ export async function verifyJwt(req: Request, res: Response, next: NextFunction)
       select: { refreshToken: true }
     })
     if (refreshCookie !==  user?.refreshToken) {
-      // res.status(401).json({ error: 'Unauthorized' })
-      // return
+      res.status(401).json({ error: 'Unauthorized' })
+      return
     }
 
     (req as any).user = { id: decoded.id, email: decoded.email, roles: decoded.roles as UserRole[] }

@@ -76,7 +76,7 @@ class AuthController {
                     secure: config.NODE_ENV === 'production',
                     sameSite: 'lax',
                     path: '/',
-                    maxAge: 10 * 60 * 1000 // 10 minutes
+                    maxAge: 4 * 60 * 60 * 1000 // 4 hours
                 })
 
                 res.status(200).json({accessToken, optVerified: user.otpVerified})
@@ -218,8 +218,6 @@ class AuthController {
                         postalCode: response.postalCode,
                         description: null,
                         members: 1,
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
                         image: null,
                     },
                 })
@@ -262,7 +260,6 @@ class AuthController {
                             content,
                             types: ["Information", "Utilisateur"],
                             districtId: neighborhood.id,
-                            createdAt: new Date(),
                         },
                     });
                 }
@@ -384,7 +381,13 @@ class AuthController {
                 {expiresIn: accessTokenExpiration}
             )
 
-            // Cookie refresh côté frontend
+            res.cookie(accessTokenName, accessToken, {
+                httpOnly: true,
+                secure: config.NODE_ENV === 'production',
+                sameSite: 'lax',
+                path: '/',
+                maxAge: 4 * 60 * 60 * 1000 // 4 hours
+            })
             res.status(200).json({accessToken})
         } catch (_) {
             res.status(401).json({error: 'Unauthorized'})

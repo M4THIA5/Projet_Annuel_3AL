@@ -33,13 +33,20 @@ export default function SigninPage() {
             const formData = new FormData(form)
             const loginData = loginFormData.parse(Object.fromEntries(formData.entries()))
 
+            if (!loginData.email || !loginData.password) {
+                setError('Email and password are required')
+                return
+            }
+
             const {accessToken, optVerified} = await loginUser(loginData)
+            if (!accessToken || !isTokenValid(accessToken.toString())) {
+                setError('Failed to login')
+            }
+
             if (!optVerified) {
                 router.push(`${Routes.auth.verify.toString()}?email=${encodeURIComponent(loginData.email)}`)
             }
-            if (!accessToken || !isTokenValid(accessToken.toString())) {
-                throw new Error('Failed to login')
-            }
+
             const returnTo = new URLSearchParams(window.location.search).get("return_to")
             if (returnTo) {
                 router.push(returnTo)
