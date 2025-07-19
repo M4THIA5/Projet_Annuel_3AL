@@ -10,9 +10,9 @@
     "prisma:generate:mongodb": "prisma generate --schema=./prisma/mongodb/schema.prisma",
     "prisma:migrate:postgresql": "prisma migrate dev --schema prisma/postgresql/schema.prisma",
     "prisma:migrate:mongodb": "prisma db push --schema prisma/mongodb/schema.prisma",
-    "prisma:seed:postgresql": "npx prisma db seed",
+    "prisma:seed": "npx prisma db seed",
     "prisma:reset:postgresql": "prisma migrate reset --force --schema prisma/postgresql/schema.prisma",
-    "prisma:reset:mongodb": "prisma migrate reset --force --schema prisma/mongodb/schema.prisma",
+
     "prisma:show:postgresql": "prisma studio --schema prisma/postgresql/schema.prisma",
     "prisma:show:mongodb": "prisma studio --schema prisma/mongodb/schema.prisma",
     "neo4j:reset": "ts-node src/scripts/reset-neodb.ts"

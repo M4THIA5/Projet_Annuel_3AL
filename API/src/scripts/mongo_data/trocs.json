@@ -1,0 +1,42 @@
+[
+  {
+    "asker": "John Doe",
+    "description": "Besoin d'aide pour déplacer des meubles",
+    "userId": 1,
+    "helperId": null,
+    "createdAt": "2023-10-01T10:00:00Z",
+    "needsConfirmation": false,
+    "isOpen": true,
+    "isDone": false
+  },
+  {
+    "asker": "Jane Smith",
+    "description": "Recherche une babysitter",
+    "userId": 2,
+    "helperId": 5,
+    "createdAt": "2023-10-02T15:30:00Z",
+    "needsConfirmation": true,
+    "isOpen": false,
+    "isDone": true
+  },
+  {
+    "asker": "Alice Johnson",
+    "description": "Besoin d'aide pour le jardinage",
+    "userId": 3,
+    "helperId": null,
+    "createdAt": "2023-10-03T08:45:00Z",
+    "needsConfirmation": false,
+    "isOpen": true,
+    "isDone": false
+  },
+  {
+    "asker": "Bob Brown",
+    "description": "Aide pour déplacer des cartons",
+    "userId": 4,
+    "helperId": 6,
+    "createdAt": "2023-10-04T12:00:00Z",
+    "needsConfirmation": true,
+    "isOpen": false,
+    "isDone": true
+  }
+]
