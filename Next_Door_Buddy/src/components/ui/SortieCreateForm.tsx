@@ -23,6 +23,7 @@ export function SortieCreateForm() {
     }
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
+    const [maxParticipant, setMaxParticipant] = useState<number>(2);
     const [address, setAddress] = useState({
         'address-1': '',
         'address-2': '',
@@ -43,6 +44,7 @@ export function SortieCreateForm() {
                 description: description,
                 address: place,
                 date: date,
+                maxParticipants: maxParticipant
             }
 
             await createSortie(sortie).then(() => {
@@ -93,6 +95,23 @@ export function SortieCreateForm() {
                             à mentionner chaque détail qui pourrait vous sembler important.
                         </div>
                     </div>
+
+                    <div>
+
+                        <Label className="text-sm font-medium">Max participant</Label>
+                        <Input
+                            name="maxParticipant"
+                            placeholder="2 minimum"
+                            type="number"
+                            min="2"
+                            max="50"
+                            onChange={(event) => setMaxParticipant(Number(event.target.value))}
+                        />
+                        <div className="text-xs text-muted-foreground">
+                            Donnez un titre à la sortie que vous allez faire.
+                        </div>
+                    </div>
+
                     <div>
                         <Label className="text-sm font-medium">Lieu</Label>
                         <input hidden={true} name="place" value={place} readOnly/>

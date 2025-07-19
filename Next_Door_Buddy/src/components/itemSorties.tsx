@@ -5,20 +5,12 @@ import { UserProfile } from "#/types/user"
 import { getProfile } from "#/lib/api_requests/user"
 import { acceptRequest } from "#/lib/api_requests/sorties"
 import { Button } from "#/components/ui/button"
-import { toast } from "react-toastify"
-import { useRouter } from "next/navigation"
+import {toast} from "react-toastify"
+import {useRouter} from "next/navigation"
+import {Sortie} from "#/types/sortie"
 
 interface Props {
-    sortie: {
-        id?: number
-        title: string
-        description: string
-        askerId: number
-        date?: string // ISO string
-        address?: string
-        open?: boolean
-        ended?: boolean
-    }
+    sortie: Sortie
     onAccept?: (id: number) => void
 }
 
@@ -39,19 +31,26 @@ export default function ItemSorties({ sortie, onAccept }: Props) {
     const [profile, setProfile] = useState<UserProfile | undefined>(undefined)
     const [loading, setLoading] = useState(false)
     const router = useRouter()
+    const [isAccepted, setIsAccepted] = useState(false)
 
     useEffect(() => {
         async function fetchProfile() {
             try {
                 const data = await getProfile()
                 setProfile(data)
+                if (data.sorties?.some(s => s.id === sortie.id)) {
+                    setIsAccepted(true)
+                }
             } catch {
-                // handle error silently
+                // ignore or handle error
             }
         }
         fetchProfile()
     }, [])
-
+    async function handleClickPlus(id:number|undefined){
+        if (!id)return
+        router.push("/sorties/"+id)
+    }
     async function handleClick() {
         if (!sortie.id) return
         setLoading(true)
@@ -75,7 +74,7 @@ export default function ItemSorties({ sortie, onAccept }: Props) {
                     </div>
                 ),
                 {
-                    autoClose: false,
+                    autoClose: false, // Let user dismiss manually
                 }
             )
         } catch (error) {
@@ -85,8 +84,8 @@ export default function ItemSorties({ sortie, onAccept }: Props) {
         }
     }
 
-    const isOwner = String(sortie.askerId) === String(profile?.id)
     const formattedDate = sortie.date ? formatDateFr(sortie.date) : null
+    const isOwner = String(sortie.creatorId) === String(profile?.id)
 
     return (
         <li className="border rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow bg-white">
@@ -110,8 +109,19 @@ export default function ItemSorties({ sortie, onAccept }: Props) {
                 </p>
             )}
 
+            {sortie.maxParticipants && (
+                <p className="text-sm text-gray-600 mb-1">
+                    <strong>Participants max :</strong> {sortie.maxParticipants}
+                </p>
+            )}
+            {sortie.participants && (
+                <p className="text-sm text-gray-600 mb-1">
+                    <strong>Participants :</strong> {sortie.participants.length}
+                </p>
+            )}
+
             <div className="flex justify-end mt-3">
-                {!isOwner && sortie.open && !sortie.ended && (
+                {!isOwner && sortie.open && !sortie.ended && !isAccepted && (
                     <Button
                         onClick={handleClick}
                         disabled={loading}
@@ -119,9 +129,19 @@ export default function ItemSorties({ sortie, onAccept }: Props) {
                         size="sm"
                         className="flex items-center space-x-2"
                     >
-                        {loading ? "Chargement…" : "Rejoindre la sortie"}
+                        {loading ? "Chargement…" : "Participer"}
                     </Button>
                 )}
+                &nbsp;
+                <Button
+                    onClick={()=> handleClickPlus(sortie.id)}
+                    disabled={loading}
+                    variant="default"
+                    size="sm"
+                    className="flex items-center space-x-2"
+                >
+                    {loading ? "Chargement…" : "Voir plus"}
+                </Button>
             </div>
         </li>
     )

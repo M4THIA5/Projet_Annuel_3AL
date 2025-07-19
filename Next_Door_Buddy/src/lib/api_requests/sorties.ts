@@ -65,3 +65,20 @@ export const deleteRequest = async (id: string): Promise<void> => {
         throw error
     }
 }
+
+export const getSortieById = async (id: number): Promise<Sortie> => {
+    try {
+        const response = await API.get('/sorties/' + id.toString(), {accessToken: await getAccessToken()})
+        console.log(response.status)
+        if (!response.ok) {
+            throw new Error('Failed to get sortie')
+        }
+        const data = await response.json() as Sortie
+        if (!data) {
+            throw new Error('No data found')
+        }
+        return data
+    } catch (error) {
+        throw error
+    }
+}

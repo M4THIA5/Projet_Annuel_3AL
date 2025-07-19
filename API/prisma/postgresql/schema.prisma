@@ -74,17 +74,18 @@ model Service {
 }
 
 model Sortie {
-  id           Int      @id @default(autoincrement())
-  title        String
-  description  String
-  open         Boolean  @default(true)
-  ended        Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  date         DateTime
-  address      String
-  creatorId    Int
-  creator      User     @relation("creator", fields: [creatorId], references: [id])
-  participants User[]   @relation("SortieParticipants")
+  id              Int      @id @default(autoincrement())
+  title           String
+  description     String
+  open            Boolean  @default(true)
+  ended           Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  date            DateTime
+  address         String
+  creatorId       Int
+  creator         User     @relation("creator", fields: [creatorId], references: [id])
+  participants    User[]   @relation("SortieParticipants")
+  maxParticipants Int      @default(50)
 }
 
 model Neighborhood {

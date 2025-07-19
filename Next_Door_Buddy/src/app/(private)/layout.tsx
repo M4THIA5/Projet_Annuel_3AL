@@ -73,20 +73,6 @@ export default function PrivateLayout({children}: { children: React.ReactNode })
                                     <Link href={Routes.troc.toString()}>Mes échanges</Link>
                                 </NavigationMenuLink>
                                 &nbsp;
-                                {/* Notification */}
-                                <NavigationMenuLink asChild className={`${navigationMenuTriggerStyle()} p-1`}>
-                                    <Link href={Routes.undefined.toString()}>
-                                        <Icon path={mdiBellOutline} size={1}/>
-                                    </Link>
-                                </NavigationMenuLink>
-                                &nbsp;
-                                {/* Settings */}
-                                <NavigationMenuLink asChild className={`${navigationMenuTriggerStyle()} p-1`}>
-                                    <Link href={Routes.undefined.toString()}>
-                                        <Icon path={mdiCog} size={1} />
-                                    </Link>
-                                </NavigationMenuLink>
-                                &nbsp;
                                 {/* Profile */}
                                 <NavigationMenuLink asChild className={`${navigationMenuTriggerStyle()} p-1 group relative`}>
                                     <Link href={Routes.profile.toString()}>

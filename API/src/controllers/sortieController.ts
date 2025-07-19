@@ -24,6 +24,9 @@ export default class SortieController {
                     date: {
                         gte: new Date() // Fetch sorties with date greater than or equal to today
                     }
+                }, include:{
+                    participants: true,
+                    creator: true,
                 }
             });
             res.status(200).json(sorties);
@@ -37,6 +40,10 @@ export default class SortieController {
         try {
             const sortie = await postgresClient.sortie.findUnique({
                 where: {id: Number(id)}
+                , include: {
+                    participants: true,
+                    creator: true,
+                }
             });
             if (!sortie) {
                 res.status(404).json({error: "Sortie not found"});
@@ -59,6 +66,11 @@ export default class SortieController {
                             id: user.id,
                         },
                     },
+                    participants: {
+                        connect: {
+                            id: user.id,
+                        },
+                    }
                 },
             });
             await postgresClient.rooms.create({
@@ -103,7 +115,7 @@ export default class SortieController {
             res.status(201).json(newSortie);
         } catch (error) {
             console.error("Error creating sortie:", error);
-            res.status(500).json({error: "Internal Server Error:" + error.message});
+            res.status(500).json({error: "Internal Server Error:"});
         }
     };
 
@@ -111,6 +123,9 @@ export default class SortieController {
         try {
             const updateSortie = await postgresClient.sortie.findUnique({
                 where: {id: Number(req.params.id)},
+                include: {
+                    participants: true,
+                }
             })
             if (!updateSortie) {
                 res.status(404).json({error: "Sortie not found"});
@@ -123,6 +138,14 @@ export default class SortieController {
             })
             if (!dbUser) {
                 res.status(404).json({error: "User not found"});
+                return;
+            }
+            if (updateSortie.participants.length >= updateSortie.maxParticipants) {
+                res.status(400).json({error: "Sortie is full"});
+                return;
+            }
+            if (updateSortie.participants.some(participant => participant.id === user.id)) {
+                res.status(400).json({error: "User already accepted the sortie"});
                 return;
             }
             await postgresClient.user.update({
@@ -150,7 +173,7 @@ export default class SortieController {
             res.status(200).json({message: "Sortie request accepted"});
         } catch (e) {
             console.error("Error with the request : ", e)
-            res.status(500).json({error: "Internal Server Error : " + e.message})
+            res.status(500).json({error: "Internal Server Error : "})
         }
     }
     deleteRequest: RequestHandler = async (req: Request, res: Response) => {

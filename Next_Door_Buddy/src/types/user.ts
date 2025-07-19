@@ -1,3 +1,5 @@
+import {Sortie} from "#/types/sortie";
+
 export type UserProfile = {
   id: number
   firstName: string
@@ -10,6 +12,7 @@ export type UserProfile = {
   address?: string
   city?: string
   postalCode?: string
+  sorties: Sortie[]
 }
 
 export type Friend = {

@@ -1,7 +1,11 @@
-import { acceptRequest, getServiceById, deleteRequest } from "#/lib/api_requests/services"
-import { Button } from "#/components/ui/button"
-import { getProfile } from "#/lib/api_requests/user"
-import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
+"use client"
+import {acceptRequest, getSortieById, deleteRequest} from "#/lib/api_requests/sorties"
+import {Button} from "#/components/ui/button"
+import {getProfile} from "#/lib/api_requests/user"
+import {Card, CardContent, CardHeader, CardTitle} from "#/components/ui/card"
+import {useEffect, useState} from "react"
+import {Sortie} from "#/types/sortie"
+import {UserProfile} from "#/types/user"
 
 type Props = { params: { id: string } }
 
@@ -14,26 +18,85 @@ async function deleteReq(id: string): Promise<void> {
 }
 
 function update(id: string): void {
-    window.location.href = `/services/${id}/update`
+    window.location.href = `/sorties/${id}/update`
 }
 
-export default async function SpecificService({ params }: Props) {
-    const service = await getServiceById(Number.parseInt(params.id))
-    const user = await getProfile()
+export default function SpecificSortie({params}: Props) {
 
-    const isOwner = user.id === service.askerId
+    const [sortie, setSortie] = useState<Sortie>({
+        address: "",
+        createdAt: undefined,
+        creator: undefined,
+        creatorId: 0,
+        date: undefined,
+        description: "",
+        ended: false,
+        id: 0,
+        open: false,
+        participants: undefined,
+        title: ""
+    })
+    const [user, setUser] = useState<UserProfile | undefined>()
+    const [isAccepted, setIsAccepted] = useState(false)
+
+    useEffect(() => {
+        async function fyegf() {
+            const id = (await params).id
+            const sortie = await getSortieById(Number.parseInt(id))
+            const user = await getProfile()
+            setSortie(sortie)
+            setUser(user)
+            if (user.sorties?.some(s => s.id === sortie.id)) {
+                setIsAccepted(true)
+            }
+        }
+
+        fyegf()
+    }, [params])
+
+    const isOwner = user?.id === sortie.creatorId
 
     return (
         <div className="max-w-2xl mx-auto py-12 px-4">
             <Card className="border rounded-2xl shadow-md">
                 <CardHeader>
-                    <CardTitle className="text-2xl font-semibold">{service.title}</CardTitle>
+                    <CardTitle className="text-2xl font-semibold">{sortie.title}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    <p className="text-gray-700 whitespace-pre-wrap">{service.description}</p>
-
+                    <p className="text-gray-700 whitespace-pre-wrap">{sortie.description}</p>
+                    <div>
+                        <strong>
+                            Participants:
+                        </strong>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                        {sortie.participants?.length ? (
+                            sortie.participants.map((participant) => (
+                                <span key={participant.id}>
+                                    {participant.firstName} {participant.lastName}
+                                </span>
+                            ))
+                        ) : (
+                            <span className="text-gray-500">Aucun participant</span>
+                        )}
+                    </div>
+                    <div>
+                        <strong>Date
+                            :</strong> {sortie.date ? new Date(sortie.date).toLocaleDateString() : "Non définie"}
+                    </div>
+                    <div>
+                        <strong>Adresse :</strong> {sortie.address || "Non définie"}
+                    </div>
+                    <div>
+                        <strong>Créateur
+                            :</strong> {sortie.creator ? `${sortie.creator.firstName} ${sortie.creator.lastName}` : "Inconnu"}
+                    </div>
+                    <div><strong>
+                        Nombre de participants maximum :
+                    </strong> {sortie.maxParticipants || "Non défini"}
+                    </div>
                     <div className="flex flex-col sm:flex-row gap-3 justify-end">
-                        {!isOwner && (
+                        {!isOwner && !isAccepted && (
                             <Button
                                 variant="default"
                                 onClick={() => acceptReq(params.id)}
@@ -48,14 +111,14 @@ export default async function SpecificService({ params }: Props) {
                                     variant="outline"
                                     onClick={() => update(params.id)}
                                 >
-                                    Modifier le service
+                                    Modifier la sortie
                                 </Button>
 
                                 <Button
                                     variant="destructive"
                                     onClick={() => deleteReq(params.id)}
                                 >
-                                    Supprimer le service
+                                    Supprimer la sortie
                                 </Button>
                             </>
                         )}
