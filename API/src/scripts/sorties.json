@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "title": "Aventure de Randonnée",
+    "description": "Une sortie amusante de randonnée en montagne.",
+    "open": true,
+    "ended": false,
+    "createdAt": "2023-10-01T10:00:00Z",
+    "date": "2023-10-15T08:00:00Z",
+    "address": "Sentier Montagneux, Région Alpine",
+    "creatorId": 10,
+    "participants": [11, 12, 13]
+  },
+  {
+    "id": 2,
+    "title": "Atelier de Cuisine",
+    "description": "Apprenez à cuisiner de délicieux repas.",
+    "open": true,
+    "ended": false,
+    "createdAt": "2023-10-02T14:00:00Z",
+    "date": "2023-10-20T10:00:00Z",
+    "address": "Centre Communautaire, Centre-ville",
+    "creatorId": 15,
+    "participants": [16, 17]
+  },
+  {
+    "id": 3,
+    "title": "Exposition d'Art",
+    "description": "Découvrez les dernières œuvres d'art des artistes locaux.",
+    "open": false,
+    "ended": true,
+    "createdAt": "2023-09-15T09:00:00Z",
+    "date": "2023-09-30T18:00:00Z",
+    "address": "Galerie d'Art, Centre-ville",
+    "creatorId": 18,
+    "participants": [19, 20, 21, 22]
+  }
+]

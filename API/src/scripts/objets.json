@@ -1,0 +1,47 @@
+[
+  {
+    "id": "1",
+    "nom": "Chaise en bois",
+    "description": "Une chaise confortable en bois massif.",
+    "createdAt": "2023-01-01T12:00:00Z",
+    "updatedAt": null,
+    "TrocId": "123",
+    "userId": 1
+  },
+  {
+    "id": "2",
+    "nom": "Table de cuisine",
+    "description": "Table robuste idéale pour la cuisine.",
+    "createdAt": "2023-01-02T12:00:00Z",
+    "updatedAt": null,
+    "TrocId": "124",
+    "userId": 2
+  },
+  {
+    "id": "3",
+    "nom": "Lampe de bureau",
+    "description": "Lampe LED moderne pour le bureau.",
+    "createdAt": "2023-01-03T12:00:00Z",
+    "updatedAt": null,
+    "TrocId": "125",
+    "userId": 3
+  },
+  {
+    "id": "4",
+    "nom": "Canapé en cuir",
+    "description": "Canapé confortable en cuir véritable.",
+    "createdAt": "2023-01-04T12:00:00Z",
+    "updatedAt": null,
+    "TrocId": "126",
+    "userId": 4
+  },
+  {
+    "id": "5",
+    "nom": "Bibliothèque en chêne",
+    "description": "Grande bibliothèque en bois de chêne.",
+    "createdAt": "2023-01-05T12:00:00Z",
+    "updatedAt": null,
+    "TrocId": "127",
+    "userId": 5
+  }
+]
