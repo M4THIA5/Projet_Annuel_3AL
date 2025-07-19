@@ -1,5 +1,6 @@
 import { z } from "zod"
 import { API } from "#/lib/api_requests/fetchRequest"
+import { deleteTokens } from "../authentification"
 
 export const loginFormData = z.object({
   email: z.string().email(),
@@ -26,7 +27,10 @@ export const loginUser = async (loginData: LoginFormData): Promise<{ accessToken
 
 export const logout = async (accessToken: string): Promise<void> => {
   try {
-    await API.post('/logout', { accessToken })
+    const response = await API.post('/logout', { accessToken })
+    if (!response.ok) {
+      await deleteTokens()
+    }
   } catch (error) {
     console.error('Error during logout:', error)
   }
