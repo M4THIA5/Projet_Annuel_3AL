@@ -7,31 +7,15 @@ import {createSortie} from "#/lib/api_requests/sorties"
 import {Card, CardContent, CardHeader, CardTitle} from "#/components/ui/card"
 import {useRouter} from "next/navigation"
 import {toast} from "react-toastify"
-import {SetStateAction, useState} from "react"
+import {useState} from "react"
 import {Label} from '@radix-ui/react-dropdown-menu'
-import AddressAutofillWrapper from "#/components/AddressAutoFillWrapper"
+import Autocomplete from "react-google-autocomplete"
 
 export function SortieCreateForm() {
     const router = useRouter()
-    const handleChangeAddress = (e: { target: { name: string; value: SetStateAction<string>; }; }) => {
-        setAddress((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value
-        }))
-        setPlace(`${address["address-1"]}, ${address['address-2'] ? address['address-2'] + ', ' : ''}${address.city}, ${address.state} ${address.zip}`)
-    }
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
     const [maxParticipant, setMaxParticipant] = useState<number>(2)
-    const [address, setAddress] = useState({
-        'address-1': '',
-        'address-2': '',
-        city: '',
-        state: '',
-        zip: ''
-    })
-
-
     const [place, setPlace] = useState('')
     const [date, setDate] = useState('')
     const onSubmit = async (e: { preventDefault: () => void }) => {
@@ -113,21 +97,25 @@ export function SortieCreateForm() {
 
                     <div>
                         <Label className="text-sm font-medium">Lieu</Label>
-                        <input hidden={true} name="place" value={place} readOnly/>
-                        <AddressAutofillWrapper accessToken={process.env.NEXT_PUBLIC_MAPBOX_API_KEY ?? ""}>
-                            <div>
-                            <Input type="text" onChange={handleChangeAddress} placeholder={"Adresse"} name="address-1"
-                                   autoComplete="street-address"/>
-                            <Input type="text" onChange={handleChangeAddress} name="address-2"
-                                   autoComplete="address-line2"/>
-                            <Input type="text" onChange={handleChangeAddress} placeholder={"Ville"} name="city"
-                                   autoComplete="address-level2"/>
-                            <Input type="text" onChange={handleChangeAddress} placeholder={"État"} name="state"
-                                   autoComplete="address-level1"/>
-                            <Input type="text" onChange={handleChangeAddress} placeholder={"Code postal"} name="zip"
-                                   autoComplete="postal-code"/>
-                            </div>
-                        </AddressAutofillWrapper>
+                        <Autocomplete
+                            apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+                            onPlaceSelected={(place) => {
+                                let final = ""
+                                if (!place.address_components) {
+                                    final = place.formatted_address ?? "Pas d'adresse fournie."
+                                } else {
+                                    for (const l of place.address_components) {
+                                        final += " " + l.long_name
+                                    }
+                                }
+                                setPlace(final)
+                            }}
+                            options={{
+                                types: ["street_address", "sublocality_level_1", "route", "locality"],
+                                componentRestrictions: {country: "fr"},
+                            }}
+                            className=" file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive"
+                        />
                         <div className="text-xs text-muted-foreground">
                             Veuillez fournir la localisation de l&#39;événement.
                         </div>

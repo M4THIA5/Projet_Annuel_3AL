@@ -10,7 +10,7 @@ import {Button} from "#/components/ui/button"
 
 import EditPost from "#/components/personal/EditPost"
 import {getProfile} from "#/lib/api_requests/user"
-import  {UserNeighborhood} from "#/types/user"
+import {UserNeighborhood} from "#/types/user"
 import {toast} from "react-toastify"
 import {Search} from "lucide-react"
 import {Input} from "#/components/ui/input"
@@ -18,26 +18,25 @@ import {Neighborhood} from "#/types/neighborghood"
 import AddPost from "#/components/personal/AddPost"
 import SafeHtmlRenderer from "#/components/personal/SafeHtmlRenderer"
 import {useRouter} from "next/navigation"
-import Lightbox from "yet-another-react-lightbox"
-import "yet-another-react-lightbox/styles.css"
+import FsLightbox from "fslightbox-react"
 
 
 interface PostFieldDialogProps {
     neighborhoodId: string
     profile?: UserNeighborhood
-    neighborhood: Neighborhood|undefined
+    neighborhood: Neighborhood | undefined
 }
 
 export default function FiedGeneralNeighborhood({neighborhoodId, profile, neighborhood}: PostFieldDialogProps) {
     const [posts, setPosts] = useState<Post[]>([])
     const [loading, setLoading] = useState(true)
-    const [isOpen, setIsOpen] = useState(false)
-    const [photoIndex, setPhotoIndex] = useState(0)
     const [activeImages, setActiveImages] = useState<string[]>([])
     const [currentUser, setCurrentUser] = useState<string>("")
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedType, setSelectedType] = useState<string | null>(null)
     const router = useRouter()
+    const [toggler, setToggler] = useState(false)
+
 
     const loadPosts = async () => {
         setLoading(true)
@@ -103,19 +102,6 @@ export default function FiedGeneralNeighborhood({neighborhoodId, profile, neighb
     }
 
     const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()
-
-    const openLightbox = (images: string[], index: number) => {
-        if (isOpen) return
-        setActiveImages(images)
-        setPhotoIndex(index)
-        setIsOpen(true)
-    }
-
-    const onCloseRequest = () => {
-        setIsOpen(false)
-        setActiveImages([])
-        setPhotoIndex(0)
-    }
 
     const handleTypeFilter = (type: string | null) => {
         setSelectedType(type)
@@ -228,7 +214,6 @@ export default function FiedGeneralNeighborhood({neighborhoodId, profile, neighb
                                 maxHeight="400px"
                             />
 
-
                             {post.images.length > 0 && (
                                 <div className={`grid gap-2 mt-4 ${
                                     post.images.length === 1
@@ -248,14 +233,20 @@ export default function FiedGeneralNeighborhood({neighborhoodId, profile, neighb
                                                 src={img}
                                                 alt={`Image ${idx + 1}`}
                                                 className={className}
-                                                onClick={() => openLightbox(post.images, idx)}
+                                                onClick={() => {
+                                                    setActiveImages(post.images)
+                                                    setToggler(!toggler)
+                                                }}
                                             />
                                         )
                                     })}
                                     {post.images.length > 4 && (
                                         <div
                                             className="relative rounded-lg cursor-pointer bg-black bg-opacity-50 flex items-center justify-center text-white text-2xl font-bold h-64"
-                                            onClick={() => openLightbox(post.images, 4)}
+                                            onClick={() => {
+                                                setActiveImages(post.images)
+                                                setToggler(!toggler)
+                                            }}
                                         >
                                             <img
                                                 src={post.images[4]}
@@ -274,26 +265,33 @@ export default function FiedGeneralNeighborhood({neighborhoodId, profile, neighb
                                     <span>💬 Commenter</span>
                                     <span>👀 Vu </span>
                                     {currentUser.toString() === post.userId.toString() && (
-                                        <div className="flex gap-2">
-                                            <EditPost post={post} onUpdateAction={loadPosts}/>
-                                            <Button
-                                                variant="ghost"
-                                                className="text-xs px-2 py-1"
-                                                type="button"
-                                                onClick={async () => {
-                                                    try {
-                                                        await deletePost(post._id)
-                                                        toast.success("✅ Votre post a bien été supprimé.")
-                                                        await loadPosts()
-                                                    } catch (error) {
-                                                        console.error("Erreur lors de la suppression du post :", error)
-                                                        toast.error("❌ Une erreur est survenue lors de la suppression du post.")
-                                                    }
-                                                }}
-                                            >
-                                                Supprimer
-                                            </Button>
-                                        </div>
+                                        <>
+                                            <div className="flex gap-2">
+                                                <EditPost post={post} onUpdateAction={loadPosts}/>
+                                                <Button
+                                                    variant="ghost"
+                                                    className="text-xs px-2 py-1"
+                                                    type="button"
+                                                    onClick={async () => {
+                                                        try {
+                                                            await deletePost(post._id)
+                                                            toast.success("✅ Votre post a bien été supprimé.")
+                                                            await loadPosts()
+                                                        } catch (error) {
+                                                            console.error("Erreur lors de la suppression du post :", error)
+                                                            toast.error("❌ Une erreur est survenue lors de la suppression du post.")
+                                                        }
+                                                    }}
+                                                >
+                                                    Supprimer
+                                                </Button>
+                                            </div>
+                                            <FsLightbox
+                                                toggler={toggler}
+                                                sources={activeImages}
+                                                key={activeImages.toString()}
+                                            />
+                                        </>
                                     )}
                                 </div>
                             ) : post.type === "service" ? (
@@ -331,25 +329,11 @@ export default function FiedGeneralNeighborhood({neighborhoodId, profile, neighb
                                 </div>
                             ) : null}
 
+
                         </CardContent>
                     </Card>
                 ))}
             </div>
-
-            {isOpen && (
-                <Lightbox
-                    mainSrc={activeImages[photoIndex]}
-                    nextSrc={activeImages[(photoIndex + 1) % activeImages.length]}
-                    prevSrc={activeImages[(photoIndex + activeImages.length - 1) % activeImages.length]}
-                    onCloseRequest={onCloseRequest}
-                    onMovePrevRequest={() =>
-                        setPhotoIndex((photoIndex + activeImages.length - 1) % activeImages.length)
-                    }
-                    onMoveNextRequest={() =>
-                        setPhotoIndex((photoIndex + 1) % activeImages.length)
-                    }
-                />
-            )}
         </>
     )
 }
