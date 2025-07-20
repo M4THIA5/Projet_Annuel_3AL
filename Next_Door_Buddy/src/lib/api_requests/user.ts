@@ -190,6 +190,9 @@ export const verifyOtp = async (data: VerifyOtpData): Promise<Response> => {
     })
     if (!response.ok) {
         const errorData = await response.json()
+        if (response.status === 400 && errorData.error ==="OTP déjà vérifié"){
+            return response
+        }
         throw new Error(errorData.error || 'Échec de la vérification du code OTP')
     }
     return response
