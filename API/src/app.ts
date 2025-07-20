@@ -29,7 +29,8 @@ const app = express()
 app.use(express.json())
 app.use(cookieParser())
 
-app.use(cors({ credentials: true, origin: config.NODE_ENV === "production" ? `https://${config.HOST}:3000` : "http://localhost:3000" }))
+app.use(cors({ credentials: true, origin: config.NODE_ENV === "production" ? `https://laporteacote.online` : "http://localhost:3000" }))
+app.options("*", cors({ credentials: true, origin: "https://laporteacote.online" }));
 app.use(urlencoded({ extended: true }))
 
 app.get("/", async (req: Request, res: Response): Promise<void> => {
