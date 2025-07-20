@@ -12,6 +12,7 @@ export const config = {
 
   HOST: process.env.HOST || "localhost",
   PORT: process.env.PORT || 3001,
+  DOMAIN: process.env.DOMAIN || undefined,
 
   ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET || "",
   REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET || "",
