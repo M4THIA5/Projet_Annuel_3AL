@@ -336,14 +336,14 @@ class AuthController {
             res.clearCookie(refreshTokenName, {
                 httpOnly: true,
                 secure: config.NODE_ENV === 'production',
-                sameSite: 'lax',
+                sameSite: config.NODE_ENV === 'production' ? 'none' : 'lax',
                 path: '/',
             })
 
             res.clearCookie(accessTokenName, {
                 httpOnly: true,
                 secure: config.NODE_ENV === 'production',
-                sameSite: 'lax',
+                sameSite: config.NODE_ENV === 'production' ? 'none' : 'lax',
                 path: '/',
             })
 

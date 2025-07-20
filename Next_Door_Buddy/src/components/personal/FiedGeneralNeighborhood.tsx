@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react"
+import React, {useCallback, useEffect, useState} from "react"
 import {Post} from "#/types/post"
 import {getPostsByNeighborhoodId, deletePost} from "#/lib/api_requests/post"
 import {Card, CardContent} from "#/components/ui/card"
@@ -20,7 +20,6 @@ import SafeHtmlRenderer from "#/components/personal/SafeHtmlRenderer"
 import {useRouter} from "next/navigation"
 import FsLightbox from "fslightbox-react"
 
-
 interface PostFieldDialogProps {
     neighborhoodId: string
     profile?: UserNeighborhood
@@ -38,7 +37,7 @@ export default function FiedGeneralNeighborhood({neighborhoodId, profile, neighb
     const [toggler, setToggler] = useState(false)
 
 
-    const loadPosts = async () => {
+    const loadPosts = useCallback(async () => {
         setLoading(true)
         try {
             const postData = await getPostsByNeighborhoodId(neighborhoodId)
@@ -51,7 +50,7 @@ export default function FiedGeneralNeighborhood({neighborhoodId, profile, neighb
         } finally {
             setLoading(false)
         }
-    }
+    }, [neighborhoodId])
 
     useEffect(() => {
         loadPosts()
@@ -64,7 +63,7 @@ export default function FiedGeneralNeighborhood({neighborhoodId, profile, neighb
             }
         }
         fetchCurrentUser()
-    }, [neighborhoodId])
+    }, [loadPosts, neighborhoodId])
 
     const getInitials = (value: string | undefined) =>
         value ? value.split(" ").map(word => word[0]?.toUpperCase()).join("").slice(0, 2) : ""
