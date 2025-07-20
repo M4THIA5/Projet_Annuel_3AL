@@ -29,12 +29,12 @@ export function UserInformation({ profile, setProfile }: { profile: UserProfile,
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: profile.firstName,
-      lastName: profile.lastName,
-      address: profile.address || "",
-      city: profile.city || "",
-      postalCode: profile.postalCode || "",
-      image: profile.image || "",
+      firstName: profile!.firstName,
+      lastName: profile!.lastName,
+      address: profile!.address || "",
+      city: profile!.city || "",
+      postalCode: profile!.postalCode || "",
+      image: profile!.image || "",
     },
   })
 
@@ -51,16 +51,16 @@ export function UserInformation({ profile, setProfile }: { profile: UserProfile,
     }
 
     const dataToSend: Partial<typeof values> = {}
-    if (firstName !== profile.firstName) dataToSend.firstName = firstName
-    if (lastName !== profile.lastName) dataToSend.lastName = lastName
-    if ((address || "") !== (profile.address || "")) dataToSend.address = address || undefined
-    if ((city || "") !== (profile.city || "")) dataToSend.city = city || undefined
-    if ((postalCode || "") !== (profile.postalCode || "")) dataToSend.postalCode = postalCode || undefined
-    if ((image || "") !== (profile.image || "")) dataToSend.image = image || undefined
+    if (firstName !== profile!.firstName) dataToSend.firstName = firstName
+    if (lastName !== profile!.lastName) dataToSend.lastName = lastName
+    if ((address || "") !== (profile!.address || "")) dataToSend.address = address || undefined
+    if ((city || "") !== (profile!.city || "")) dataToSend.city = city || undefined
+    if ((postalCode || "") !== (profile!.postalCode || "")) dataToSend.postalCode = postalCode || undefined
+    if ((image || "") !== (profile!.image || "")) dataToSend.image = image || undefined
 
     try {
       if (Object.keys(dataToSend).length > 0) {
-        await updateUser(profile.id, dataToSend)
+        await updateUser(profile!.id, dataToSend)
         const data = await getProfile()
         setProfile(data)
       }
@@ -117,7 +117,7 @@ export function UserInformation({ profile, setProfile }: { profile: UserProfile,
               )}
               />
               <Avatar className="w-20 h-20">
-              <AvatarImage src={form.watch("image") || profile.image} alt="Profile Image" className="w-20 h-20" />
+              <AvatarImage src={form.watch("image") || profile!.image} alt="Profile Image" className="w-20 h-20" />
               <AvatarFallback>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <circle cx="12" cy="8" r="4" />
@@ -202,7 +202,7 @@ export function UserInformation({ profile, setProfile }: { profile: UserProfile,
         <div className="flex flex-col gap-3 px-4 py-2 bg-blue-50 rounded-lg shadow-inner">
           <div className="flex items-center gap-4 mb-2">
             <Avatar className="w-20 h-20">
-              <AvatarImage src={profile.image} alt="Profile Image" className="w-20 h-20" />
+              <AvatarImage src={profile!.image} alt="Profile Image" className="w-20 h-20" />
               <AvatarFallback>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <circle cx="12" cy="8" r="4" />
@@ -213,29 +213,29 @@ export function UserInformation({ profile, setProfile }: { profile: UserProfile,
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-blue-900 w-24">Prénom :</span>
-                <span className="text-blue-700">{profile.firstName}</span>
+                <span className="text-blue-700">{profile!.firstName}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-blue-900 w-24">Nom :</span>
-                <span className="text-blue-700">{profile.lastName}</span>
+                <span className="text-blue-700">{profile!.lastName}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-blue-900 w-24">Email :</span>
-                <span className="text-blue-700">{profile.email}</span>
+                <span className="text-blue-700">{profile!.email}</span>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <span className="font-semibold text-blue-900 w-24">Adresse :</span>
-            <span className="text-blue-700">{profile.address || "-"}</span>
+            <span className="text-blue-700">{profile!.address || "-"}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="font-semibold text-blue-900 w-24">Ville :</span>
-            <span className="text-blue-700">{profile.city || "-"}</span>
+            <span className="text-blue-700">{profile!.city || "-"}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="font-semibold text-blue-900 w-24">Code postal :</span>
-            <span className="text-blue-700">{profile.postalCode || "-"}</span>
+            <span className="text-blue-700">{profile!.postalCode || "-"}</span>
           </div>
         </div>
       )}

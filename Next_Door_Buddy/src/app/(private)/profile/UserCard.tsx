@@ -10,6 +10,9 @@ export const UserCard = ({ user, profile, setMultiFriendTypes }: {user: Friend, 
     try {
       await sendFriendRequest(friendId)
       toast.success("Demande d'ami envoyée")
+      if (!profile || !profile.id) {
+        return
+      }
       const data = await fetchFriends(profile.id)
       setMultiFriendTypes(data)
     } catch (e) {
@@ -22,6 +25,9 @@ export const UserCard = ({ user, profile, setMultiFriendTypes }: {user: Friend, 
     try {
       await acceptFriendRequest(friendId)
       toast.success("Ami accepté")
+      if (!profile || !profile.id) {
+        return
+      }
       const data = await fetchFriends(profile.id)
       setMultiFriendTypes(data)
     } catch (e) {
@@ -34,6 +40,9 @@ export const UserCard = ({ user, profile, setMultiFriendTypes }: {user: Friend, 
     try {
       await refuseFriendRequest(friendId)
       toast.success("Demande refusée")
+      if (!profile || !profile.id) {
+        return
+      }
       const data = await fetchFriends(profile.id)
       setMultiFriendTypes(data)
     } catch (e) {
@@ -46,6 +55,9 @@ export const UserCard = ({ user, profile, setMultiFriendTypes }: {user: Friend, 
     try {
       await cancelFriendRequest(friendId)
       toast.success("Demande annulée")
+      if (!profile || !profile.id) {
+        return
+      }
       const data = await fetchFriends(profile.id)
       setMultiFriendTypes(data)
     } catch (e) {
@@ -58,6 +70,9 @@ export const UserCard = ({ user, profile, setMultiFriendTypes }: {user: Friend, 
     try {
       await removeFriend(friendId)
       toast.success("Ami supprimé")
+        if (!profile || !profile.id) {
+            return
+        }
       const data = await fetchFriends(profile.id)
       setMultiFriendTypes(data)
     } catch (e) {
@@ -79,7 +94,7 @@ export const UserCard = ({ user, profile, setMultiFriendTypes }: {user: Friend, 
       </Avatar>
       <span className="font-medium text-gray-800">{user.firstName} {user.lastName}</span>
       <div className="ml-auto flex gap-2">
-        {user.id === profile.id && (
+        {user.id === profile!.id && (
           <span className="text-gray-500">Vous-même</span>
         )}
         {user.status === 'accepted' && (
@@ -114,7 +129,7 @@ export const UserCard = ({ user, profile, setMultiFriendTypes }: {user: Friend, 
             </Button>
           </>
         )}
-        {(!user.status || user.status === 'none') && user.id !== profile.id && (
+        {(!user.status || user.status === 'none') && user.id !== profile!.id && (
           <Button
             variant="default"
             onClick={() => handleSendFriendRequest(user.id)}

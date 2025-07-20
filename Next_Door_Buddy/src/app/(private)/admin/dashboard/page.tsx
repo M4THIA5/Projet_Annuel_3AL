@@ -178,8 +178,8 @@ function getAllColumns(
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => setUserDetails(row.original.id)}>Voir le détail</DropdownMenuItem>
-          <DeleteUserDialog onConfirm={() => deleteUser(row.original.id)} />
+          <DropdownMenuItem onClick={() => setUserDetails(row.original? row.original.id:0)}>Voir le détail</DropdownMenuItem>
+          <DeleteUserDialog onConfirm={() => deleteUser(row.original? row.original.id:0)} />
         </DropdownMenuContent>
       </DropdownMenu>
     )

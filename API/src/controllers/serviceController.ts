@@ -34,6 +34,7 @@ export default class ServiceController {
             res.status(500).json({error: "Internal Server Error"});
         }
     }
+
     getServiceById: RequestHandler = async (req: Request, res: Response) => {
         const {id} = req.params;
         try {
@@ -86,7 +87,6 @@ export default class ServiceController {
                 userId: user.id.toString(),
                 type: "service",
                 neighborhoodId: userNeighborhood.neighborhoodId.toString(),
-                createdAt: new Date(),
                 content: htmlContent,
                 images: [],
             };
@@ -100,7 +100,6 @@ export default class ServiceController {
                     content,
                     types: ["Information", "Service"],
                     districtId: userNeighborhood.neighborhoodId,
-                    createdAt: new Date(),
                 },
             });
 
@@ -159,7 +158,6 @@ export default class ServiceController {
                     content: journalContent,
                     types: ["Information", "Service"],
                     districtId: providerNeighborhood.neighborhoodId,
-                    createdAt: new Date(),
                 },
             });
 

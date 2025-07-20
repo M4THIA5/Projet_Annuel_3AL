@@ -73,7 +73,7 @@ export default function Journal({ params }: Props) {
                             Contenu
                         </label>
                         <div className="border border-gray-300 rounded-md p-4">
-                            <SimpleEditor parentCallback={handleCallback} />
+                            <SimpleEditor initialContent="" parentCallback={handleCallback} />
                         </div>
                     </div>
 

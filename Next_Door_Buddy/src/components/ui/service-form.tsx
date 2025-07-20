@@ -20,7 +20,7 @@ import { Service } from "#/types/service"
 import { createService } from "#/lib/api_requests/services"
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
 import { useRouter } from "next/navigation"
-import {toast} from "react-toastify"; // ✅ Utilise le hook App Router
+import {toast} from "react-toastify" // ✅ Utilise le hook App Router
 
 const formSchema = z.object({
     title: z.string().min(5, {
@@ -46,13 +46,13 @@ export function ProfileForm() {
         const profile = await getProfile()
         const service: Service = {
             ...values,
-            asker: profile.email,
+            asker: profile!.email,
             createdAt: new Date(),
             open: true,
         }
 
         await createService(service).then(() => {
-            toast.success("Le service a été créé avec succès !");
+            toast.success("Le service a été créé avec succès !")
             router.push("/services") // ✅ Utilise router.push (au lieu de window.location.href)
         })
     }

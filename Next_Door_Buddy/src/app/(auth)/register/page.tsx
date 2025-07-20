@@ -8,7 +8,7 @@ import { Label } from "#/components/ui/label"
 import { Checkbox } from "#/components/ui/checkbox"
 import { getMapBoxAdresse, getMapBoxNeighborhood } from "#/lib/api_requests/mapbox"
 import { RegisterUserData } from "#/types/mapbox"
-import { getAllUsers, registerUser } from "#/lib/api_requests/user"
+import { registerUser } from "#/lib/api_requests/user"
 import {Routes} from "#/Routes"
 import {useRouter} from "next/navigation"
 

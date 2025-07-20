@@ -13,7 +13,7 @@ interface Props {
         id?: number
         title: string
         description: string
-        askerId: number
+        askerId?: number | undefined
     }
     onAccept?: (id: number) => void
 }
@@ -60,7 +60,7 @@ export default function ItemServices({ service, onAccept }: Props) {
                 {
                     autoClose: false, // Let user dismiss manually
                 }
-            );
+            )
         } catch (error) {
             console.error("Erreur lors de l'activation du service", error)
         } finally {

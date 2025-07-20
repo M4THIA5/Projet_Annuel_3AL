@@ -1,16 +1,15 @@
 "use client"
 
-import {AddressAutofill} from '@mapbox/search-js-react'
 import {Input} from "#/components/ui/input"
 import {Button} from "#/components/ui/button"
 import {Textarea} from "#/components/ui/textarea"
-import {Sortie} from "#/types/sortie"
 import {createSortie} from "#/lib/api_requests/sorties"
 import {Card, CardContent, CardHeader, CardTitle} from "#/components/ui/card"
 import {useRouter} from "next/navigation"
 import {toast} from "react-toastify"
 import {SetStateAction, useState} from "react"
 import {Label} from '@radix-ui/react-dropdown-menu'
+import AddressAutofillWrapper from "#/components/AddressAutoFillWrapper"
 
 export function SortieCreateForm() {
     const router = useRouter()
@@ -23,7 +22,7 @@ export function SortieCreateForm() {
     }
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
-    const [maxParticipant, setMaxParticipant] = useState<number>(2);
+    const [maxParticipant, setMaxParticipant] = useState<number>(2)
     const [address, setAddress] = useState({
         'address-1': '',
         'address-2': '',
@@ -115,7 +114,8 @@ export function SortieCreateForm() {
                     <div>
                         <Label className="text-sm font-medium">Lieu</Label>
                         <input hidden={true} name="place" value={place} readOnly/>
-                        <AddressAutofill accessToken={process.env.NEXT_PUBLIC_MAPBOX_API_KEY ?? ""}>
+                        <AddressAutofillWrapper accessToken={process.env.NEXT_PUBLIC_MAPBOX_API_KEY ?? ""}>
+                            <div>
                             <Input type="text" onChange={handleChangeAddress} placeholder={"Adresse"} name="address-1"
                                    autoComplete="street-address"/>
                             <Input type="text" onChange={handleChangeAddress} name="address-2"
@@ -126,7 +126,8 @@ export function SortieCreateForm() {
                                    autoComplete="address-level1"/>
                             <Input type="text" onChange={handleChangeAddress} placeholder={"Code postal"} name="zip"
                                    autoComplete="postal-code"/>
-                        </AddressAutofill>
+                            </div>
+                        </AddressAutofillWrapper>
                         <div className="text-xs text-muted-foreground">
                             Veuillez fournir la localisation de l&#39;événement.
                         </div>

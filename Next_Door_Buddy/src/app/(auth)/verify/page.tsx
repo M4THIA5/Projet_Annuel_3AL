@@ -32,11 +32,6 @@ export default function OTPForm() {
         }, 1000)
     }
 
-    useEffect(() => {
-        if (code.length === 6) {
-            handleSubmit(code)
-        }
-    }, [code])
 
     const handleSubmit = async (code: string) => {
         setIsVerifying(true)
@@ -51,6 +46,11 @@ export default function OTPForm() {
             setIsVerifying(false)
         }
     }
+    useEffect(() => {
+        if (code.length === 6) {
+            handleSubmit(code)
+        }
+    }, [code, handleSubmit])
 
     const handleResend = async () => {
         setIsResending(true)

@@ -9,26 +9,19 @@ import logo from "@/logo.png"
 import {getObjet, modifyObjet} from "#/lib/api_requests/troc"
 
 
-type Props = {
-    params: {
-        id: string
-    }
-}
-
-export default function ModifyPage({params}: Props) {
+export default function ModifyPage({params}: { params: Promise<{ id: string }> }) {
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
-
+    
     useEffect(() => {
-        async function modifObjet(id: string) {
-            const data = await getObjet(id)
+        async function modifObjet() {
+            const data = await getObjet((await params).id)
             setName(data.nom)
             setDescription(data.description || "")
             setImagePreview(data.image || null)
         }
-
-        modifObjet(params.id)
-    }, [])
+        modifObjet()
+    }, [params])
 
     const [imagePreview, setImagePreview] = useState<string | null>(null)
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,7 +47,7 @@ export default function ModifyPage({params}: Props) {
         if (imagePreview) {
             formData.append("image", imagePreview)
         }
-        await modifyObjet(params.id, formData).then(() => {
+        await modifyObjet((await params).id, formData).then(() => {
             window.location.href = "/troc"
         })
 

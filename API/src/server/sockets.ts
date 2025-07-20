@@ -5,7 +5,11 @@ interface CurrentUser {
     userID: string,
     username: string,
 }
-
+declare module "socket.io" {
+    interface Socket {
+        username?: string;
+    }
+}
 let users: CurrentUser[] = []
 const db = new MongoClient()
 
@@ -59,6 +63,8 @@ const socketHandler = async (socket: Socket, io: Server): Promise<void> => {
         await saveMessage(data)
         if (data.room) {
             io.to(data.room).emit('message_sent', data)
+        } else {
+            io.emit('message_sent', data)  // Envoie le message à tous les clients
         }
     })
     socket.on('newUser', (data) => {
@@ -70,7 +76,7 @@ const socketHandler = async (socket: Socket, io: Server): Promise<void> => {
     for (const [id, socket] of io.of("/").sockets) {
         users.push({
             userID: id,
-            username: socket.username,
+            username: socket.username??"Anonymous",
         })
     }
     socket.emit("users", users)

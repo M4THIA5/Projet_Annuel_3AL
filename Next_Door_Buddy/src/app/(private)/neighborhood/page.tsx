@@ -22,10 +22,14 @@ export default function NeighborhoodsPage() {
     useEffect(() => {
         async function fetchNeighborhoods() {
             const user = await getProfile()
+            if (!user || !user.id) {
+                router.push('/login')
+                return
+            }
             // setProfile(user)
             const data = await getNeighborhoodsOfUser(user.id)
             setNeighborhoodUser(data)
-            const data2 = await getNeighborhoodsAroundMe(user.id)
+            const data2 = await getNeighborhoodsAroundMe(String(user.id))
             setNeighborhoodsAround(data2)
         }
 

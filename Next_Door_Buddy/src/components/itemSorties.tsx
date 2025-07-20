@@ -38,7 +38,7 @@ export default function ItemSorties({ sortie, onAccept }: Props) {
             try {
                 const data = await getProfile()
                 setProfile(data)
-                if (data.sorties?.some(s => s.id === sortie.id)) {
+                if (data!.sorties?.some(s => s.id === sortie?.id)) {
                     setIsAccepted(true)
                 }
             } catch {

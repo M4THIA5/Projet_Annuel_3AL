@@ -1,5 +1,4 @@
 import {API} from '#/lib/api_requests/fetchRequest'
-import {getAccessToken} from '../authentification'
 import {MapboxAdresse, MapboxNeighborhood} from "#/types/mapbox"
 
 export const getMapBoxNeighborhood = async (address: string): Promise<MapboxNeighborhood> => {

@@ -3,10 +3,7 @@ import { PrismaClient as MongoClient } from "../../prisma/client/mongoClient";
 import {
     createValidator,
     idValidator,
-    neighborhoodIdValidator,
-    updateValidator,
 } from "../validators/post";
-import fs from "fs";
 import {PrismaClient as PostgresClient} from "../../prisma/client/postgresClient";
 
 const db = new MongoClient();
@@ -96,7 +93,6 @@ export default class PostController {
                 ...value,
                 images: imageUrls,
             };
-            // console.log(postData);
 
             await db.post.create({ data: postData });
 
@@ -118,7 +114,6 @@ export default class PostController {
                     content,
                     types: ["Information", "Post"],
                     districtId: userNeighborhood.neighborhoodId,
-                    createdAt: new Date(),
                 },
             });
             console.log("Resource created")

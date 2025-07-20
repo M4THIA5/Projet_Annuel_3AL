@@ -44,7 +44,13 @@ export const acceptRequest = async (id: string): Promise<void> => {
     }
 }
 
-export const createSortie = async (sortie: Sortie): Promise<void> => {
+export const createSortie = async (sortie: {
+    title: string;
+    description: string;
+    address: string;
+    date: string;
+    maxParticipants: number
+}): Promise<void> => {
     try {
         const response = await API.post('/sorties', {accessToken: await getAccessToken(), data: sortie})
         if (!response.ok) {

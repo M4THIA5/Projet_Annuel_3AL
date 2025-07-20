@@ -7,7 +7,6 @@ import {useEffect, useState} from "react"
 import {Sortie} from "#/types/sortie"
 import {UserProfile} from "#/types/user"
 
-type Props = { params: { id: string } }
 
 async function acceptReq(id: string): Promise<void> {
     await acceptRequest(id)
@@ -21,17 +20,18 @@ function update(id: string): void {
     window.location.href = `/sorties/${id}/update`
 }
 
-export default function SpecificSortie({params}: Props) {
+export default function SpecificSortie({params}: { params: Promise<{ id: string }> }) {
 
     const [sortie, setSortie] = useState<Sortie>({
         address: "",
         createdAt: undefined,
-        creator: undefined,
+        creator: null,
         creatorId: 0,
-        date: undefined,
+        date: "",
         description: "",
         ended: false,
         id: 0,
+        maxParticipants: 0,
         open: false,
         participants: undefined,
         title: ""
@@ -46,6 +46,7 @@ export default function SpecificSortie({params}: Props) {
             const user = await getProfile()
             setSortie(sortie)
             setUser(user)
+            if (!user) return
             if (user.sorties?.some(s => s.id === sortie.id)) {
                 setIsAccepted(true)
             }
@@ -72,8 +73,8 @@ export default function SpecificSortie({params}: Props) {
                     <div className="flex flex-wrap gap-2">
                         {sortie.participants?.length ? (
                             sortie.participants.map((participant) => (
-                                <span key={participant.id}>
-                                    {participant.firstName} {participant.lastName}
+                                <span key={participant ? participant.id:""}>
+                                    {participant ? participant.firstName:""} {participant ? participant.lastName:""}
                                 </span>
                             ))
                         ) : (
@@ -99,7 +100,7 @@ export default function SpecificSortie({params}: Props) {
                         {!isOwner && !isAccepted && (
                             <Button
                                 variant="default"
-                                onClick={() => acceptReq(params.id)}
+                                onClick={async () => acceptReq((await params).id)}
                             >
                                 Accepter la demande
                             </Button>
@@ -109,14 +110,14 @@ export default function SpecificSortie({params}: Props) {
                             <>
                                 <Button
                                     variant="outline"
-                                    onClick={() => update(params.id)}
+                                    onClick={async () => update((await params).id)}
                                 >
                                     Modifier la sortie
                                 </Button>
 
                                 <Button
                                     variant="destructive"
-                                    onClick={() => deleteReq(params.id)}
+                                    onClick={async () => deleteReq((await params).id)}
                                 >
                                     Supprimer la sortie
                                 </Button>

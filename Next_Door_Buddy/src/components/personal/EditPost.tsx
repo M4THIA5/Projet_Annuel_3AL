@@ -16,19 +16,19 @@ import { toast } from "react-toastify"
 import { Post } from "#/types/post"
 import { Label } from "#/components/ui/label"
 import { updatePost } from "#/lib/api_requests/post"
+import {Content} from "@tiptap/react"
 
 interface EditPostDialogProps {
     post: Post
-    onUpdate: () => void
+    onUpdateAction: () => void
 }
 
-export default function EditPostDialog({ post, onUpdate }: EditPostDialogProps) {
+export default function EditPostDialog({ post, onUpdateAction }: EditPostDialogProps) {
     const [open, setOpen] = useState(false)
-    const [value, setValue] = useState<string>(post.content)
+    const [value, setValue] = useState<string|Content>(post.content)
     const [images, setImages] = useState<File[]>([])
     const [imagePreviews, setImagePreviews] = useState<string[]>([])
     const [existingImages, setExistingImages] = useState<string[]>(post.images || [])
-    const [type, setType] = useState<string>(post.type)
     const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
@@ -55,20 +55,22 @@ export default function EditPostDialog({ post, onUpdate }: EditPostDialogProps) 
     const handleSubmit = async () => {
         setIsLoading(true)
         try {
-            await updatePost({
-                postId: post._id,
-                userId: post.userId,
-                neighborhoodId: post.neighborhoodId,
-                content: value,
-                type,
-                images,
-                keptImages: existingImages,
-            })
-            toast.success("✅ Post mis à jour avec succès.")
-            onUpdate()
-            setOpen(false)
-            setImages([])
-            setImagePreviews([])
+            if (typeof value === "string" && value.trim() !== "") {
+                await updatePost({
+                    postId: post._id,
+                    userId: post.userId,
+                    neighborhoodId: post.neighborhoodId,
+                    content: value,
+                    type: post.type,
+                    images,
+                    keptImages: existingImages,
+                })
+                toast.success("✅ Post mis à jour avec succès.")
+                onUpdateAction()
+                setOpen(false)
+                setImages([])
+                setImagePreviews([])
+            }
         } catch (error) {
             toast.error("❌ Échec de la mise à jour du post.")
             console.error("Erreur lors de la mise à jour du post :", error)
@@ -178,8 +180,10 @@ export default function EditPostDialog({ post, onUpdate }: EditPostDialogProps) 
                             multiple
                             accept="image/*"
                             onChange={(e) => {
-                                if (!e.target.files) return
-                                setImages(prev => [...prev, ...Array.from(e.target.files)])
+                                const files = e.target.files
+                                if (files) {
+                                    setImages(prev => [...prev, ...Array.from(files)])
+                                }
                             }}
                             className="mb-4"
                         />

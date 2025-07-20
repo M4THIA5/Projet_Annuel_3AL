@@ -24,7 +24,7 @@ const ListeServices: React.FC = () => {
                 {services.map(service => (
                     <li key={service.id}>
                         <strong>{service.title}</strong> : {service.description}
-                        {service.providerId ? (
+                        {service.providerId ? service.provider && (
                             <span>
                                 Accepté par {service.provider.firstName} {service.provider.lastName}
                             </span>

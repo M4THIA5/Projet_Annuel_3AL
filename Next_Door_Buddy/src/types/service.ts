@@ -4,7 +4,10 @@ export interface Service {
     description:string,
     open:boolean,
     asker?:unknown,
-    provider?:unknown,
+    provider?: {
+        firstName: string,
+        lastName: string,
+    },
     askerId?:number,
     providerId?:number,
     createdAt:Date

@@ -10,21 +10,20 @@ import Lightbox from "react-image-lightbox"
 import "react-image-lightbox/style.css"
 import EditPost from "#/components/personal/EditPost"
 import {getProfile} from "#/lib/api_requests/user"
-import {User, UserNeighborhood} from "#/types/user"
+import  {UserNeighborhood} from "#/types/user"
 import {toast} from "react-toastify"
 import {Search} from "lucide-react"
 import {Input} from "#/components/ui/input"
 import {Neighborhood} from "#/types/neighborghood"
 import AddPost from "#/components/personal/AddPost"
-import DOMPurify from "dompurify"
-import SafeHtmlRenderer from "#/components/personal/SafeHtmlRenderer";
-import {useRouter} from "next/navigation";
+import SafeHtmlRenderer from "#/components/personal/SafeHtmlRenderer"
+import {useRouter} from "next/navigation"
 
 
 interface PostFieldDialogProps {
     neighborhoodId: string
     profile?: UserNeighborhood
-    neighborhood: Neighborhood
+    neighborhood: Neighborhood|undefined
 }
 
 export default function FiedGeneralNeighborhood({neighborhoodId, profile, neighborhood}: PostFieldDialogProps) {
@@ -58,7 +57,7 @@ export default function FiedGeneralNeighborhood({neighborhoodId, profile, neighb
         const fetchCurrentUser = async () => {
             try {
                 const user = await getProfile()
-                setCurrentUser(user.id)
+                setCurrentUser(String(user!.id))
             } catch (error) {
                 console.error("Erreur lors de la récupération de l'utilisateur courant", error)
             }
@@ -162,8 +161,7 @@ export default function FiedGeneralNeighborhood({neighborhoodId, profile, neighb
                     profileId={profile.user.id.toString()}
                     neighborhoodId={neighborhoodId}
                     profile={profile}
-                    neighborhood={neighborhood}
-                    loadPosts={loadPosts}
+                    loadPostsAction={loadPosts}
                 />
             )}
 
@@ -275,7 +273,7 @@ export default function FiedGeneralNeighborhood({neighborhoodId, profile, neighb
                                     <span>👀 Vu </span>
                                     {currentUser.toString() === post.userId.toString() && (
                                         <div className="flex gap-2">
-                                            <EditPost post={post} onUpdate={loadPosts}/>
+                                            <EditPost post={post} onUpdateAction={loadPosts}/>
                                             <Button
                                                 variant="ghost"
                                                 className="text-xs px-2 py-1"

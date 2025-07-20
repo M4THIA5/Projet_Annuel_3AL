@@ -139,12 +139,12 @@ export const getAllUsers = async (
     const {users, total, page, pageSize, totalPages} = await response.json()
     return {
         users: users.map((user: UserProfile) => ({
-            id: user.id,
-            firstName: user.firstName || '',
-            lastName: user.lastName || '',
-            email: user.email,
-            image: user.image || '',
-            roles: user.roles || []
+            id: user!.id,
+            firstName: user!.firstName || '',
+            lastName: user!.lastName || '',
+            email: user!.email,
+            image: user!.image || '',
+            roles: user!.roles || []
         })),
         total,
         page,

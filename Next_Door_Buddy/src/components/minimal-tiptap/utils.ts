@@ -50,7 +50,7 @@ export const getOutput = (
     case "html":
       return editor.isEmpty ? "" : editor.getHTML()
     default:
-      return editor.getText()
+      return editor.isEmpty ? "" : editor.getText()
   }
 }
 

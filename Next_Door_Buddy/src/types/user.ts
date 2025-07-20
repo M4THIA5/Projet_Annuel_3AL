@@ -1,4 +1,4 @@
-import {Sortie} from "#/types/sortie";
+import {Sortie} from "#/types/sortie"
 
 export type UserProfile = {
   id: number
@@ -13,7 +13,7 @@ export type UserProfile = {
   city?: string
   postalCode?: string
   sorties: Sortie[]
-}
+} | null
 
 export type Friend = {
   id: number

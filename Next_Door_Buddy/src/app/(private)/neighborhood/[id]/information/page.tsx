@@ -35,6 +35,10 @@ export default function NeighborhoodView({params}: { params: Promise<{ id: strin
             try {
                 setIsLoading(true)
                 const user = await getProfile()
+                if (!user || !user.id) {
+                    router.push('/login')
+                    return
+                }
                 const role = await getRoleInArea(Number(user.id), Number(neighborhoodId))
                 if (role !== 'admin') {
                     router.back()

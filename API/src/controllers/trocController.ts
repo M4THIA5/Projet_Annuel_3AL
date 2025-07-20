@@ -138,7 +138,6 @@ export default class TrocController {
                     content,
                     types: ["Information", "Troc"],
                     districtId: userNeighborhood.neighborhoodId,
-                    createdAt: new Date(),
                 },
             });
 
@@ -300,7 +299,6 @@ export default class TrocController {
                         content,
                         types: ["Information", "Troc"],
                         districtId: userNeighborhood.neighborhoodId,
-                        createdAt: new Date(),
                     },
                 });
             }

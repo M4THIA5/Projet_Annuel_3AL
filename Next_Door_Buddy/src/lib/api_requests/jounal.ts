@@ -1,16 +1,15 @@
 import {API} from "#/lib/api_requests/fetchRequest"
 import {getAccessToken} from "#/lib/authentification"
 import { JournalEntry } from "#/types/journal"
-import {Post} from "#/types/post";
 
-export const getJournalPageById = async (id: string): Promise<object> => {
+export const getJournalPageById = async (id: string): Promise<{content:string, types:string}> => {
     try {
         const response = await API.get('/journal/' + id, {accessToken: await getAccessToken()})
         console.log(response)
         if (!response.ok) {
             throw new Error('Failed to get page')
         }
-        const data = await response.json()
+        const data:{content:string, types:string} = await response.json()
         if (!data) {
             throw new Error('No data found')
         }

@@ -3,7 +3,6 @@ import { Button } from "#/components/ui/button"
 import { getProfile } from "#/lib/api_requests/user"
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
 
-type Props = { params: { id: string } }
 
 async function acceptReq(id: string): Promise<void> {
     await acceptRequest(id)
@@ -17,11 +16,11 @@ function update(id: string): void {
     window.location.href = `/services/${id}/update`
 }
 
-export default async function SpecificService({ params }: Props) {
-    const service = await getServiceById(Number.parseInt(params.id))
+export default async function SpecificService({params}: { params: Promise<{ id: string }> }) {
+    const service = await getServiceById(Number.parseInt((await params).id))
     const user = await getProfile()
 
-    const isOwner = user.id === service.askerId
+    const isOwner = user!.id === service.askerId
 
     return (
         <div className="max-w-2xl mx-auto py-12 px-4">
@@ -36,7 +35,7 @@ export default async function SpecificService({ params }: Props) {
                         {!isOwner && (
                             <Button
                                 variant="default"
-                                onClick={() => acceptReq(params.id)}
+                                onClick={async () => acceptReq((await params).id)}
                             >
                                 Accepter la demande
                             </Button>
@@ -46,14 +45,14 @@ export default async function SpecificService({ params }: Props) {
                             <>
                                 <Button
                                     variant="outline"
-                                    onClick={() => update(params.id)}
+                                    onClick={async () => update((await params).id)}
                                 >
                                     Modifier le service
                                 </Button>
 
                                 <Button
                                     variant="destructive"
-                                    onClick={() => deleteReq(params.id)}
+                                    onClick={async () => deleteReq((await params).id)}
                                 >
                                     Supprimer le service
                                 </Button>

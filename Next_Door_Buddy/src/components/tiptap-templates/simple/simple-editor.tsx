@@ -67,7 +67,6 @@ import {useWindowSize} from "#/hooks/use-window-size"
 import {useCursorVisibility} from "#/hooks/use-cursor-visibility"
 
 // --- Components ---
-import {ThemeToggle} from "#/components/tiptap-templates/simple/theme-toggle"
 
 // --- Lib ---
 import {handleImageUpload, MAX_FILE_SIZE} from "#/lib/tiptap-utils"
@@ -75,7 +74,7 @@ import {handleImageUpload, MAX_FILE_SIZE} from "#/lib/tiptap-utils"
 // --- Styles ---
 import "#/components/tiptap-templates/simple/simple-editor.scss"
 
-import {useEffect, useState} from "react"
+import {useState} from "react"
 // import {createJournal} from "#/lib/api_requests/jounal"
 
 const MainToolbarContent = ({
@@ -189,6 +188,7 @@ export function SimpleEditor({
     const windowSize = useWindowSize()
     const [mobileView, setMobileView] = React.useState<"main" | "highlighter" | "link">("main")
     const toolbarRef = React.useRef<HTMLDivElement>(null)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [editorContent, setEditorContent] = useState(initialContent)
 
     const editor = useEditor({

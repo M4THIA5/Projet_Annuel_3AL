@@ -36,6 +36,10 @@ export default function NeighborhoodForm({ params }: { params: Promise<{ id: str
         async function fetchNeighborhood() {
             try {
                 const user = await getProfile()
+                if (!user || !user.id) {
+                    router.push('/login')
+                    return
+                }
                 const role = await getRoleInArea(Number(user.id), Number(NeighborhoodId))
                 if (role !== 'admin') {
                     router.back()
@@ -70,7 +74,7 @@ export default function NeighborhoodForm({ params }: { params: Promise<{ id: str
         }
 
         fetchNeighborhood()
-    }, [NeighborhoodId])
+    }, [NeighborhoodId, router])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target

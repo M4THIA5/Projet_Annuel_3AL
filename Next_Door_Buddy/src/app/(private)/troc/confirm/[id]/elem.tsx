@@ -1,5 +1,5 @@
 import {Objet} from "#/types/troc"
-
+import Image from "next/image"
 
 type Props = {
     user1Name: string;
@@ -29,7 +29,7 @@ export default function TradeConfirmationPage({
                     <ul className="space-y-4">
                         {user1Items.map((item) => (
                             <li key={item.id} className="flex items-start gap-4 bg-gray-50 border border-gray-200 rounded-lg p-4">
-                                <img src={item.image} alt={item.nom} className="w-16 h-16 object-cover rounded-md" />
+                                <Image src={item.image} alt={item.nom} className="w-16 h-16 object-cover rounded-md" />
                                 <div>
                                     <h3 className="font-bold">{item.nom}</h3>
                                     <p className="text-sm text-gray-600">{item.description}</p>
@@ -45,7 +45,7 @@ export default function TradeConfirmationPage({
                     <ul className="space-y-4">
                         {user2Items.map((item) => (
                             <li key={item.id} className="flex items-start gap-4 bg-gray-50 border border-gray-200 rounded-lg p-4">
-                                <img src={item.image} alt={item.nom} className="w-16 h-16 object-cover rounded-md" />
+                                <Image src={item.image} alt={item.nom} className="w-16 h-16 object-cover rounded-md" />
                                 <div>
                                     <h3 className="font-bold">{item.nom}</h3>
                                     <p className="text-sm text-gray-600">{item.description}</p>
@@ -68,9 +68,9 @@ export default function TradeConfirmationPage({
                     onClick={onConfirm}
                     className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl shadow transition"
                 >
-                    Confirmer l'échange
+                    Confirmer l&apos;échange
                 </button>
             </div>
         </div>
-    );
+    )
 }

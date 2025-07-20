@@ -17,7 +17,6 @@ import {
   DotsHorizontalIcon,
   DownloadIcon,
   Link2Icon,
-  SizeIcon,
 } from "@radix-ui/react-icons"
 
 interface ImageActionsProps {

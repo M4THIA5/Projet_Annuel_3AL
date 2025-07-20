@@ -6,7 +6,7 @@ import {Button} from "#/components/ui/button"
 import {Label} from "#/components/ui/label"
 import Image from "next/image"
 import logo from "@/logo.png"
-import {createObjet} from "#/lib/api_requests/troc";
+import {createObjet} from "#/lib/api_requests/troc"
 
 export default function Create() {
     const [name, setName] = useState("")

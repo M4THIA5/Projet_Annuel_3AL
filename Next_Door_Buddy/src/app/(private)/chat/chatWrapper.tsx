@@ -1,6 +1,6 @@
 "use client"
 
-import {FormEvent, useEffect, useMemo, useRef, useState} from "react"
+import {FormEvent, RefObject, useEffect, useMemo, useRef, useState} from "react"
 import {MySocket, useSocket} from "./socketProvider"
 import {
     Dialog, DialogClose,
@@ -43,6 +43,7 @@ export function ChatWrapper({firstName, lastName, id}: { firstName: string, last
         if (!socket) return
 
         const handleMessage = (data: Message) => {
+            console.log("New message received:", data)
             setMessages(prev => [...prev, data])
         }
 
@@ -92,34 +93,34 @@ function ChatBody({
                       messages, user, lastMessageRef, typingStatus, reload
                   }: {
     messages: Message[]
-    user: { firstName: string; lastName: string; id: number }
-    lastMessageRef: React.RefObject<HTMLDivElement | null>
+    user: { firstName: string, lastName: string, id: number }
+    lastMessageRef: RefObject<HTMLDivElement | null>
     typingStatus: string
     reload: (value: boolean | ((prev: boolean) => boolean)) => void
 }) {
     const username = `${user.firstName} ${user.lastName}`
     const [users, setUsers] = useState<GroupUser[]>([])
-    const [selectedUsers, setSelectedUsers] = useState<number[]>([])
+    const [selectedUsers, setSelectedUsers] = useState<string[]>([])
     const [open, setOpen] = useState(false)
 
     const lockedUsers = useMemo(() => [{name: username, id: user.id}], [username, user.id])
-    const lockedUsersStr = useMemo(() => lockedUsers.map(u => u.id), [lockedUsers])
+    const lockedUsersStr = useMemo(() => lockedUsers.map(u => String(u.id)), [lockedUsers])
 
     useEffect(() => {
         const fetchUsers = async () => {
             const data = await getAllChatUsers()
-            setUsers(data.filter(u => !lockedUsersStr.includes(u.id)))
+            setUsers(data.filter(u => !lockedUsersStr.includes(String(u.id))))
             setSelectedUsers(lockedUsersStr)
         }
         fetchUsers()
     }, [lockedUsersStr])
 
-    const options = users.map(user => ({label: user.name, value: user.id}))
+    const options = users.map(user => ({label: user.name, value: String(user.id)}))
 
     const handleCreateGroupChat = async (evt: FormEvent<HTMLFormElement>) => {
         evt.preventDefault()
         const formData = new FormData(evt.currentTarget)
-        const payload: { name: string; users: string[] } = {name: '', users: []}
+        const payload: { name: string, users: string[] } = {name: '', users: []}
 
         for (const [key, value] of formData.entries()) {
             if (key === 'name') payload.name = value as string
@@ -259,25 +260,25 @@ interface ChatBarProps {
     reload: boolean
 }
 
-function ChatBar({ setCurrentRoom, reload }: ChatBarProps) {
-    const [groups, setGroups] = useState<Group[]>([]);
-    const [current, setCurrent] = useState<string>("");
+function ChatBar({setCurrentRoom, reload}: ChatBarProps) {
+    const [groups, setGroups] = useState<Group[]>([])
+    const [current, setCurrent] = useState<string>("")
 
     useEffect(() => {
         const fetchGroups = async () => {
-            const d = await getUserGroups();
-            setGroups([{ id: "", nom: "Global Chat" }, ...d]);
-        };
-        fetchGroups();
-    }, [reload]);
+            const d = await getUserGroups()
+            setGroups([{id: "", nom: "Global Chat"}, ...d])
+        }
+        fetchGroups()
+    }, [reload])
 
     function simpleHash(str: string): number {
-        let hash = 0;
-        for(let i = 0; i < str.length; i++) {
-            hash = (hash << 5) - hash + str.charCodeAt(i);
-            hash |= 0;
+        let hash = 0
+        for (let i = 0; i < str.length; i++) {
+            hash = (hash << 5) - hash + str.charCodeAt(i)
+            hash |= 0
         }
-        return Math.abs(hash);
+        return Math.abs(hash)
     }
 
     return (
@@ -320,6 +321,6 @@ function ChatBar({ setCurrentRoom, reload }: ChatBarProps) {
                 )
             })}
         </div>
-    );
+    )
 }
 

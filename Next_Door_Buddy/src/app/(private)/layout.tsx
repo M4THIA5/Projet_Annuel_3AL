@@ -8,8 +8,6 @@ import {
     NavigationMenuLink,
     navigationMenuTriggerStyle
 } from "#/components/ui/navigation-menu"
-import Icon from '@mdi/react'
-import {mdiBellOutline, mdiCog} from '@mdi/js'
 import {Avatar, AvatarFallback, AvatarImage} from "#/components/ui/avatar"
 import {UserProfile, userRole} from "#/types/user"
 import {getProfile} from "#/lib/api_requests/user"

@@ -1,6 +1,6 @@
 'use client'
 
-import {useState, useRef} from "react"
+import React, {useState, useRef, ChangeEvent} from "react"
 import {
     Dialog,
     DialogTrigger,
@@ -18,20 +18,19 @@ import {Skeleton} from "#/components/ui/skeleton"
 import {Avatar, AvatarImage, AvatarFallback} from "#/components/ui/avatar"
 import {mdiHandshake, mdiSwapHorizontal, mdiCompass, mdiPlusBox} from "@mdi/js"
 import Icon from "@mdi/react"
-import {Neighborhood} from "#/types/neighborghood";
-import {UserNeighborhood} from "#/types/user";
-import {useRouter} from "next/navigation";
+import {UserNeighborhood} from "#/types/user"
+import {useRouter} from "next/navigation"
+import {Content} from "@tiptap/react"
 
 interface PostDialogProps {
     profileId: string
     neighborhoodId: string
     profile: UserNeighborhood
-    neighborhood: Neighborhood
-    loadPosts: () => Promise<void>
+    loadPostsAction: () => Promise<void>
 }
 
-export default function AddPost({profileId, neighborhoodId, profile, neighborhood,loadPosts}: PostDialogProps) {
-    const [value, setValue] = useState<string>("")
+export default function AddPost({profileId, neighborhoodId, profile,loadPostsAction}: PostDialogProps) {
+    const [value, setValue] = useState<Content>("")
     const [formErrors, setFormErrors] = useState<Record<string, string>>({})
     const [images, setImages] = useState<File[]>([])
     const [isLoading, setIsLoading] = useState(false)
@@ -41,7 +40,7 @@ export default function AddPost({profileId, neighborhoodId, profile, neighborhoo
     const getInitials = (value: string | undefined) =>
         value ? value.split(" ").map(word => word[0]?.toUpperCase()).join("").slice(0, 2) : ""
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files
         if (!files || files.length === 0) return
 
@@ -82,18 +81,21 @@ export default function AddPost({profileId, neighborhoodId, profile, neighborhoo
     const handleSubmitPost = async () => {
         setIsLoading(true)
         try {
-            await createPost({
-                userId: profileId,
-                neighborhoodId,
-                content: value,
-                type: 'post',
-                images: images,
-            })
-            toast.success("✅ Votre post a bien été ajouté au quartier.")
-            setValue("")
-            setImages([])
-            await loadPosts()
-            dialogRef.current?.click() // Ferme le Dialog
+            if (typeof value === "string" && value.trim() !== "") {
+
+                await createPost({
+                    userId: profileId,
+                    neighborhoodId,
+                    content: value,
+                    type: 'post',
+                    images: images,
+                })
+                toast.success("✅ Votre post a bien été ajouté au quartier.")
+                setValue("")
+                setImages([])
+                await loadPostsAction()
+                dialogRef.current?.click() // Ferme le Dialog
+            }
         } catch (error) {
             toast.error("❌ Impossible de publier le post. Veuillez réessayer.")
             console.error('Erreur lors de la création du post:', error)

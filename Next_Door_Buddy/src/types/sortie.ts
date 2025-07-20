@@ -7,7 +7,7 @@ export type Sortie = {
     open:boolean
     ended:boolean
     createdAt:unknown
-    date:unknown
+    date:string
     address:string
     creatorId?:number
     creator:UserProfile

@@ -1,32 +1,24 @@
 "use client"
 
 import React, {useState, useEffect} from "react"
-import {Card, CardContent} from "#/components/ui/card"
 import {Button} from "#/components/ui/button"
-import {Input} from "#/components/ui/input"
 import {Avatar, AvatarFallback, AvatarImage} from "#/components/ui/avatar"
 import {ScrollArea} from "#/components/ui/scroll-area"
 import {Skeleton} from "#/components/ui/skeleton"
-import { ToastContainer, toast } from "react-toastify"
+import { ToastContainer } from "react-toastify"
 import {
     mdiBookOpenPageVariant,
     mdiChatOutline,
     mdiMapMarker,
     mdiLogout,
     mdiCog,
-    mdiHandshake,
-    mdiCompass,
-    mdiPlusBox,
-    mdiSwapHorizontal
 } from "@mdi/js"
 import Icon from "@mdi/react"
 import {useRouter} from "next/navigation"
-import {Search} from "lucide-react"
 import {getNeighborhood, getUsersOfNeighborhood} from "#/lib/api_requests/neighborhood"
 import {Neighborhood} from "#/types/neighborghood"
 import {getProfile} from "#/lib/api_requests/user"
 import {UserNeighborhood} from "#/types/user"
-import AddPost from "#/components/personal/AddPost"
 import FiedGeneralNeighborhood from "#/components/personal/FiedGeneralNeighborhood"
 
 
@@ -44,6 +36,10 @@ const NeighborhoodCommunityPage = ({params}: { params: Promise<{ id: string }> }
         const fetchNeighborhood = async () => {
             try {
                 const user = await getProfile()
+                if (!user || !user.id) {
+                    router.push('/login')
+                    return
+                }
                 const neighborhoodData = await getNeighborhood(NeighborhoodId)
                 setNeighborhood(neighborhoodData)
 

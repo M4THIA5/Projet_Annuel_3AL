@@ -1,7 +1,7 @@
 import {API} from "#/lib/api_requests/fetchRequest"
 import {getAccessToken} from "#/lib/authentification"
 import {DemandeTroc, Objet} from "#/types/troc"
-import {redirect} from "next/navigation";
+import {redirect} from "next/navigation"
 
 export const getObjets = async (): Promise<Objet[]> => {
     try {
@@ -104,9 +104,11 @@ export const getDemandesTroc = async (): Promise<DemandeTroc[]> => {
 
 export const createDemandeTroc = async (form: FormData): Promise<void> => {
     try {
-        const formDataJson: Record<string, any> = {}
+        const formDataJson: Record<string, string> = {}
         form.forEach((value, key) => {
-            formDataJson[key] = value
+            if (typeof value === "string") {
+                formDataJson[key] = value
+            }
         })
 
         const response = await API.post('/troc/', {accessToken: await getAccessToken(), data: formDataJson})
