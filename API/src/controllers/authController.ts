@@ -68,6 +68,7 @@ class AuthController {
                     secure: config.NODE_ENV === 'production',
                     sameSite: config.NODE_ENV === 'production' ? 'none' : 'lax',
                     path: '/',
+                    domain:'.laporteacote.online',
                     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
                 })
 
@@ -76,6 +77,7 @@ class AuthController {
                     secure: config.NODE_ENV === 'production',
                     sameSite: config.NODE_ENV === 'production' ? 'none' : 'lax',
                     path: '/',
+                    domain:'.laporteacote.online',
                     maxAge: 4 * 60 * 60 * 1000 // 4 hours
                 })
 
