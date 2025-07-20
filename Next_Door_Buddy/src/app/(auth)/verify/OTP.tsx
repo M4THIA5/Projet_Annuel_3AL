@@ -6,11 +6,10 @@ import {Button} from '#/components/ui/button'
 import {Label} from '#/components/ui/label'
 import {InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot} from '#/components/ui/input-otp'
 import {resendOtp, verifyOtp} from '#/lib/api_requests/user'
-import {useRouter, useSearchParams} from 'next/navigation'
+import {redirect, useRouter, useSearchParams} from 'next/navigation'
 import {Routes} from '#/Routes'
 
 export default function OTPForm() {
-    const router = useRouter()
     const searchParams = useSearchParams()
     const email = searchParams.get('email') ?? ''
     const [code, setCode] = useState('')
@@ -38,7 +37,7 @@ export default function OTPForm() {
         setError('')
         try {
             await verifyOtp({email, otp: code})
-            router.push(Routes.neighborhood.toString())
+            redirect(Routes.neighborhood.toString())
         } catch (err) {
             console.error(err)
             setError('Verification failed.')
