@@ -1,6 +1,12 @@
 # dependencies
 node_modules/
 dist/
+# dependencies
+prisma/mongodb/client/
+prisma/postgre/client/
+prisma/sqlite/client/
+prisma/sqlite/data.db
+build
 
 # Prisma client génération
 prisma/**/*Client/

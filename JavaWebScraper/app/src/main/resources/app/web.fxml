@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.WebScrapController">
+    <top>
+        <MenuBar>
+            <Menu text="_File">
+                <MenuItem fx:id="Save" onAction="#notImplemented" text="Save" />
+                <MenuItem fx:id="Exit" onAction="#exit" text="Exit" />
+            </Menu>
+            <Menu text="_Edit">
+                <MenuItem fx:id="Cut" onAction="#notImplemented" text="Cut" />
+                <MenuItem fx:id="Copy" onAction="#notImplemented" text="Copy" />
+                <MenuItem fx:id="Paste" onAction="#notImplemented" text="Paste" />
+            </Menu>
+            <Menu fx:id="options" text="_Options">
+                <MenuItem fx:id="changeThemeItem" mnemonicParsing="false" text="Change Theme"/>
+                <MenuItem mnemonicParsing="false" text="Plugins" onAction="#showPlugins"/>
+                <MenuItem mnemonicParsing="false" text="Something"/>
+            </Menu>
+            <Menu text="_Help">
+                <MenuItem fx:id="Show" onAction="#showShortcuts" text="Show shortcuts" />
+                <MenuItem fx:id="About" onAction="#showAbout" text="About" />
+            </Menu>
+        </MenuBar>
+    </top>
+    <center>
+        <VBox alignment="TOP_CENTER" spacing="20.0" fx:id="baseVBOX">
+            <TabPane fx:id="tabPane">
+                <Tab fx:id="searcher" closable="false" text="Form">
+                    <GridPane hgap="10" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="458.0" prefWidth="856.0" styleClass="page" vgap="10">
+                        <Text text="Welcome">Welcome</Text>
+                  <Label text="Mots-clés" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                         <TextField fx:id="keyword" maxHeight="1.7976931348623157E308" prefHeight="0.0" prefWidth="358.0" GridPane.rowIndex="2" />
+                        <Text fx:id="errors"/>
+                        <Button fx:id="btn" onAction="#click" prefHeight="46.0" prefWidth="451.0" styleClass="btn, btn-success" text="Rechercher" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" />
+                  <columnConstraints>
+                     <ColumnConstraints />
+                  </columnConstraints>
+                  <rowConstraints>
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                  </rowConstraints>
+                  <padding>
+                     <Insets top="10.0" />
+                  </padding>
+                    </GridPane>
+                </Tab>
+            </TabPane>
+        </VBox>
+    </center>
+</BorderPane>

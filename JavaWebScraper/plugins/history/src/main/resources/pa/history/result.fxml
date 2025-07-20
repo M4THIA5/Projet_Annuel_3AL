@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12">
+    <TextArea fx:id="text" wrapText="true" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0" />
+    <Button fx:id="copyBtn" onAction="#saveValueClipBoard" prefHeight="26.0" prefWidth="185.0" text="Copy" GridPane.columnIndex="0" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" />
+    <Button fx:id="saveBtn" onAction="#saveInFile" prefHeight="26.0" prefWidth="162.0" text="Save" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+   <columnConstraints>
+      <ColumnConstraints maxWidth="325.0" minWidth="234.00001525878906" prefWidth="236.00001525878906" />
+      <ColumnConstraints maxWidth="233.79998474121095" minWidth="142.8" prefWidth="231.79998474121095" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+   </rowConstraints>
+</GridPane>

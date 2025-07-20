@@ -1,0 +1,43 @@
+.root {
+    -fx-background-color: #000000;
+    -fx-font-family: "Segoe UI";
+}
+
+.label {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+.button {
+    -fx-background-color: #ffff00;
+    -fx-text-fill: #000000;
+    -fx-border-radius: 5;
+}
+
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ff0000;
+    -fx-text-fill: #000000;
+}
+
+.tab-pane {
+    -fx-background-color: #1a1a1a;
+}
+
+.menu-bar {
+    -fx-background-color: #333333;
+}
+
+.menu {
+    -fx-text-fill: #ffffff;
+    -fx-background-color: #000000;
+}
+
+.menu-item:focused {
+    -fx-background-color: #ffff00;
+    -fx-text-fill: #000000;
+}
+
+.context-menu {
+    -fx-background-color: #000000;
+}

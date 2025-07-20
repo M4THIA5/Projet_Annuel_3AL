@@ -1,0 +1,77 @@
+.root {
+    -fx-background-color: #000000;
+    -fx-font-family: "Courier New";
+    -fx-text-fill: #00FF00;
+}
+
+/* Labels, texte, etc. */
+.label {
+    -fx-text-fill: #00FF00;
+    -fx-font-weight: bold;
+}
+
+.button {
+    -fx-background-color: black;
+    -fx-text-fill: #00FF00;
+    -fx-border-color: #00FF00;
+    -fx-border-radius: 3;
+    -fx-background-insets: 0;
+}
+
+.button:hover {
+    -fx-background-color: #003300;
+}
+
+.text-field {
+    -fx-background-color: black;
+    -fx-text-fill: #00FF00;
+    -fx-border-color: #00FF00;
+}
+
+/* Menu bar & menus */
+.menu-bar {
+    -fx-background-color: black;
+}
+
+.menu {
+    -fx-text-fill: #00FF00;
+    -fx-background-color: black;
+}
+
+.menu-item {
+    -fx-text-fill: #00FF00;
+    -fx-background-color: black;
+}
+
+.menu-item:focused {
+    -fx-background-color: #003300;
+    -fx-text-fill: #00FF00;
+}
+
+.context-menu {
+    -fx-background-color: black;
+}
+
+/* Tabs */
+.tab-pane {
+    -fx-background-color: black;
+}
+
+.tab {
+    -fx-background-color: #000000;
+    -fx-text-base-color: #00FF00;
+}
+
+.tab:selected {
+    -fx-background-color: #003300;
+    -fx-text-base-color: #00FF00;
+}
+
+/* Scrollbar, optional */
+.scroll-bar {
+    -fx-background-color: black;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #00FF00;
+}
