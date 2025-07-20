@@ -39,3 +39,16 @@ export const isAdmin = (token?: string): boolean => {
     return false
   }
 }
+
+export const getUserIdFromJwt = (token?: string): number | null => {
+  if (!token) {
+    return null
+  }
+  try {
+    const decodedToken = jwtDecode<JwtPayload & { userId?: number }>(token)
+    return decodedToken.userId ?? null
+  } catch (error) {
+    console.error("Error decoding token:", error)
+    return null
+  }
+}

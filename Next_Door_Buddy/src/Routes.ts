@@ -30,6 +30,9 @@ export const Routes = {
     },
     neighborhood: {
         toString: () => "/neighborhood" as const,
+        id: {
+            toString: (id: string) => `/neighborhood/${id}` as const,
+        },
     },
     chat: {
         toString: () => "/chat" as const,

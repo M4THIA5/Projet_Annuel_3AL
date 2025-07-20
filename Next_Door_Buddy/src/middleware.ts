@@ -1,7 +1,8 @@
 import { isAuthenticated } from "#/lib/authentification"
 import { Routes } from "#/Routes"
 import { NextRequest, NextResponse } from "next/server"
-import { isAdmin } from "./lib/config"
+import { getUserIdFromJwt, isAdmin } from "./lib/config"
+import { getNeighborhoodsOfUser } from "./lib/api_requests/neighborhood"
 
 const PUBLIC_ROUTES = [
   Routes.auth.login.toString(),
@@ -19,15 +20,27 @@ export async function middleware(req: NextRequest) {
     const pls = req.nextUrl.pathname.replace('/','').length > 0 ? "?return_to="+ req.nextUrl.pathname.replace('/',''): ''
     return NextResponse.redirect(new URL(Routes.auth.login.toString()+pls, req.url))
   }
-  if (isAuth && isPublicRoute) {
-    return NextResponse.redirect(new URL(Routes.home.toString(), req.url))
+
+  const refreshToken = req.cookies.get('refreshToken')?.value
+  const userId = getUserIdFromJwt(refreshToken)
+  if (isAuth && isPublicRoute && userId) {
+
+    const neighborhoods = await getNeighborhoodsOfUser(userId)
+    if (neighborhoods.length > 0) {
+      return NextResponse.redirect(new URL(Routes.neighborhood.id.toString(String(neighborhoods[0].id)), req.url))
+    }
+    return NextResponse.redirect(new URL(Routes.neighborhood.toString(), req.url))
   }
 
   if (isAuth && isAdminRoute) {
     const refreshToken = req.cookies.get('refreshToken')?.value
 
-    if (!isAdmin(refreshToken)) {
-      return NextResponse.redirect(new URL(Routes.home.toString(), req.url))
+    if (!isAdmin(refreshToken) && userId) {
+      const neighborhoods = await getNeighborhoodsOfUser(userId)
+      if (neighborhoods.length > 0) {
+        return NextResponse.redirect(new URL(Routes.neighborhood.id.toString(String(neighborhoods[0].id)), req.url))
+      }
+      return NextResponse.redirect(new URL(Routes.neighborhood.toString(), req.url))
     }
   }
   return NextResponse.next()

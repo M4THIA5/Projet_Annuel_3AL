@@ -15,8 +15,9 @@ import {Input} from "#/components/ui/input"
 import {loginFormData, loginUser} from "#/lib/api_requests/auth"
 
 import {Routes} from "#/Routes"
-import {isTokenValid} from "#/lib/config"
+import {getUserIdFromJwt, isTokenValid} from "#/lib/config"
 import {Mail, Lock} from "lucide-react"
+import { getNeighborhoodsOfUser } from "#/lib/api_requests/neighborhood"
 
 export default function SigninPage() {
     const [isLoading, setIsLoading] = useState(false)
@@ -51,7 +52,18 @@ export default function SigninPage() {
             if (returnTo) {
                 router.push(returnTo)
             } else {
-                router.push(Routes.home.toString())
+                const userId = await getUserIdFromJwt(accessToken)
+                if (!userId) {
+                    router.push(Routes.neighborhood.toString())
+                    return
+                }
+                const neighborhoods = await getNeighborhoodsOfUser(userId)
+                if (neighborhoods.length > 0) {
+                    router.push(Routes.neighborhood.id.toString(String(neighborhoods[0].id)))
+                }
+                else {
+                    router.push(Routes.neighborhood.toString())
+                }
             }
         } catch (error) {
             console.error(error)

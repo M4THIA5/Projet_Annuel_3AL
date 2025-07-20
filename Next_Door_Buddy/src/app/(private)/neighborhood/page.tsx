@@ -8,6 +8,7 @@ import {Neighborhood} from "#/types/neighborghood"
 import { useRouter } from 'next/navigation'
 import {getProfile} from "#/lib/api_requests/user"
 import { Skeleton } from "#/components/ui/skeleton"
+import { Routes } from "#/Routes"
 
 export default function NeighborhoodsPage() {
     const router = useRouter()
@@ -16,7 +17,7 @@ export default function NeighborhoodsPage() {
     const [neighborhoodsAround, setNeighborhoodsAround] = useState<Neighborhood[]>([])
 
     const handleClick = (n :Neighborhood) => {
-        router.push(`/neighborhood/${n.id}`)
+        router.push(Routes.neighborhood.id.toString(String(n.id)))
     }
 
     useEffect(() => {
