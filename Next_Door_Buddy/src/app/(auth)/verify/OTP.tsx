@@ -6,7 +6,7 @@ import {Button} from '#/components/ui/button'
 import {Label} from '#/components/ui/label'
 import {InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot} from '#/components/ui/input-otp'
 import {resendOtp, verifyOtp} from '#/lib/api_requests/user'
-import {redirect, useRouter, useSearchParams} from 'next/navigation'
+import {redirect, useSearchParams} from 'next/navigation'
 import {Routes} from '#/Routes'
 
 export default function OTPForm() {

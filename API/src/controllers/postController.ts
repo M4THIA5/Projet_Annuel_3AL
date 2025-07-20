@@ -1,5 +1,5 @@
-import { Request, RequestHandler, Response } from "express";
-import { PrismaClient as MongoClient } from "../../prisma/client/mongoClient";
+import {Request, RequestHandler, Response} from "express";
+import {PrismaClient as MongoClient} from "../../prisma/client/mongoClient";
 import {
     createValidator,
     idValidator,
@@ -12,13 +12,13 @@ const postgresClient = new PostgresClient()
 export default class PostController {
     getAll: RequestHandler = async (_: Request, res: Response) => {
         const posts = await db.post.findMany();
-        res.status(200).send({ data: posts });
+        res.status(200).send({data: posts});
     };
 
     getOne: RequestHandler = async (req: Request, res: Response) => {
         const validator = idValidator.validate(req.query);
         if (validator.error != undefined) {
-            res.status(400).send({ error: validator.error.message });
+            res.status(400).send({error: validator.error.message});
             return;
         }
         const id = validator.value.id;
@@ -27,19 +27,19 @@ export default class PostController {
                 id: id,
             },
         });
-        res.status(200).send({ data: post });
+        res.status(200).send({data: post});
     };
 
     getByNeighborhood: RequestHandler = async (req: Request, res: Response) => {
         const neighborhoodId = req.params.neighborhoodId;
         try {
             const posts = await db.post.findMany({
-                where: { neighborhoodId },
+                where: {neighborhoodId},
             });
             const userIds = [...new Set(posts.map(p => Number(p.userId)))];
 
             const users = await postgresClient.user.findMany({
-                where: { id: { in: userIds } },
+                where: {id: {in: userIds}},
                 select: {
                     id: true,
                     email: true,
@@ -67,18 +67,18 @@ export default class PostController {
             res.status(200).send(formattedPosts);
         } catch (error) {
             console.error(error);
-            res.status(500).send({ error: "An error occurred while fetching posts." });
+            res.status(500).send({error: "An error occurred while fetching posts."});
         }
     };
 
 
     create: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        const { error, value } = createValidator.validate(req.body);
+        const {error, value} = createValidator.validate(req.body);
         console.log(value)
 
         if (error) {
             console.log(error.message);
-            res.status(400).send({ error: error.message });
+            res.status(400).send({error: error.message});
             return;
         }
 
@@ -94,7 +94,7 @@ export default class PostController {
                 images: imageUrls,
             };
 
-            await db.post.create({ data: postData });
+            await db.post.create({data: postData});
 
             const full = await postgresClient.user.findUniqueOrThrow({
                 where: {id: Number(value.userId)},
@@ -117,10 +117,10 @@ export default class PostController {
                 },
             });
             console.log("Resource created")
-            res.status(201).send({ message: "Resource created" });
+            res.status(201).send({message: "Resource created"});
         } catch (err) {
             console.error("Erreur lors du traitement des images :", err);
-            res.status(500).send({ error: "Erreur lors de la création du post" });
+            res.status(500).send({error: "Erreur lors de la création du post"});
         }
     };
 
@@ -130,11 +130,11 @@ export default class PostController {
 
         try {
             const existingPost = await db.post.findUnique({
-                where: { id: postId },
+                where: {id: postId},
             });
 
             if (!existingPost) {
-                res.status(404).send({ error: "Post non trouvé" });
+                res.status(404).send({error: "Post non trouvé"});
                 return;
             }
 
@@ -147,30 +147,30 @@ export default class PostController {
             const updatedImages = [...keptImages, ...newImageUrls];
 
             const postData = {
-                userId : existingPost.userId,
-                type : req.body.type ?? existingPost.type,
-                neighborhoodId : existingPost.neighborhoodId,
-                createdAt : existingPost.createdAt,
+                userId: existingPost.userId,
+                type: req.body.type ?? existingPost.type,
+                neighborhoodId: existingPost.neighborhoodId,
+                createdAt: existingPost.createdAt,
                 content: req.body.content ?? existingPost.content,
                 images: updatedImages,
             };
 
             const updatedPost = await db.post.update({
-                where: { id: postId },
+                where: {id: postId},
                 data: postData,
             });
 
-            res.status(200).send({ message: "Resource updated", post: updatedPost });
+            res.status(200).send({message: "Resource updated", post: updatedPost});
         } catch (err) {
             console.error("Erreur lors de la mise à jour :", err);
-            res.status(500).send({ error: "Erreur lors de la mise à jour du post" });
+            res.status(500).send({error: "Erreur lors de la mise à jour du post"});
         }
     };
 
     delete: RequestHandler = async (req: Request, res: Response) => {
         const validator = idValidator.validate(req.params);
         if (validator.error != undefined) {
-            res.status(400).send({ error: validator.error.message });
+            res.status(400).send({error: validator.error.message});
             return;
         }
         const id = validator.value.id;
