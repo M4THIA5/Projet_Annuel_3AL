@@ -6,8 +6,8 @@ import {Badge} from "#/components/ui/badge"
 import {Skeleton} from "../ui/skeleton"
 import {Avatar, AvatarFallback, AvatarImage} from "#/components/ui/avatar"
 import {Button} from "#/components/ui/button"
-import Lightbox from "react-image-lightbox"
-import "react-image-lightbox/style.css"
+
+
 import EditPost from "#/components/personal/EditPost"
 import {getProfile} from "#/lib/api_requests/user"
 import  {UserNeighborhood} from "#/types/user"
@@ -18,6 +18,8 @@ import {Neighborhood} from "#/types/neighborghood"
 import AddPost from "#/components/personal/AddPost"
 import SafeHtmlRenderer from "#/components/personal/SafeHtmlRenderer"
 import {useRouter} from "next/navigation"
+import Lightbox from "yet-another-react-lightbox"
+import "yet-another-react-lightbox/styles.css"
 
 
 interface PostFieldDialogProps {
