@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -20,6 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import io.github.cdimascio.dotenv.DotenvException;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import static java.lang.Thread.sleep;
 
@@ -53,26 +56,31 @@ public class WebScrapper {
         for (int attempt = 0; attempt < 3; attempt++) {
             try {
                 WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(7));
-                wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("p")));
+                elements = wait.until(ExpectedConditions.refreshed(
+                        ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//*[self::p or self::h1 or self::h2 or self::li or self::div]"))
+                ));
 
-                elements = driver.findElements(By.xpath("//*[self::p or self::h1 or self::h2 or self::li or self::div]"));
 
 //            elements = driver.findElements(By.tagName("p")); // Récupère tous les <p>
 //            elements.addAll(driver.findElements(By.tagName("h1")));
 //            elements.addAll(driver.findElements(By.tagName("h2")));
 //            elements.addAll(driver.findElements(By.tagName("li")));
+                for (WebElement element : elements) {
+                    String text = element.getText().trim();
+                    for (String keyword : keywords) {
+                        if (!text.isEmpty() && text.toLowerCase().contains(keyword.toLowerCase()) && text.length() > 30) {
+                            paragraphs.add(text); // Garde les paragraphes contenant le mot-clé
+                        }
+
+                    }
+                }
             } catch (StaleElementReferenceException e) {
                 // System.out.println("erreur");
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            for (WebElement element : elements) {
-                String text = element.getText().trim();
-                for (String keyword : keywords) {
-                    if (!text.isEmpty() && text.toLowerCase().contains(keyword.toLowerCase()) && text.length() > 30) {
-                        paragraphs.add(text); // Garde les paragraphes contenant le mot-clé
-                    }
-
+            } catch (TimeoutException e) {
+                try {
+                    sleep(1000); // Attendre un peu avant de réessayer
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt(); // Restaurer l'état d'interruption
                 }
             }
             if (!paragraphs.isEmpty()) {
