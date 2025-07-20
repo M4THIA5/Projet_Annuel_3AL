@@ -66,7 +66,7 @@ class AuthController {
                 res.cookie(refreshTokenName, refreshToken, {
                     httpOnly: true,
                     secure: config.NODE_ENV === 'production',
-                    sameSite: 'lax',
+                    sameSite: config.NODE_ENV === 'production' ? 'none' : 'lax',
                     path: '/',
                     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
                 })
@@ -74,7 +74,7 @@ class AuthController {
                 res.cookie(accessTokenName, accessToken, {
                     httpOnly: true,
                     secure: config.NODE_ENV === 'production',
-                    sameSite: 'lax',
+                    sameSite: config.NODE_ENV === 'production' ? 'none' : 'lax',
                     path: '/',
                     maxAge: 4 * 60 * 60 * 1000 // 4 hours
                 })
@@ -384,7 +384,7 @@ class AuthController {
             res.cookie(accessTokenName, accessToken, {
                 httpOnly: true,
                 secure: config.NODE_ENV === 'production',
-                sameSite: 'lax',
+                sameSite: config.NODE_ENV === 'production' ? 'none' : 'lax',
                 path: '/',
                 maxAge: 4 * 60 * 60 * 1000 // 4 hours
             })
