@@ -183,7 +183,7 @@ export const registerUser = async (data: RegisterUserData): Promise<Response> =>
     return response
 }
 
-export const verifyOtp = async (data: VerifyOtpData): Promise<Response> => {
+export const verifyOtp = async (data: VerifyOtpData): Promise<boolean> => {
     const response = await API.post('/verify-otp', {
         accessToken: await getAccessToken(),
         data,
@@ -191,11 +191,11 @@ export const verifyOtp = async (data: VerifyOtpData): Promise<Response> => {
     if (!response.ok) {
         const errorData = await response.json()
         if (response.status === 400 && errorData.error ==="OTP déjà vérifié"){
-            return response
+            return true
         }
         throw new Error(errorData.error || 'Échec de la vérification du code OTP')
     }
-    return response
+    return true
 }
 
 export const resendOtp = async (data: ResendOtpData): Promise<Response> => {

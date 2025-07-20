@@ -36,8 +36,7 @@ export default function OTPForm() {
         setIsVerifying(true)
         setError('')
         try {
-            await verifyOtp({email, otp: code})
-            redirect(Routes.neighborhood.toString())
+            return await verifyOtp({email, otp: code})
         } catch (err) {
             console.error(err)
             setError('Verification failed.')
@@ -47,7 +46,10 @@ export default function OTPForm() {
     }
     useEffect(() => {
         if (code.length === 6) {
-            handleSubmit(code)
+            handleSubmit(code).then((res)=> {
+                setCode('')
+                if (res) redirect(Routes.neighborhood.toString())
+            })
         }
     }, [code, handleSubmit])
 
