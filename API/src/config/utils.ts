@@ -1,4 +1,4 @@
-export const accessTokenExpiration = '10m'
+export const accessTokenExpiration = '4h'
 export const refreshTokenExpiration = '7d'
 
 export const refreshTokenName = 'refreshToken'
