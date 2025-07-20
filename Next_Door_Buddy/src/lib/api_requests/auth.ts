@@ -27,10 +27,8 @@ export const loginUser = async (loginData: LoginFormData): Promise<{ accessToken
 
 export const logout = async (accessToken: string): Promise<void> => {
   try {
-    const response = await API.post('/logout', { accessToken })
-    if (!response.ok) {
-      await deleteTokens()
-    }
+    await API.post('/logout', { accessToken })
+    await deleteTokens()
   } catch (error) {
     console.error('Error during logout:', error)
   }
