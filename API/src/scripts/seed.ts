@@ -1,7 +1,6 @@
 import { PrismaClient as PostgresClient } from '../../prisma/client/postgresClient'
 import { PrismaClient as MongoClient } from '../../prisma/client/mongoClient'
 import { User } from '../neo4j/neogma'
-import { seedMongo } from './seed_mongo'
 import { seedPostgres } from './seed_postgres'
 
 const postgresql = new PostgresClient()
@@ -9,7 +8,6 @@ const mongo = new MongoClient()
 
 async function main() {
   await seedPostgres()
-  await seedMongo()
 
   const allUsers = await postgresql.user.findMany({
     select: {

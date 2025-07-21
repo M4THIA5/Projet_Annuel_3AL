@@ -163,6 +163,8 @@ export const seedPostgres = async () => {
   const objetsData = JSON.parse(fs.readFileSync(objetsPath, 'utf-8'))
 
   for (const objet of objetsData) {
+  const imagePath = path.resolve(__dirname, './postgres_data/', objet.image)
+  const imageData = fs.readFileSync(imagePath, 'utf-8')
     await postgresql.objet.upsert({
       where: { id: objet.id },
       update: {},
@@ -171,6 +173,7 @@ export const seedPostgres = async () => {
         description: objet.description,
         userId: objet.userId,
         TrocId: objet.TrocId,
+        image: imageData || null,
       }
     })
   }
